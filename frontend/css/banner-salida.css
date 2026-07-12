@@ -1,0 +1,282 @@
+/* Banner "Sobre Así Salgo!": alguien recorre, en una sola línea de tiempo,
+   las cuatro escenas reales de "El Viaje" (mismo trazo que las tarjetas del
+   formulario). Cada estación se enciende justo cuando la persona pasa por
+   delante, como si su paso encendiera un reflector. */
+
+.banner-salida {
+    background: linear-gradient(180deg,
+            color-mix(in srgb, var(--texto-secundario) 6%, transparent),
+            transparent 75%);
+    border: 1px solid var(--linea);
+    border-radius: var(--radio-card);
+    margin: 28px 0 40px;
+    overflow: hidden;
+    padding: 6px 6px 0;
+}
+
+.banner-salida__svg {
+    display: block;
+    height: auto;
+    width: 100%;
+}
+
+.banner-salida__leyenda {
+    color: var(--texto-tenue);
+    font-size: .78rem;
+    padding: 10px 18px 18px;
+    text-align: center;
+}
+
+/* --- Línea de tiempo --- */
+
+.banner-suelo,
+.banner-suelo-marca {
+    fill: none;
+    stroke: var(--linea-fuerte);
+    stroke-linecap: round;
+    stroke-width: 1.4;
+    vector-effect: non-scaling-stroke;
+}
+
+.banner-suelo-marca {
+    opacity: .8;
+}
+
+/* --- Escenas (mismo lenguaje que .arte-trazo / .escena-* de El Viaje) --- */
+
+.banner-estacion {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+}
+
+.banner-estacion--1 {
+    --color-estacion: var(--color-desenchufarme);
+}
+
+.banner-estacion--2 {
+    --color-estacion: var(--color-sentirlo);
+}
+
+.banner-estacion--3 {
+    --color-estacion: var(--color-conectar);
+}
+
+.banner-estacion--4 {
+    --color-estacion: var(--color-misterio);
+}
+
+.banner-arte-trazo {
+    color: var(--color-estacion);
+    fill: none;
+    opacity: .58;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.6;
+    vector-effect: non-scaling-stroke;
+}
+
+.banner-arte-detalle {
+    fill: none;
+    opacity: .4;
+    stroke: var(--texto-secundario);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+}
+
+.banner-acento-linea {
+    fill: none;
+    opacity: .35;
+    stroke: var(--texto-secundario);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.4;
+    vector-effect: non-scaling-stroke;
+}
+
+.banner-acento-forma {
+    fill: var(--texto-secundario);
+    opacity: .22;
+    stroke: none;
+}
+
+/* El paso de la persona "enciende" cada estación con el color de su energía. */
+.banner-estacion--1 {
+    animation: banner-resaltar-1 16s linear infinite;
+}
+
+.banner-estacion--2 {
+    animation: banner-resaltar-2 16s linear infinite;
+}
+
+.banner-estacion--3 {
+    animation: banner-resaltar-3 16s linear infinite;
+}
+
+.banner-estacion--4 {
+    animation: banner-resaltar-4 16s linear infinite;
+}
+
+/* --- La persona --- */
+
+.banner-corredor {
+    animation: banner-recorrer 16s linear infinite;
+    color: var(--texto-principal);
+}
+
+.corredor-rebote {
+    animation: banner-rebote .38s ease-in-out infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+.corredor-cabeza {
+    fill: currentColor;
+    stroke: none;
+}
+
+.corredor-cuerpo {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2.2;
+    vector-effect: non-scaling-stroke;
+}
+
+.corredor-estela {
+    fill: none;
+    opacity: .3;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+}
+
+/* --- Animaciones --- */
+
+@keyframes banner-rebote {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-2.5px);
+    }
+}
+
+@keyframes banner-recorrer {
+    0% {
+        opacity: 0;
+        transform: translate(60px, 146px);
+    }
+
+    4% {
+        opacity: 1;
+    }
+
+    96% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(760px, 146px);
+    }
+}
+
+@keyframes banner-resaltar-1 {
+
+    0%,
+    6%,
+    14%,
+    100% {
+        filter: none;
+        transform: scale(1);
+    }
+
+    10% {
+        filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-estacion) 65%, transparent));
+        transform: scale(1.06);
+    }
+}
+
+@keyframes banner-resaltar-2 {
+
+    0%,
+    33%,
+    41%,
+    100% {
+        filter: none;
+        transform: scale(1);
+    }
+
+    37% {
+        filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-estacion) 65%, transparent));
+        transform: scale(1.06);
+    }
+}
+
+@keyframes banner-resaltar-3 {
+
+    0%,
+    60%,
+    68%,
+    100% {
+        filter: none;
+        transform: scale(1);
+    }
+
+    64% {
+        filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-estacion) 65%, transparent));
+        transform: scale(1.06);
+    }
+}
+
+@keyframes banner-resaltar-4 {
+
+    0%,
+    87%,
+    95%,
+    100% {
+        filter: none;
+        transform: scale(1);
+    }
+
+    91% {
+        filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-estacion) 65%, transparent));
+        transform: scale(1.06);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .banner-estacion--1,
+    .banner-estacion--2,
+    .banner-estacion--3,
+    .banner-estacion--4,
+    .banner-corredor,
+    .corredor-rebote {
+        animation: none;
+    }
+
+    .banner-corredor {
+        opacity: 1;
+        transform: translate(320px, 146px);
+    }
+
+    .banner-arte-trazo {
+        opacity: .8;
+    }
+}
+
+@media (max-width: 640px) {
+    .banner-salida__leyenda {
+        font-size: .74rem;
+        padding: 8px 14px 14px;
+    }
+}

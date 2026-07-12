@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto — Así Salgo!</title>
+    <meta name="description"
+        content="Sumate a las novedades de Así Salgo! Contanos qué tipo de salidas te interesan y te avisamos de las próximas.">
+    <meta property="og:title" content="Contacto — Así Salgo!">
+    <meta property="og:description" content="Sumate a las novedades de salidas culturales en Rosario y Buenos Aires.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="css/paginas.css">
+    <link rel="stylesheet" href="css/banner-salida.css">
+    <link rel="stylesheet" href="css/banner-contacto.css">
+</head>
+
+<body data-pagina="contacto">
+
+    <div id="nav-raiz" class="nav-sitio"></div>
+
+    <main class="pagina pagina-contacto">
+        <header class="pagina-hero pagina-hero--chica">
+            <p class="eyebrow">Contacto</p>
+            <h1>Sumate a las próximas salidas.</h1>
+            <p class="pagina-hero__lead">
+                Dejanos tu correo y contanos qué tipo de planes te interesan. Para ver planes de otros en vivo,
+                andá a <a href="salen.html">A dónde salen</a>.
+            </p>
+        </header>
+
+        <figure class="banner-salida" aria-hidden="true">
+            <svg class="banner-salida__svg" viewBox="0 0 820 170" role="presentation" focusable="false">
+                <defs>
+                    <radialGradient id="brillo-correo">
+                        <stop class="banner-correo-centro" offset="0%" />
+                        <stop class="banner-correo-borde" offset="100%" />
+                    </radialGradient>
+                </defs>
+
+                <!-- Ondas de aviso: lo que vas a recibir de vuelta -->
+                <circle class="banner-onda banner-onda--1" cx="410" cy="92" r="44" />
+                <circle class="banner-onda banner-onda--2" cx="410" cy="92" r="44" />
+                <circle class="banner-onda banner-onda--3" cx="410" cy="92" r="44" />
+
+                <!-- El sobre: donde llega tu correo -->
+                <g class="banner-sobre">
+                    <circle class="banner-sobre-brillo" cx="410" cy="92" r="46" fill="url(#brillo-correo)" />
+                    <path class="banner-destello"
+                        d="M410 58 L413 68 L423 71 L413 74 L410 84 L407 74 L397 71 L407 68 Z" />
+                    <rect class="banner-sobre-cuerpo" x="368" y="65" width="84" height="54" rx="4" />
+                    <path class="banner-sobre-solapa" d="M368 65 L410 100 L452 65" />
+                </g>
+
+                <!-- El mensaje viajando hacia el sobre -->
+                <g class="banner-avion">
+                    <path class="avion-cuerpo" d="M-9 -6 L9 0 L-9 6 L-4 0 Z" />
+                    <path class="avion-pliegue" d="M-4 0 L2 -2" />
+                </g>
+            </svg>
+            <figcaption class="banner-salida__leyenda">Un mensaje corto, sin spam: te avisamos solo cuando valga la pena salir.</figcaption>
+        </figure>
+
+        <form class="formulario" id="form-contacto" novalidate>
+            <div class="campo">
+                <label for="campo-nombre">Nombre <span class="campo__opcional">(opcional)</span></label>
+                <input type="text" id="campo-nombre" name="nombre" autocomplete="name" maxlength="80">
+            </div>
+
+            <div class="campo">
+                <label for="campo-email">Email</label>
+                <input type="email" id="campo-email" name="email" autocomplete="email" required aria-describedby="error-email">
+                <p class="campo__error" id="error-email" aria-live="polite"></p>
+            </div>
+
+            <div class="campo">
+                <label for="campo-ciudad">Ciudad</label>
+                <select id="campo-ciudad" name="ciudad">
+                    <option value="rosario">Rosario</option>
+                    <option value="buenos-aires">Buenos Aires</option>
+                </select>
+            </div>
+
+            <fieldset class="campo campo--grupo">
+                <legend>¿Qué tipo de salidas te interesan? <span class="campo__opcional">(opcional)</span></legend>
+                <div class="opciones-checkbox">
+                    <label class="checkbox"><input type="checkbox" name="intereses" value="desenchufarme"> Desenchufarme</label>
+                    <label class="checkbox"><input type="checkbox" name="intereses" value="sentirlo"> Sentirlo</label>
+                    <label class="checkbox"><input type="checkbox" name="intereses" value="conectar"> Conectar</label>
+                    <label class="checkbox"><input type="checkbox" name="intereses" value="misterio"> Misterio</label>
+                </div>
+            </fieldset>
+
+            <button class="cta-principal" type="submit" id="btn-enviar">
+                Sumarme a las salidas <span aria-hidden="true">→</span>
+            </button>
+        </form>
+
+        <section class="salen-teaser">
+            <h2>A dónde salen</h2>
+            <p>
+                Mirá los planes que otros publicaron y sumate con <strong>Me sumo</strong> — sin likes,
+                sin presión. Si encontrás algo en El Viaje, podés decir que vas desde la tarjeta del evento.
+            </p>
+            <a class="cta-principal cta-principal--secundario" href="salen.html">Ver la comunidad →</a>
+        </section>
+    </main>
+
+    <footer id="pie-raiz" class="pie-sitio"></footer>
+
+    <script src="js/nav.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/contacto.js"></script>
+</body>
+
+</html>

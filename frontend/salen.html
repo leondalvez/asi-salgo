@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A dónde salen — Así Salgo!</title>
+    <meta name="description"
+        content="Mirá a dónde salen otras personas en Rosario o Buenos Aires y sumate con un clic. Sin likes, sin scroll: solo planes reales para salir juntos.">
+    <meta property="og:title" content="A dónde salen — Así Salgo!">
+    <meta property="og:description" content="Planes de la comunidad para salir en grupo. Publicá el tuyo o apretá Me sumo.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="css/paginas.css">
+    <link rel="stylesheet" href="css/salen.css">
+</head>
+
+<body data-pagina="salen">
+
+    <div id="nav-raiz" class="nav-sitio"></div>
+
+    <main class="pagina pagina-salen">
+        <header class="pagina-hero pagina-hero--chica">
+            <p class="eyebrow">Comunidad</p>
+            <h1>A dónde salen.</h1>
+            <p class="pagina-hero__lead">
+                Mirá los planes que otros armaron y sumate si te pinta. Sin likes ni rankings: solo un
+                <strong>Me sumo</strong> para decir que vas.
+            </p>
+        </header>
+
+        <section class="salen-herramientas" aria-label="Filtros y tu perfil">
+            <div class="campo campo--inline">
+                <label for="filtro-ciudad">Ciudad</label>
+                <select id="filtro-ciudad" name="ciudad">
+                    <option value="">Todas</option>
+                    <option value="rosario" selected>Rosario</option>
+                    <option value="buenos-aires">Buenos Aires</option>
+                </select>
+            </div>
+            <div class="salen-perfil" id="salen-perfil" aria-live="polite"></div>
+        </section>
+
+        <section class="salen-feed" aria-labelledby="titulo-feed">
+            <div class="salen-feed__encabezado">
+                <h2 id="titulo-feed">Planes de la comunidad</h2>
+                <p class="salen-feed__estado" id="estado-feed" aria-live="polite">Cargando salidas…</p>
+            </div>
+            <div class="salen-lista" id="lista-salen" aria-live="polite"></div>
+        </section>
+
+        <section class="salen-publicar" id="publicar" aria-labelledby="titulo-publicar">
+            <h2 id="titulo-publicar">Publicá que vas a salir</h2>
+            <p class="salen-publicar__ayuda">
+                Contale a otros a dónde vas. Si encontraste algo en El Viaje, podés traerlo acá con el botón
+                <em>Voy a salir</em> en la tarjeta del evento.
+            </p>
+
+            <form class="formulario" id="form-publicar-salida" novalidate>
+                <div class="campo">
+                    <label for="pub-titulo">¿A dónde vas?</label>
+                    <input type="text" id="pub-titulo" name="titulo" maxlength="120" required
+                        placeholder="Ej: Recital en el parque, feria de artesanos…">
+                </div>
+
+                <div class="campo">
+                    <label for="pub-descripcion">Un detalle para quien se sume <span class="campo__opcional">(opcional)</span></label>
+                    <textarea id="pub-descripcion" name="descripcion" rows="3" maxlength="320"
+                        placeholder="Horario aproximado, con quién te gustaría ir, si es tranqui o con música…"></textarea>
+                </div>
+
+                <div class="salen-publicar__fila">
+                    <div class="campo">
+                        <label for="pub-ciudad">Ciudad</label>
+                        <select id="pub-ciudad" name="ciudad">
+                            <option value="rosario">Rosario</option>
+                            <option value="buenos-aires">Buenos Aires</option>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label for="pub-lugar">Lugar <span class="campo__opcional">(opcional)</span></label>
+                        <input type="text" id="pub-lugar" name="lugar" maxlength="120" placeholder="Barrio o espacio">
+                    </div>
+                </div>
+
+                <button class="cta-principal" type="submit" id="btn-publicar-salida">
+                    Publicar mi salida <span aria-hidden="true">→</span>
+                </button>
+            </form>
+        </section>
+
+        <p class="salen-nota">
+            No guardamos contraseñas: tu nombre autopercibido y un código corto (ej. Camila#4821) para distinguirte en la comunidad.
+            <a class="salen-nota__link" href="entrar.html?dest=salen.html">Entrá o recuperá tu código</a>
+            · <a class="salen-nota__link" href="contacto.html">¿Querés avisos por correo?</a>
+        </p>
+    </main>
+
+    <footer id="pie-raiz" class="pie-sitio"></footer>
+
+    <script src="js/perfil.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/salen.js"></script>
+</body>
+
+</html>

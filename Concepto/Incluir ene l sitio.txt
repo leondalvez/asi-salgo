@@ -1,0 +1,50 @@
+﻿Teoría
+
+
+
+
+
+El diseño del sitio web debe incluir como mínimo:
+
+> Navegabilidad
+
+
+ El sitio debe permitir la navegabilidad a través de menús claros y bien estructurados o hiperlinks.
+Debe tener, al menos, 6 secciones distintas para proporcionar una amplia gama de información.
+Debe incluir links gráficos que sean intuitivos y atractivos, mejorando la experiencia del usuario.
+Debe incluir links (de tipo índice) para dirigir a anclas locales para facilitar la navegación dentro de las páginas.
+La navegación debe ser coherente en todo el sitio para evitar confusiones.
+
+
+> Interactividad
+
+
+ El sitio debe contar con elementos interactivos para hacerlo más atractivo y funcional. Esto podría incluir imágenes con rollovers, mensajes popup, y la apertura de nuevas ventanas.
+Se debe considerar la implementación de formularios interactivos para recoger información de los usuarios o para proporcionar funciones como la suscripción a una newsletter o la realización de consultas.
+
+
+> Diseño y Estilo
+
+
+ El sitio debe hacer uso de hojas de estilo en cascada (CSS) para crear un diseño coherente y atractivo.
+Se deben considerar las tendencias actuales de diseño web y asegurarse de que el sitio sea visualmente atractivo para su público objetivo.
+El sitio debe ser fácil de leer con un uso eficaz del color, la fuente y el espacio.
+
+
+> Adaptabilidad y Responsividad
+
+
+ El sitio web debe ser responsivo, es decir, debe adaptarse a cualquier tamaño de pantalla para proporcionar una buena experiencia de usuario en cualquier dispositivo.
+
+
+> Integración de Redes Sociales
+
+
+ Se deben incluir enlaces a las redes sociales para fomentar la interacción y la participación del usuario.
+Se debe considerar la posibilidad de integrar funciones de redes sociales, como botones de "me gusta" o "compartir", para aumentar la visibilidad del sitio.
+
+
+> Ubicación y Alojamiento Web
+
+
+ El sitio debe estar alojado en un servidor web, lo que permitirá que sea accesible para los usuarios a través de Internet. Se debe seleccionar un proveedor de alojamiento web confiable que ofrezca un buen rendimiento, seguridad y soporte.

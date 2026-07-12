@@ -1,0 +1,285 @@
+/* --- Así Salgo! · Sistema de diseño base --- */
+
+:root {
+    --fondo-principal: #0d0f0d;
+    --fondo-card: #141715;
+    --fondo-card-hover: #1a1e1b;
+    --fondo-card-seleccionada: #1d221e;
+    --linea: #2a2f2b;
+    --linea-fuerte: #3a413b;
+    --texto-principal: #e9e5dc;
+    --texto-titulo: #f4f0e7;
+    --texto-secundario: #9aa097;
+    --texto-tenue: #6d746c;
+
+    --color-desenchufarme: #79c995;
+    --color-sentirlo: #d98c7d;
+    --color-conectar: #d8be67;
+    --color-misterio: #a99ac7;
+
+    --color-card: var(--color-desenchufarme);
+
+    --radio-card: 24px;
+    --gap-grilla: 24px;
+    --ancho-max-grilla: 1000px;
+
+    --sombra-card: 0 1px 2px rgba(0, 0, 0, .4), 0 12px 30px -18px rgba(0, 0, 0, .8);
+    --sombra-card-hover: 0 2px 6px rgba(0, 0, 0, .45), 0 22px 48px -20px rgba(0, 0, 0, .85);
+
+    --anim-rapida: 180ms;
+    --anim-media: 420ms;
+    --anim-lenta: 640ms;
+    --anim-easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --anim-suave: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--fondo-principal);
+    background-image:
+        radial-gradient(120% 80% at 50% -10%,
+            color-mix(in srgb, var(--color-card) 16%, transparent) 0%,
+            transparent 55%),
+        radial-gradient(90% 60% at 100% 100%,
+            color-mix(in srgb, var(--color-card) 9%, transparent) 0%,
+            transparent 60%);
+    background-attachment: fixed;
+    color: var(--texto-principal);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 20px;
+    transition: background-image var(--anim-lenta) var(--anim-suave);
+}
+
+.eyebrow {
+    color: var(--texto-secundario);
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+button,
+input,
+select,
+textarea {
+    color: inherit;
+    font: inherit;
+}
+
+/* --- Botón de acción principal y link de "volver" ---
+   Definidos acá (no solo en viaje.css) para que funcionen igual en
+   cualquier página, se usen como <button> o como <a>. */
+
+.cta-principal {
+    align-items: center;
+    background: var(--color-card, var(--color-desenchufarme));
+    border: 1px solid var(--color-card, var(--color-desenchufarme));
+    border-radius: 999px;
+    box-shadow: 0 10px 26px -12px color-mix(in srgb, var(--color-card, #000) 70%, transparent);
+    color: var(--fondo-principal);
+    cursor: pointer;
+    display: inline-flex;
+    font-weight: 600;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 15px 22px;
+    text-decoration: none;
+    transition:
+        transform var(--anim-media) var(--anim-suave),
+        box-shadow var(--anim-media) var(--anim-suave),
+        background-color var(--anim-media) var(--anim-suave),
+        border-color var(--anim-media) var(--anim-suave);
+}
+
+.cta-principal--grande {
+    font-size: 1.05rem;
+    overflow: visible;
+    padding: 18px 28px;
+    position: relative;
+}
+
+/* Anillo tipo "ping" que respira alrededor del botón, invitando al click. */
+.cta-principal--grande::before {
+    border-radius: inherit;
+    content: '';
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+    animation: cta-pulso 2.6s var(--anim-easing) infinite;
+}
+
+/* Brillo suave que recorre la superficie del botón en loop lento. */
+.cta-principal--grande::after {
+    background: linear-gradient(115deg,
+        transparent 35%,
+        color-mix(in srgb, white 20%, transparent) 50%,
+        transparent 65%);
+    background-size: 220% 100%;
+    border-radius: inherit;
+    content: '';
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+    animation: cta-brillo 3.8s ease-in-out infinite;
+}
+
+@keyframes cta-pulso {
+    0% {
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-card, var(--color-desenchufarme)) 45%, transparent);
+        opacity: .9;
+    }
+    100% {
+        box-shadow: 0 0 0 16px color-mix(in srgb, var(--color-card, var(--color-desenchufarme)) 0%, transparent);
+        opacity: 0;
+    }
+}
+
+@keyframes cta-brillo {
+    0% { background-position: 130% 0; }
+    100% { background-position: -30% 0; }
+}
+
+/* --- Puertita que se abre dentro del CTA al hacer click --- */
+
+.cta-principal__puerta {
+    flex-shrink: 0;
+    height: 22px;
+    position: relative;
+    width: 18px;
+    z-index: 1;
+}
+
+.puerta-marco {
+    fill: none;
+    opacity: .75;
+    stroke: currentColor;
+    stroke-width: 1.4;
+    vector-effect: non-scaling-stroke;
+}
+
+.puerta-luz {
+    fill: #fff6de;
+    opacity: 0;
+    transition: opacity 320ms var(--anim-suave) 80ms;
+}
+
+.puerta-hoja {
+    fill: currentColor;
+    transform-box: fill-box;
+    transition: transform 520ms var(--anim-suave);
+}
+
+.puerta-hoja--izq {
+    transform-origin: left center;
+}
+
+.puerta-hoja--der {
+    transform-origin: right center;
+}
+
+.cta-principal.abriendo .puerta-luz {
+    opacity: .95;
+}
+
+.cta-principal.abriendo .puerta-hoja--izq {
+    transform: rotateY(80deg);
+}
+
+.cta-principal.abriendo .puerta-hoja--der {
+    transform: rotateY(-80deg);
+}
+
+.cta-principal.abriendo {
+    pointer-events: none;
+}
+
+.cta-principal.abriendo span {
+    opacity: .6;
+    transform: translateX(6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .puerta-hoja,
+    .puerta-luz {
+        transition: none;
+    }
+}
+
+.cta-principal span {
+    display: inline-block;
+    transition: transform var(--anim-media) var(--anim-suave);
+}
+
+.cta-principal:hover {
+    box-shadow: 0 16px 34px -12px color-mix(in srgb, var(--color-card, #000) 80%, transparent);
+    transform: translateY(-2px);
+}
+
+.cta-principal:hover span {
+    transform: translateX(4px);
+}
+
+.cta-principal:active {
+    transform: translateY(0) scale(.99);
+}
+
+.cta-principal:disabled {
+    cursor: wait;
+    opacity: .7;
+    transform: none;
+}
+
+.cta-principal:focus-visible,
+.volver:focus-visible {
+    outline: 2px solid var(--color-card, var(--texto-principal));
+    outline-offset: 3px;
+}
+
+.volver {
+    background: transparent;
+    border: 0;
+    color: var(--texto-secundario);
+    cursor: pointer;
+    margin-bottom: 28px;
+    padding: 4px 0;
+    text-decoration: none;
+    transition: color var(--anim-rapida) var(--anim-suave), transform var(--anim-rapida) var(--anim-suave);
+}
+
+.volver:hover,
+.volver:focus-visible {
+    color: var(--texto-principal);
+}
+
+.volver:active {
+    transform: translateX(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .cta-principal--grande::before,
+    .cta-principal--grande::after {
+        display: none;
+    }
+}

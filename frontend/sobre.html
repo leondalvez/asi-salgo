@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre Así Salgo! — Manifiesto del proyecto</title>
+    <meta name="description"
+        content="Por qué existe Así Salgo!: la filosofía anti-scroll detrás de la app, cómo funciona y de dónde vienen los datos.">
+    <meta property="og:title" content="Sobre Así Salgo!">
+    <meta property="og:description" content="La filosofía anti-scroll detrás de la app: menos redes, más ciudad.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="css/paginas.css">
+    <link rel="stylesheet" href="css/banner-salida.css">
+</head>
+
+<body data-pagina="sobre">
+
+    <div id="nav-raiz" class="nav-sitio"></div>
+
+    <main class="pagina pagina-sobre">
+        <header class="pagina-hero pagina-hero--chica">
+            <p class="eyebrow">Sobre el proyecto</p>
+            <h1>La app para dejar las apps.</h1>
+            <p class="pagina-hero__lead">
+                Así Salgo! es un proyecto final de la Tecnicatura Universitaria en Informática Aplicada al Diseño
+                Multimedial y Web (UNL). Esto es lo que lo motiva y cómo está construido.
+            </p>
+        </header>
+
+        <figure class="banner-salida" aria-hidden="true">
+            <svg class="banner-salida__svg" viewBox="0 0 820 170" role="presentation" focusable="false">
+                <!-- Línea de tiempo: las cuatro experiencias de "El Viaje" -->
+                <path class="banner-suelo" d="M50 146 H780" />
+                <path class="banner-suelo-marca" d="M130 141 V151 M320 141 V151 M510 141 V151 M700 141 V151" />
+
+                <!-- Estación 1: Desenchufarme -->
+                <g class="banner-estacion banner-estacion--1">
+                    <g transform="translate(100,93) scale(0.62)">
+                        <circle class="banner-arte-detalle" cx="80" cy="14" r="6" />
+                        <path class="banner-acento-linea" d="M80 2 V6 M94 14 H90 M90.5 4.5 L87.8 7.2" />
+                        <path class="banner-acento-linea" d="M6 18 L10 14 L14 18 M14 24 L18 20 L22 24" />
+                        <path class="banner-arte-trazo"
+                            d="M48 20 C35 20 27 32 30 44 C20 44 18 56 29 60 C22 67 31 74 42 71 C41 78 55 78 54 71 C65 74 74 67 67 60 C78 56 76 44 66 44 C69 32 61 20 48 20 Z" />
+                        <path class="banner-arte-trazo" d="M48 84 V54 M34 84 H62 M38 84 V89 M58 84 V89" />
+                    </g>
+                </g>
+
+                <!-- Estación 2: Sentirlo -->
+                <g class="banner-estacion banner-estacion--2">
+                    <g transform="translate(290,93) scale(0.62)">
+                        <path class="banner-acento-forma" d="M16 8 L48 30 L8 42 Z" />
+                        <path class="banner-acento-forma" d="M80 8 L48 30 L88 42 Z" />
+                        <path class="banner-acento-linea" d="M62 22 V38 A5 5 0 1 1 57 33" />
+                        <rect class="banner-arte-trazo" x="41" y="28" width="14" height="20" rx="7" />
+                        <path class="banner-arte-trazo" d="M48 84 V48 M38 84 H58" />
+                        <path class="banner-acento-linea" d="M64 84 V70 M72 84 V60 M80 84 V68 M88 84 V64" />
+                    </g>
+                </g>
+
+                <!-- Estación 3: Conectar -->
+                <g class="banner-estacion banner-estacion--3">
+                    <g transform="translate(480,93) scale(0.62)">
+                        <path class="banner-arte-detalle"
+                            d="M28 14 H68 A6 6 0 0 1 74 20 V28 A6 6 0 0 1 68 34 H50 L44 40 V34 H28 A6 6 0 0 1 22 28 V20 A6 6 0 0 1 28 14 Z" />
+                        <circle class="banner-acento-forma" cx="40" cy="24" r="2.3" />
+                        <circle class="banner-acento-forma" cx="48" cy="24" r="2.3" />
+                        <circle class="banner-acento-forma" cx="56" cy="24" r="2.3" />
+                        <path class="banner-acento-linea" d="M34 54 Q31 48 35 44 M62 54 Q59 48 63 44" />
+                        <path class="banner-arte-trazo" d="M22 66 H74 M48 66 V86 M30 66 V56 H40 V66 M56 66 V56 H66 V66" />
+                    </g>
+                </g>
+
+                <!-- Estación 4: Misterio -->
+                <g class="banner-estacion banner-estacion--4">
+                    <g transform="translate(670,93) scale(0.62)">
+                        <path class="banner-arte-detalle" d="M20 12 A9 9 0 1 0 20 30 A6.5 6.5 0 1 1 20 12 Z" />
+                        <path class="banner-acento-linea" d="M36 10 L37 13 L40 14 L37 15 L36 18 L35 15 L32 14 L35 13 Z" />
+                        <circle class="banner-acento-forma" cx="46" cy="8" r="1.2" />
+                        <circle class="banner-acento-forma" cx="80" cy="38" r="13" />
+                        <path class="banner-arte-trazo"
+                            d="M6 86 C20 86 24 76 40 76 C56 76 58 64 66 58 M74 86 V38 H86 M78 34 H90 L88 42 H82 Z" />
+                    </g>
+                </g>
+
+                <!-- La persona recorriendo las cuatro experiencias -->
+                <g class="banner-corredor">
+                    <g class="corredor-rebote">
+                        <path class="corredor-estela" d="M-16 -5 H-25 M-15 2 H-26 M-17 8 H-24" />
+                        <circle class="corredor-cabeza" cx="1" cy="-15" r="3" />
+                        <path class="corredor-cuerpo"
+                            d="M-0.5 -12 Q 3 -7 2 -1 M0 -10 Q 6 -9 8 -4 M1 -10 Q -4 -7 -6 -2 M2 -1 L7 3 L5 10 M2 -1 L-3 4 L-7 9" />
+                    </g>
+                </g>
+            </svg>
+            <figcaption class="banner-salida__leyenda">Un recorrido rápido por las cuatro energías de "El Viaje", antes de vivirlas de verdad.</figcaption>
+        </figure>
+
+        <nav class="indice" id="indice" aria-label="Índice de esta página">
+            <span class="indice__titulo">En esta página</span>
+            <ol>
+                <li><a href="#manifiesto">El manifiesto anti-scroll</a></li>
+                <li><a href="#como-funciona">Cómo funciona El Viaje</a></li>
+                <li><a href="#de-donde-vienen-los-datos">De dónde vienen los datos</a></li>
+                <li><a href="#stack-y-creditos">Stack técnico y créditos</a></li>
+            </ol>
+        </nav>
+
+        <section class="bloque-largo" id="manifiesto" aria-labelledby="titulo-manifiesto">
+            <h2 id="titulo-manifiesto">El manifiesto anti-scroll</h2>
+            <p>
+                La temática central de este proyecto es una agenda cultural minimalista enfocada en fomentar las
+                salidas presenciales y reducir la carga cognitiva y la dependencia de las redes sociales. No queremos
+                que navegues durante horas: queremos que encuentres una opción de salida cultural en pocos clics y
+                salgas de la pantalla lo antes posible.
+            </p>
+            <p>
+                A diferencia de una agenda tradicional o de scrollear Instagram buscando "qué hay para hacer",
+                Así Salgo! actúa como un facilitador rápido. La idea es combatir la fatiga de pantallas con la
+                salida real: socializar en el mundo físico y vivir experiencias culturales enriquecedoras, sin la
+                ansiedad de perderse algo.
+            </p>
+            <a class="volver-indice" href="#indice">↑ Volver al índice</a>
+        </section>
+
+        <section class="bloque-largo" id="como-funciona" aria-labelledby="titulo-como-funciona">
+            <h2 id="titulo-como-funciona">Cómo funciona El Viaje</h2>
+            <p>
+                En vez de un buscador con filtros interminables, "El Viaje" te hace tres preguntas cortas: qué
+                energía necesitás hoy, qué tipo de plan te llama dentro de esa energía, y cómo tiene que encajar
+                (momento, ciudad, distancia). Con esas tres decisiones alcanza para proponerte algo concreto.
+            </p>
+            <p>
+                Si compartís tu ubicación, ordenamos las propuestas por cercanía real y las cruzamos con el clima
+                del momento, para no sugerirte un plan al aire libre bajo la lluvia. El resultado no es una lista
+                infinita: es un puñado de opciones pensadas para que elijas rápido y te vayas.
+            </p>
+            <a class="volver-indice" href="#indice">↑ Volver al índice</a>
+        </section>
+
+        <section class="bloque-largo" id="de-donde-vienen-los-datos" aria-labelledby="titulo-datos">
+            <h2 id="titulo-datos">De dónde vienen los datos</h2>
+            <p>Transparencia ante todo: estas son las fuentes públicas que consultamos en tiempo real.</p>
+            <ul class="lista-fuentes">
+                <li><strong>Agenda cultural municipal de Rosario</strong> — actividades y eventos oficiales de la ciudad.</li>
+                <li><strong>Buenos Aires Data / Linda</strong> — agenda cultural de la Ciudad de Buenos Aires.</li>
+                <li><strong>OpenStreetMap (Overpass y Nominatim)</strong> — parques, plazas y puntos de interés cercanos, y geocodificación de direcciones sin coordenadas propias.</li>
+                <li><strong>Open-Meteo</strong> — clima actual, para adaptar la sugerencia y avisarte si hace falta abrigo o paraguas.</li>
+            </ul>
+            <p>
+                No usamos estos datos para perfilarte ni para venderte nada: solo para responder tu búsqueda del
+                momento. No guardamos tu ubicación en un servidor; se usa en tu navegador para calcular distancias.
+            </p>
+            <a class="volver-indice" href="#indice">↑ Volver al índice</a>
+        </section>
+
+        <section class="bloque-largo" id="stack-y-creditos" aria-labelledby="titulo-stack">
+            <h2 id="titulo-stack">Stack técnico y créditos</h2>
+            <p>
+                Frontend en HTML5, CSS3 y JavaScript nativo (sin frameworks), con animaciones e iconografía en SVG
+                en lugar de imágenes pesadas. Backend en Node.js, actuando como proxy hacia las fuentes públicas de
+                datos y con geocodificación propia para ubicar eventos que no traen coordenadas.
+            </p>
+            <p class="creditos">
+                Proyecto Final · Leonardo Alvez · Tecnicatura Universitaria en Informática Aplicada al Diseño
+                Multimedial y Web · Facultad de Ingeniería y Ciencias Hídricas · Universidad Nacional del Litoral.
+            </p>
+            <a class="volver-indice" href="#indice">↑ Volver al índice</a>
+        </section>
+
+        <p class="pagina-cierre">
+            ¿Con ganas de probarlo? <a href="viaje.html">Iniciá el viaje →</a>
+        </p>
+    </main>
+
+    <footer id="pie-raiz" class="pie-sitio"></footer>
+
+    <script src="js/nav.js"></script>
+    <script src="js/toast.js"></script>
+</body>
+
+</html>

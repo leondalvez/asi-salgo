@@ -1,0 +1,71 @@
+﻿Universidad Nacional del Litoral
+Facultad de Ingeniería y Ciencias Hídricas
+Departamento de Informática
+
+Proyecto Final
+
+Tecnicatura Universitaria en Informática Aplicada al Diseño Multimedia y Web
+
+Leonardo Alvez
+
+Temática Proyecto Final
+
+
+
+Así Salgo! La app para dejar las apps.
+
+
+1. Temática del sitio web
+
+
+La temática central es una agenda cultural minimalista denominada "Así Salgo!", enfocada en fomentar las salidas presenciales y reducir la carga cognitiva y la dependencia de las redes sociales. El sitio propone una experiencia de usuario que prioriza la acción de salir de casa por sobre el consumo digital prolongado centrado en una agenda cultural y social. La idea es combatir la desconexión de redes sociales con la salida a socializar en eventos culturales de la ciudad.
+
+
+2. Descripción del sitio web
+
+
+Institución/Destinatario: La aplicación está diseñada para integrarse con los servicios de cultura locales, tomando como referencia inicial la agenda cultural de la Municipalidad de Rosario.
+
+
+Utilidad: 
+Servir como un facilitador de salidas culturales mediante un "viaje interactivo" que ayuda al usuario a encontrar eventos según su estado de ánimo, evitando que pierda tiempo navegando en redes sociales.
+
+
+Funciones clave:
+Auto Segmentación: Un flujo de preguntas ("El Viaje") para definir el perfil del usuario en el momento (ej: "Busco inspiración", "Necesito desconectar").
+Geolocalización: Uso de la ubicación en tiempo real para mostrar eventos y lugares cercanos al usuario.
+Filtrado inteligente: Un backend que procesa las preferencias y devuelve una lista de eventos recomendados en formato JSON para su renderización dinámica.
+Interactividad: Inclusión de formularios de validación, efectos rollover y mensajes emergentes para mejorar la experiencia sin saturar al usuario.
+
+
+3. Estructura del sitio web
+
+
+Para cumplir con los requisitos mínimos de navegabilidad y amplitud del desarrollo, el sitio contará con al menos 6 secciones:
+
+
+Home/Bienvenida: Pantalla minimalista con un botón de acción principal para iniciar el viaje.
+
+El Viaje (Formulario): Un componente de pasos donde se capturan las preferencias culturales de forma interactiva.
+
+Agenda de Resultados (Card View): Visualización limpia de eventos recomendados mediante tarjetas con íconos intuitivos.
+
+Mapa de Salidas: Sección dedicada a la visualización geográfica de los eventos "Cerca de mí".
+Sobre "Así Salgo": Información sobre el concepto de desconexión digital y el propósito del proyecto.
+Contacto / Suscripción: Formulario funcional para consultas o suscripción a una newsletter de eventos destacados. También podría convertirse en una sección que se llame “A donde salen” y puedas ver donde salen amigos y que el contacto se oriente a contactar amigos que salen a eventos que puedan compartir.
+
+
+4. Tecnologías web, librerías o frameworks
+
+
+Backend: Java con Jakarta EE (anteriormente Java EE), utilizando Payara Server como servidor de aplicaciones para gestionar la lógica de negocio y las APIs REST.
+
+
+Frontend: JavaScript nativo (vanilla JS) para garantizar ligereza, junto con CSS externo gestionado mediante Media Queries para asegurar la responsividad en móviles y escritorio.
+
+
+Base de Datos: PostgreSQL con la extensión PostGIS para el manejo avanzado de datos geográficos y filtrado de eventos por radio de cercanía.
+Contenerización: Docker para empaquetar todo el entorno (Payara, Postgres y la App), asegurando que la estructura sea profesional y fácil de desplegar.
+
+
+Leonardo Alvez

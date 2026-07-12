@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Así Salgo! - ¿A dónde salgo este mes?</title>
+    <meta name="description"
+        content="Todo lo que hay para hacer este mes en Rosario o Buenos Aires, sin cuestionario: la agenda completa, ordenada por cercanía.">
+    <meta property="og:title" content="Así Salgo! - ¿A dónde salgo este mes?">
+    <meta property="og:description" content="La agenda cultural del mes en Rosario y Buenos Aires, sin vueltas.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="css/viaje.css">
+    <link rel="stylesheet" href="css/paginas.css">
+</head>
+
+<body data-pagina="mes">
+
+    <div id="nav-raiz" class="nav-sitio"></div>
+
+    <main class="pagina">
+        <header class="pagina-hero">
+            <p class="eyebrow">Sin preguntas</p>
+            <h1>¿A dónde salgo<br>este mes?</h1>
+            <p class="pagina-hero__lead">
+                Te mostramos directamente la agenda completa del mes, ordenada por cercanía si nos compartís tu
+                ubicación. Sin energía, sin plan: todo lo que hay, junto.
+            </p>
+        </header>
+
+        <fieldset class="filtros">
+            <legend>Ciudad</legend>
+            <div class="chips" role="group" aria-label="Ciudad" id="chips-ciudad">
+                <button type="button" class="chip seleccionado" data-ciudad="rosario">
+                    <svg class="chip-arte" viewBox="0 0 28 28" aria-hidden="true">
+                        <path class="chip-trazo" pathLength="100" d="M4 23 H24 M7 23 V12 L14 7 L21 12 V23" />
+                    </svg>
+                    Rosario
+                </button>
+                <button type="button" class="chip" data-ciudad="buenos-aires">
+                    <svg class="chip-arte" viewBox="0 0 28 28" aria-hidden="true">
+                        <path class="chip-trazo" pathLength="100" d="M6 23 H22 M8 23 V10 L14 5 L20 10 V23" />
+                        <path class="chip-trazo chip-trazo--detalle" pathLength="100" d="M11 14 H17" />
+                    </svg>
+                    Buenos Aires
+                </button>
+            </div>
+        </fieldset>
+
+        <button class="cta-principal" type="button" id="usar-ubicacion">
+            Usar mi ubicación <span aria-hidden="true">→</span>
+        </button>
+
+        <p id="estado-mes" role="status" class="lector"></p>
+
+        <section class="resultado-directo" aria-labelledby="titulo-resultado-mes">
+            <p class="eyebrow" id="titulo-resultado-mes">La agenda de este mes</p>
+            <div class="contexto-salida" id="contexto-clima" hidden></div>
+            <div class="eventos" id="lista-eventos" aria-live="polite"></div>
+            <section class="complementos" id="seccion-complementos" hidden>
+                <h3 class="complementos__titulo">Planes cerca</h3>
+                <p class="complementos__ayuda">Espacios públicos según tu plan, sin depender de la agenda cultural.
+                </p>
+                <div class="eventos" id="lista-complementos"></div>
+            </section>
+            <p class="resultado__nota" id="nota-fuente" hidden></p>
+        </section>
+    </main>
+
+    <footer id="pie-raiz" class="pie-sitio"></footer>
+
+    <script src="js/nav.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/compartir.js"></script>
+    <script src="js/eventos.js"></script>
+    <script src="js/mes.js"></script>
+</body>
+
+</html>

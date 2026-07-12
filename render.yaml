@@ -1,0 +1,14 @@
+# Render.com — plan Free, $0/mes
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: asi-salgo
+    runtime: node
+    rootDir: server
+    buildCommand: echo "Sin dependencias npm — solo Node nativo"
+    startCommand: node index.js
+    healthCheckPath: /api/health
+    plan: free
+    envVars:
+      - key: NODE_VERSION
+        value: "20"

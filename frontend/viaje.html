@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Así Salgo! - El Viaje</title>
+    <meta name="description"
+        content="Encontrá una salida cultural en Rosario o Buenos Aires con pocas decisiones. Menos scroll, más ciudad.">
+    <meta property="og:title" content="Así Salgo! - El Viaje">
+    <meta property="og:description" content="Fomentá salidas presenciales en Rosario. Elegí tu energía y descubrí tu plan.">
+    <meta property="og:image" content="/og-salida.svg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="css/viaje.css">
+</head>
+
+<body data-pagina="viaje">
+
+    <div id="nav-raiz" class="nav-sitio"></div>
+
+    <header class="titulo-viaje">
+        <p class="eyebrow">El viaje · <span id="ciudad-actual">Rosario</span></p>
+        <h1>Menos scroll.<br>Más ciudad.</h1>
+        <p>En tres decisiones encontramos una salida que te dé ganas de ir.</p>
+    </header>
+
+    <main class="viaje" id="viaje">
+        <div class="progreso" aria-label="Progreso del viaje">
+            <span class="progreso__paso activo">1 <b>Energía</b></span>
+            <span class="progreso__linea" aria-hidden="true"></span>
+            <span class="progreso__paso">2 <b>Plan</b></span>
+            <span class="progreso__linea" aria-hidden="true"></span>
+            <span class="progreso__paso">3 <b>Ahora</b></span>
+        </div>
+
+        <p class="lector" id="estado-viaje" aria-live="polite"></p>
+
+        <section class="paso activo" data-paso="1" aria-labelledby="pregunta-energia">
+            <div class="paso__encabezado">
+                <span>01 · Empezá por vos</span>
+                <h2 id="pregunta-energia">¿Qué necesitás sentir hoy?</h2>
+                <p>No buscás un evento: buscás cómo querés volver a casa.</p>
+            </div>
+
+            <div class="grid-viaje" role="group" aria-label="Elegí la energía de tu salida">
+                <button type="button" class="card-viaje" data-energia="desenchufarme">
+                    <svg class="arte-experiencia arte-experiencia--calma" viewBox="0 0 96 96" aria-hidden="true">
+                        <!-- Sol y rayos -->
+                        <circle class="arte-trazo arte-trazo--detalle" pathLength="100" cx="80" cy="14" r="6" />
+                        <path class="escena-rayo" d="M80 2 V6" />
+                        <path class="escena-rayo escena-rayo--2" d="M94 14 H90" />
+                        <path class="escena-rayo escena-rayo--3" d="M90.5 4.5 L87.8 7.2" />
+                        <!-- Pájaros en el cielo -->
+                        <path class="escena-pajaro" d="M6 18 L10 14 L14 18" />
+                        <path class="escena-pajaro escena-pajaro--2" d="M14 24 L18 20 L22 24" />
+                        <!-- Follaje del árbol -->
+                        <path class="arte-trazo arte-trazo--principal" pathLength="100"
+                            d="M48 20 C35 20 27 32 30 44 C20 44 18 56 29 60 C22 67 31 74 42 71 C41 78 55 78 54 71 C65 74 74 67 67 60 C78 56 76 44 66 44 C69 32 61 20 48 20 Z" />
+                        <!-- Tronco y banco -->
+                        <path class="arte-trazo arte-trazo--principal" pathLength="100"
+                            d="M48 84 V54 M34 84 H62 M38 84 V89 M58 84 V89" />
+                    </svg>
+                    <span><strong>Desenchufarme</strong><small>Aire, calma, bajar un cambio</small></span>
+                </button>
+                <button type="button" class="card-viaje" data-energia="sentirlo">
+                    <svg class="arte-experiencia arte-experiencia--sentir" viewBox="0 0 96 96" aria-hidden="true">
+                        <!-- Haces de luz del escenario -->
+                        <path class="escena-foco" d="M16 8 L48 30 L8 42 Z" />
+                        <path class="escena-foco escena-foco--2" d="M80 8 L48 30 L88 42 Z" />
+                        <!-- Nota musical flotando -->
+                        <path class="escena-nota" d="M62 22 V38 A5 5 0 1 1 57 33" />
+                        <!-- Micrófono -->
+                        <rect class="arte-trazo arte-trazo--principal" pathLength="100" x="41" y="28" width="14" height="20" rx="7" />
+                        <path class="arte-trazo arte-trazo--principal" pathLength="100" d="M48 84 V48 M38 84 H58" />
+                        <!-- Ecualizador -->
+                        <path class="escena-barra" d="M64 84 V70" />
+                        <path class="escena-barra escena-barra--2" d="M72 84 V60" />
+                        <path class="escena-barra escena-barra--3" d="M80 84 V68" />
+                        <path class="escena-barra escena-barra--4" d="M88 84 V64" />
+                    </svg>
+                    <span><strong>Sentirlo</strong><small>Música, escena, algo que mueva</small></span>
+                </button>
+                <button type="button" class="card-viaje" data-energia="conectar">
+                    <svg class="arte-experiencia arte-experiencia--conectar" viewBox="0 0 96 96" aria-hidden="true">
+                        <!-- Globo de conversación -->
+                        <path class="arte-trazo arte-trazo--detalle" pathLength="100"
+                            d="M28 14 H68 A6 6 0 0 1 74 20 V28 A6 6 0 0 1 68 34 H50 L44 40 V34 H28 A6 6 0 0 1 22 28 V20 A6 6 0 0 1 28 14 Z" />
+                        <circle class="escena-punto" cx="40" cy="24" r="2.3" />
+                        <circle class="escena-punto escena-punto--2" cx="48" cy="24" r="2.3" />
+                        <circle class="escena-punto escena-punto--3" cx="56" cy="24" r="2.3" />
+                        <!-- Vapor de las tazas -->
+                        <path class="escena-vapor" d="M34 54 Q31 48 35 44" />
+                        <path class="escena-vapor escena-vapor--2" d="M62 54 Q59 48 63 44" />
+                        <!-- Mesa y tazas -->
+                        <path class="arte-trazo arte-trazo--principal" pathLength="100"
+                            d="M22 66 H74 M48 66 V86 M30 66 V56 H40 V66 M56 66 V56 H66 V66" />
+                    </svg>
+                    <span><strong>Conectar</strong><small>Conversar, compartir, conocer</small></span>
+                </button>
+                <button type="button" class="card-viaje" data-energia="misterio">
+                    <svg class="arte-experiencia arte-experiencia--misterio" viewBox="0 0 96 96" aria-hidden="true">
+                        <!-- Luna y estrellas -->
+                        <path class="arte-trazo arte-trazo--detalle" pathLength="100"
+                            d="M20 12 A9 9 0 1 0 20 30 A6.5 6.5 0 1 1 20 12 Z" />
+                        <path class="escena-estrella" d="M36 10 L37 13 L40 14 L37 15 L36 18 L35 15 L32 14 L35 13 Z" />
+                        <circle class="escena-estrella escena-estrella--2" cx="46" cy="8" r="1.2" />
+                        <!-- Brillo del farol -->
+                        <circle class="escena-brillo" cx="80" cy="38" r="13" />
+                        <!-- Camino y farol -->
+                        <path class="arte-trazo arte-trazo--principal" pathLength="100"
+                            d="M6 86 C20 86 24 76 40 76 C56 76 58 64 66 58 M74 86 V38 H86 M78 34 H90 L88 42 H82 Z" />
+                    </svg>
+                    <span><strong>Misterio</strong><small>Salir de la rutina, descubrir</small></span>
+                </button>
+            </div>
+        </section>
+
+        <section class="paso" data-paso="2" aria-labelledby="pregunta-plan" hidden>
+            <button class="volver" type="button" data-volver="1">← Cambiar energía</button>
+            <div class="paso__encabezado">
+                <span>02 · Afinemos la búsqueda</span>
+                <h2 id="pregunta-plan">¿Qué tipo de plan te llama?</h2>
+                <p id="ayuda-plan">Elegí una opción. Adaptamos el tono, no te llenamos de filtros.</p>
+            </div>
+            <div class="opciones-plan" id="opciones-plan" role="group" aria-label="Elegí el tipo de experiencia"></div>
+        </section>
+
+        <section class="paso" data-paso="3" aria-labelledby="pregunta-ahora" hidden>
+            <button class="volver" type="button" data-volver="2">← Ajustar el plan</button>
+            <div class="paso__encabezado">
+                <span>03 · Que sea posible</span>
+                <h2 id="pregunta-ahora">¿Cómo querés que encaje hoy?</h2>
+                <p>Dos datos concretos bastan para no recomendarte algo imposible.</p>
+            </div>
+            <fieldset class="filtros">
+                <legend>Momento</legend>
+                <div class="chips" role="group" aria-label="Momento de salida">
+                    <button type="button" class="chip seleccionado" data-momento="hoy">
+                        <svg class="chip-arte" viewBox="0 0 28 28" aria-hidden="true">
+                            <circle class="chip-trazo" pathLength="100" cx="14" cy="14" r="5" />
+                            <path class="chip-trazo chip-trazo--detalle" pathLength="100" d="M14 2 V6 M14 22 V26 M2 14 H6 M22 14 H26" />
+                        </svg>
+                        Hoy
+                    </button>
+                    <button type="button" class="chip" data-momento="manana">
+                        <svg class="chip-arte" viewBox="0 0 28 28" aria-hidden="true">
+                            <path class="chip-trazo" pathLength="100" d="M4 19 A10 10 0 0 1 24 19 M2 20 H26" />
+                            <path class="chip-trazo chip-trazo--detalle" pathLength="100" d="M14 5 V9 M5 11 L8 13 M23 11 L20 13" />
+                        </svg>
+                        Mañana
+                    </button>
+                    <button type="button" class="chip" data-momento="finde">
+                        <svg class="chip-arte" viewBox="0 0 28 28" aria-hidden="true">
+                            <rect class="chip-trazo" pathLength="100" x="4" y="6" width="20" height="18" rx="4" />
+                            <path class="chip-trazo chip-trazo--detalle" pathLength="100" d="M4 12 H24 M9 3 V8 M19 3 V8" />
+                        </svg>
+                        Este finde
+                    </button>
+                </div>
+            </fieldset>
+            <fieldset class="filtros">
+                <legend>Ciudad</legend>
+                <div class="chips" role="group" aria-label="Ciudad">
+                    <button type="button" class="chip seleccionado" data-ciudad="rosario">
+                        <svg class="chip-arte" viewBox="0 0 28 28" aria-hidden="true">
+                            <path class="chip-trazo" pathLength="100" d="M4 23 H24 M7 23 V12 L14 7 L21 12 V23" />
+                        </svg>
+                        Rosario
+                    </button>
+                    <button type="button" class="chip" data-ciudad="buenos-aires">
+                        <svg class="chip-arte" viewBox="0 0 28 28" aria-hidden="true">
+                            <path class="chip-trazo" pathLength="100" d="M6 23 H22 M8 23 V10 L14 5 L20 10 V23" />
+                            <path class="chip-trazo chip-trazo--detalle" pathLength="100" d="M11 14 H17" />
+                        </svg>
+                        Buenos Aires
+                    </button>
+                </div>
+            </fieldset>
+            <fieldset class="filtros">
+                <legend>Distancia</legend>
+                <div class="chips" role="group" aria-label="Distancia máxima">
+                    <button type="button" class="chip seleccionado" data-distancia="cerca">
+                        <svg class="chip-arte" viewBox="0 0 28 28" aria-hidden="true">
+                            <circle class="chip-trazo" pathLength="100" cx="7" cy="20" r="3" />
+                            <circle class="chip-trazo" pathLength="100" cx="21" cy="7" r="3" />
+                            <path class="chip-trazo chip-trazo--detalle" pathLength="100" d="M9 18 C13 14 15 12 19 9" />
+                        </svg>
+                        A 15 min
+                    </button>
+                    <button type="button" class="chip" data-distancia="barrio">
+                        <svg class="chip-arte" viewBox="0 0 28 28" aria-hidden="true">
+                            <path class="chip-trazo" pathLength="100" d="M3 23 H25 M5 23 V13 L11 8 L17 13 V23 M18 23 V16 L22 12 L25 15" />
+                            <path class="chip-trazo chip-trazo--detalle" pathLength="100" d="M9 18 H13" />
+                        </svg>
+                        Por mi barrio
+                    </button>
+                    <button type="button" class="chip" data-distancia="ciudad">
+                        <svg class="chip-arte" viewBox="0 0 28 28" aria-hidden="true">
+                            <path class="chip-trazo" pathLength="100" d="M2 24 H26 M4 24 V13 H10 V24 M10 24 V6 H17 V24 M17 24 V10 H24 V24" />
+                            <path class="chip-trazo chip-trazo--detalle" pathLength="100" d="M7 17 V20 M14 10 V14 M20 14 V18" />
+                        </svg>
+                        Toda <span class="ciudad-chip-label">Rosario</span>
+                    </button>
+                </div>
+            </fieldset>
+            <button class="cta-principal" type="button" id="descubrir">Descubrir mi plan <span aria-hidden="true">→</span></button>
+        </section>
+
+        <section class="paso resultado" data-paso="4" aria-labelledby="titulo-resultado" hidden>
+            <p class="eyebrow">Tu brújula para salir</p>
+            <h2 id="titulo-resultado">Hay una salida esperándote.</h2>
+            <p id="resumen-resultado"></p>
+            <div class="contexto-salida" id="contexto-clima" hidden></div>
+            <div class="eventos" id="lista-eventos" aria-live="polite"></div>
+            <section class="complementos" id="seccion-complementos" hidden>
+                <h3 class="complementos__titulo">Planes cerca</h3>
+                <p class="complementos__ayuda">Espacios públicos según tu plan, sin depender de la agenda cultural.</p>
+                <div class="eventos" id="lista-complementos"></div>
+            </section>
+            <p class="resultado__nota" id="nota-fuente" hidden></p>
+            <p class="resultado__enlaces">
+                <a class="volver-indice" href="mes.html">Ver todo lo de este mes →</a>
+                <a class="volver-indice" href="peques.html">¿Vas con peques? Mirá esta agenda →</a>
+            </p>
+            <button class="volver" type="button" data-reiniciar>Empezar otro viaje</button>
+        </section>
+    </main>
+
+    <footer id="pie-raiz" class="pie-sitio"></footer>
+
+    <script src="js/nav.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/compartir.js"></script>
+    <script src="js/eventos.js"></script>
+    <script src="js/viaje.js"></script>
+</body>
+
+</html>

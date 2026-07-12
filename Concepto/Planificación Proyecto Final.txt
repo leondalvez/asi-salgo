@@ -1,0 +1,75 @@
+﻿Universidad Nacional del Litoral
+Facultad de Ingeniería y Ciencias Hídricas
+Departamento de Informática
+
+Proyecto Final
+
+Tecnicatura Universitaria en Informática Aplicada al Diseño Multimedia y Web
+
+Leonardo Alvez
+
+Planificación del Proyecto Final
+PLANIFICACIÓN: "Así Salgo!"
+1. Definición de los objetivos
+El objetivo principal de "Así Salgo!", es fomentar la salida presencial y reducir la carga cognitiva asociada al consumo digital prolongado. A diferencia de una agenda tradicional, el sitio no busca que el usuario "navegue" durante horas, sino que actúa como un facilitador rápido. Metas medibles:
+* Lograr que el usuario encuentre una opción de salida cultural en pocos clics (mediante "El Viaje").
+* Reducir la tasa de rebote en la sección de resultados ofreciendo propuestas hiper-segmentadas y geolocalizadas.
+* Garantizar un tiempo de carga inferior a 3 segundos, coherente con la filosofía minimalista de la marca.
+2. Identificación del público objetivo
+* Perfil demográfico: Jóvenes y adultos de 18 a 40 años, residentes en la ciudad de Rosario. 
+* Psicografía y Necesidades: Personas que experimentan "fatiga de pantallas" o parálisis por análisis al buscar planes en redes sociales (Instagram/TikTok). Buscan desconectar, socializar en el mundo físico y tener experiencias culturales enriquecedoras sin la ansiedad de perderse "qué hay para hacer".
+* Comportamiento web: Navegan predominantemente desde el celular (mobile-first). Tienen paciencia baja para formularios complejos, pero responden bien a las interfaces intuitivas, visuales y de acción rápida.
+3. Análisis de la competencia
+* Competencia Directa: Portales de agenda cultural tradicional (ej: Rosario Ciudad, portales de noticias culturales) y aplicaciones genéricas de eventos (Eventbrite).
+* Competencia Indirecta: Redes sociales (Instagram/Facebook) donde los usuarios suelen descubrir eventos de forma orgánica o algorítmica.
+* Ventaja competitiva (Diferenciador): Mientras la competencia satura al usuario con listados infinitos y publicidad, "Así Salgo!" filtra la información mediante un flujo emocional ("El Viaje") y prioriza la cercanía geográfica (PostGIS). No busca retener al usuario en la web, sino expulsarlo hacia la vida real.
+4. Arquitectura de la Información y Mapa del Sitio
+El sitio se compone de 6 secciones principales con una navegación lineal y limpia:
+1. Home (Bienvenida): Pantalla "cero distracción". Contiene un eslogan, una breve explicación y un CTA (Call to Action) único y prominente: "Iniciar el Viaje".
+2. El Viaje (Auto-segmentación): Flujo de pasos (sin recargar página) donde el usuario elige su estado de ánimo e intereses. (Ej: ¿Busco inspiración? ¿Necesito desconectar? ¿Quiero moverme?).
+3. Agenda de Resultados (Card View): Renderizado dinámico (vía Fetch API) mostrando tarjetas con el evento, ícono de categoría, horario y distancia.
+4. Mapa de Salidas: Visualización de los eventos filtrados sobre un mapa interactivo centrado en la geolocalización del usuario.
+5. Sobre "Así Salgo": Manifiesto del proyecto. Explicación de la filosofía anti-scroll y pro-salida presencial.
+6. A Dónde Salen / Contacto: Formulario de suscripción a novedades destacadas y un espacio conceptual para ver la actividad de la comunidad.
+5. Diseño de la Interfaz de Usuario (UI/UX)
+* Estilo Visual: Minimalista. Uso abundante de espacios en blanco (negative space). Paleta de colores neutra (blancos, grises suaves, negro profundo) con un único color de acento (ej: un verde o azul calmante) para los botones de acción.
+* Tipografía: Fuentes Sans-Serif modernas y altamente legibles (ej: Inter o Poppins), con un tamaño base mínimo de 16px para evitar fatiga visual.
+* Accesibilidad (Nivel AA):
+   * Alto contraste de texto.
+   * Todos los íconos y botones gráficos contarán con su atributo alt correspondiente.
+   * Navegación completa posible mediante la tecla Tab y Enter (especialmente crucial en el formulario "El Viaje").
+   * Uso de etiquetas <label> reales asociadas a los inputs, no solo placeholders.
+* Diseño Responsivo (Mobile-First): Desarrollo pensado desde el celular (360px) hacia el escritorio (1280px +). Implementación de menú "Hamburguesa" para dispositivos móviles y tarjetas que pasen de columna única a grillas en pantallas grandes.
+6. Desarrollo del contenido
+Para mantener la coherencia con el objetivo de "baja carga cognitiva", el contenido textuales será escaso, directo y alentador.
+* Imágenes: Se priorizará el uso de bibliotecas de íconos vectoriales (SVG) en lugar de fotografías pesadas, logrando así tiempos de carga ínfimos y una estética limpia.
+* Textos: Microcopys orientados a la acción (ej: en lugar de "Enviar formulario", usar "Descubrir mi plan").
+7. Stack Tecnológico (Arquitectura)
+Para garantizar profesionalismo, escalabilidad y el cumplimiento de los requisitos de la carrera, se utilizará la siguiente arquitectura:
+* Frontend: HTML5, CSS3 (con Media Queries y Flexbox/Grid) y JavaScript Vanilla. Ligero, sin dependencias de frameworks, alineado a la filosofía de la app.
+* Backend: Java EE (Jakarta EE) corriendo sobre Payara Server. Se encargará de exponer endpoints REST (JAX-RS).
+* Base de Datos: Supabase (PostgreSQL + PostGIS). Se utilizará Supabase como servicio de base de datos gestionado (DBaaS) gratuito para alojar la extensión PostGIS sin complicaciones de DevOps. El backend de Java se conectará a ella vía JDBC.
+* Consumo de Datos Externos: El backend Java actuará como proxy. Utilizará HttpClient para consumir la API de Datos Abiertos de la Municipalidad de Rosario, procesar el JSON, extraer coordenadas y almacenar/consultar los eventos en PostGIS.
+* Despliegue (Hosting):
+   * Frontend y Backend: Desplegados en Render.com (Tier gratuito).
+   * Base de Datos: Hosteada en Supabase (Tier gratuito).
+   * Esto garantiza HTTPS (SSL), alta disponibilidad y $0 de costo durante la etapa de corrección.
+8. Interactividad (Estrategia de Checklist)
+* Efectos Rollover: Implementación de transiciones CSS suaves (:hover) en las tarjetas de eventos y botones.
+* Mensajes Emergentes (Popups/Alertas): En lugar de utilizar alert() de JavaScript (que rompe la UX minimalista), se implementarán componentes Toast (notificaciones flotantes no intrusivas) para confirmar envíos o mostrar errores en formularios.
+* Validaciones: Formularios validados en el cliente (JavaScript) antes de enviar la petición al backend, mostrando errores inline al lado de cada campo.
+* Integración Social (Filosófica): No se incluirán botones de "Seguir en redes". En su lugar, se implementará la etiqueta og:image (Open Graph) para que, al compartir un evento vía WhatsApp usando un botón "Invitar a un amigo a salir", se previsualice como una tarjeta bonita. El link abrirá en target='_blank'.
+9. Planificación de Pruebas, Lanzamiento y Mantenimiento
+Cronograma de desarrollo (25 días - Julio 25 a Agosto 20):
+* Días 1-6 (Backend e Infraestructura): Configuración de Supabase, creación de entidades JPA en Java, consumo de la API municipal y endpoints REST de filtrado/geo-búsqueda.
+* Días 6-10 (Frontend Core): Maquetación CSS Mobile-First, estructura HTML de las 6 secciones, implementación del flujo "El Viaje" y consumo de APIs con fetch().
+* Días 10-13 (Interactividad y Mapa): Integración de mapa (ej: Leaflet.js), validaciones de formularios, implementación de toasts y efectos rollover.
+* Días 13-17 (Testing y Checklist): Pruebas cross-browser (Chrome, Firefox, Edge, Safari). Revisión exhaustiva contra el checklist de la cátedra (SEO, Open Graph, alt en imágenes, navegación por teclado).
+* Día 17-25 (Despliegue Final): Subida a producción (Render + Supabase), verificación de certificado SSL y prueba de carga (PageSpeed).
+Mantenimiento y Actualización Post-Lanzamiento (Futuro): Una vez entregado y aprobado el TP, la primera iteración planificada será agregar la funcionalidad "Sorpréndeme". Esta consistirá en un botón que, utilizando una consulta aleatoria (ORDER BY RANDOM()) en PostGIS, ignore las preferencias del usuario y le proponga un evento completamente fuera de su zona de confort, reforzando aún más el propósito de romper la rutina digital.
+
+
+                                                                Leonardo Alvez
+                                                                Proyecto Final
+Tec Universitaria en Informática Aplicada al Diseño Multimedial y Web
+Facultad de Ingeniería y Ciencias Hídricas -  Universidad Nacional del Litoral

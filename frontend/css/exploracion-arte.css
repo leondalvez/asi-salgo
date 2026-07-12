@@ -1,0 +1,166 @@
+/* Así Salgo! — Exploración visual "Salida editorial" (Línea B) */
+
+:root {
+    --fondo-lienzo: #101210;
+    --superficie: #f1ede4;
+    --superficie-hover: #e8e2d6;
+    --texto-oscuro: #101210;
+    --texto-suave: #4a524c;
+    --linea: #d8d2c6;
+    --acento: #79c995;
+    --acento-complemento: #d98c7d;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body.exploracion {
+    background: var(--fondo-lienzo);
+    color: var(--texto-oscuro);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.canvas-fondo {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.45;
+}
+
+.exploracion__contenido {
+    position: relative;
+    z-index: 1;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 20px 64px;
+}
+
+.exploracion__volver {
+    color: #969b94;
+    display: inline-block;
+    font-size: 0.88rem;
+    margin-bottom: 28px;
+    text-decoration: none;
+}
+
+.exploracion__volver:hover {
+    color: var(--superficie);
+}
+
+.exploracion__hero {
+    background: var(--superficie);
+    border: 1px solid var(--linea);
+    border-radius: 28px;
+    margin-bottom: 28px;
+    padding: 32px 28px;
+}
+
+.exploracion__eyebrow {
+    color: var(--acento);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+.exploracion__hero h1 {
+    color: var(--texto-oscuro);
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    font-weight: 600;
+    line-height: 1.1;
+    margin-bottom: 12px;
+}
+
+.exploracion__hero p {
+    color: var(--texto-suave);
+    line-height: 1.5;
+    max-width: 52ch;
+}
+
+.exploracion__badge {
+    background: color-mix(in srgb, var(--acento) 14%, var(--superficie));
+    border: 1px solid color-mix(in srgb, var(--acento) 35%, var(--linea));
+    border-radius: 999px;
+    color: var(--texto-oscuro);
+    display: inline-block;
+    font-size: 0.78rem;
+    margin-top: 18px;
+    padding: 6px 12px;
+}
+
+.exploracion__grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.exploracion__card {
+    background: var(--superficie);
+    border: 1px solid var(--linea);
+    border-radius: 22px;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    min-height: 180px;
+    padding: 22px 18px;
+    text-align: left;
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.exploracion__card:hover,
+.exploracion__card:focus-visible {
+    border-color: var(--card-accent, var(--acento));
+    box-shadow: 0 12px 32px color-mix(in srgb, var(--card-accent, var(--acento)) 18%, transparent);
+    outline: none;
+    transform: translateY(-4px);
+}
+
+.exploracion__card strong {
+    color: var(--texto-oscuro);
+    display: block;
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+}
+
+.exploracion__card small {
+    color: var(--texto-suave);
+    display: block;
+    line-height: 1.4;
+}
+
+.exploracion__icono {
+    color: var(--card-accent, var(--acento));
+    display: block;
+    font-size: 1.6rem;
+    margin-bottom: 14px;
+}
+
+.exploracion__card[data-energia="desenchufarme"] { --card-accent: #79c995; }
+.exploracion__card[data-energia="sentirlo"] { --card-accent: #d98c7d; }
+.exploracion__card[data-energia="conectar"] { --card-accent: #d8be67; }
+.exploracion__card[data-energia="misterio"] { --card-accent: #a99ac7; }
+
+.exploracion__nota {
+    color: #969b94;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    margin-top: 24px;
+    max-width: 60ch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .exploracion__card {
+        transition: none;
+    }
+}

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrá — Así Salgo!</title>
+    <meta name="description"
+        content="Elegí cómo querés que te llamemos en la comunidad. Tu nombre autopercibido y un código único para salir juntos.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="css/paginas.css">
+    <link rel="stylesheet" href="css/entrar.css">
+</head>
+
+<body data-pagina="entrar">
+
+    <div id="nav-raiz" class="nav-sitio"></div>
+
+    <main class="pagina pagina-entrar">
+        <header class="pagina-hero pagina-hero--chica">
+            <p class="eyebrow">Comunidad</p>
+            <h1>Así te vamos a llamar.</h1>
+            <p class="pagina-hero__lead">
+                Sin contraseñas ni mails: solo un nombre que elijas vos y un código corto
+                por si hay otra persona con el mismo apodo.
+            </p>
+        </header>
+
+        <section class="entrar-panel" aria-labelledby="titulo-entrar">
+            <div id="entrar-formulario" class="entrar-formulario">
+                <div class="entrar-tabs" role="tablist" aria-label="Tipo de acceso">
+                    <button class="entrar-tabs__btn activo" type="button" role="tab" aria-selected="true"
+                        id="tab-nuevo" aria-controls="vista-nuevo" data-vista="nuevo">
+                        Primera vez
+                    </button>
+                    <button class="entrar-tabs__btn" type="button" role="tab" aria-selected="false" id="tab-volver"
+                        aria-controls="vista-volver" data-vista="volver">
+                        Ya tengo código
+                    </button>
+                </div>
+
+                <div class="entrar-vista activa" id="vista-nuevo" role="tabpanel" aria-labelledby="tab-nuevo">
+                    <h2 class="entrar-panel__pregunta" id="titulo-entrar">¿Cómo te gustaría que te llamemos?</h2>
+                    <p class="entrar-panel__ayuda">
+                        Puede ser tu nombre, un apodo o como te autopercibís. En la comunidad
+                        te vamos a mostrar con un número al lado para distinguirte.
+                    </p>
+
+                    <form class="formulario" id="form-nuevo-perfil" novalidate>
+                        <div class="campo">
+                            <label for="nombre-nuevo">Tu nombre en la comunidad</label>
+                            <input type="text" id="nombre-nuevo" name="nombre" maxlength="32" autocomplete="nickname"
+                                placeholder="Ej: Camila, Nico, Lu…" required>
+                        </div>
+                        <p class="entrar-preview" id="preview-nombre" aria-live="polite">
+                            Así te verán: <strong id="preview-texto">…</strong>
+                        </p>
+                        <button class="cta-principal" type="submit" id="btn-crear-perfil">
+                            Crear mi nombre <span aria-hidden="true">→</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="entrar-vista" id="vista-volver" role="tabpanel" aria-labelledby="tab-volver" hidden>
+                    <h2 class="entrar-panel__pregunta">Volvé con tu código</h2>
+                    <p class="entrar-panel__ayuda">
+                        Si cambiaste de celular o navegador, ingresá el mismo nombre y el código
+                        de cuatro dígitos que te dimos la primera vez.
+                    </p>
+
+                    <form class="formulario" id="form-ingresar-perfil" novalidate>
+                        <div class="entrar-codigo-fila">
+                            <div class="campo">
+                                <label for="nombre-volver">Tu nombre</label>
+                                <input type="text" id="nombre-volver" name="nombre" maxlength="32"
+                                    autocomplete="nickname" placeholder="El que elegiste" required>
+                            </div>
+                            <div class="campo">
+                                <label for="codigo-volver">Código</label>
+                                <input type="text" id="codigo-volver" name="codigo" maxlength="6" inputmode="numeric"
+                                    pattern="[0-9]*" autocomplete="one-time-code" placeholder="4821" required>
+                            </div>
+                        </div>
+                        <button class="cta-principal" type="submit" id="btn-ingresar-perfil">
+                            Entrar <span aria-hidden="true">→</span>
+                        </button>
+                    </form>
+                </div>
+
+                <a class="entrar-saltar" href="#" id="link-saltar">Explorar sin identificarme por ahora</a>
+            </div>
+
+            <div class="entrar-exito" id="entrar-exito" aria-live="polite">
+                <div class="entrar-exito__avatar" id="exito-inicial" aria-hidden="true">?</div>
+                <p class="entrar-exito__nombre" id="exito-nombre"></p>
+                <p class="entrar-exito__codigo" id="exito-detalle"></p>
+                <button class="cta-principal" type="button" id="btn-continuar">
+                    Seguir a Así Salgo! <span aria-hidden="true">→</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer id="pie-raiz" class="pie-sitio"></footer>
+
+    <script src="js/perfil.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/entrar.js"></script>
+</body>
+
+</html>

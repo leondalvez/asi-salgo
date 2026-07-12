@@ -1,0 +1,1499 @@
+/* --- El viaje: decisiones cortas y orientadas a salir --- */
+
+.titulo-viaje,
+.viaje {
+    width: min(100%, 980px);
+}
+
+.titulo-viaje {
+    margin-bottom: 36px;
+    text-align: center;
+}
+
+.eyebrow,
+.paso__encabezado > span {
+    color: var(--texto-secundario);
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.titulo-viaje h1 {
+    color: var(--texto-titulo);
+    font-size: clamp(2.25rem, 7vw, 4.25rem);
+    font-weight: 300;
+    letter-spacing: -.06em;
+    line-height: .95;
+    margin: 12px 0;
+}
+
+.titulo-viaje > p:last-child,
+.paso__encabezado p,
+.resultado__nota {
+    color: var(--texto-secundario);
+    line-height: 1.5;
+}
+
+.progreso {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    margin: 0 auto 32px;
+    max-width: 420px;
+}
+
+.progreso__paso {
+    align-items: center;
+    color: var(--texto-secundario);
+    display: flex;
+    font-size: .8rem;
+    gap: 7px;
+    transition: color var(--anim-media) var(--anim-suave);
+    white-space: nowrap;
+}
+
+.progreso__paso::first-letter {
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    display: inline-grid;
+    height: 22px;
+    place-items: center;
+    width: 22px;
+}
+
+.progreso__paso.activo {
+    color: var(--color-card, var(--texto-principal));
+}
+
+.progreso__linea {
+    background: linear-gradient(to right,
+        var(--color-card, var(--linea)) 0%,
+        var(--color-card, var(--linea)) var(--relleno, 0%),
+        var(--linea) var(--relleno, 0%),
+        var(--linea) 100%);
+    flex: 1;
+    height: 2px;
+    transition: --relleno var(--anim-lenta) var(--anim-suave);
+}
+
+@property --relleno {
+    syntax: '<percentage>';
+    inherits: false;
+    initial-value: 0%;
+}
+
+.paso {
+    animation: entrar var(--anim-media) var(--anim-suave);
+    margin: auto;
+    max-width: 900px;
+}
+
+.paso.activo .card-viaje,
+.paso.activo .opcion-plan,
+.paso.activo .filtros,
+.paso.activo .cta-principal {
+    animation: subir var(--anim-media) var(--anim-suave) backwards;
+}
+
+.paso.activo .card-viaje:nth-child(1),
+.paso.activo .opcion-plan:nth-child(1) { animation-delay: 60ms; }
+.paso.activo .card-viaje:nth-child(2),
+.paso.activo .opcion-plan:nth-child(2) { animation-delay: 120ms; }
+.paso.activo .card-viaje:nth-child(3),
+.paso.activo .opcion-plan:nth-child(3) { animation-delay: 180ms; }
+.paso.activo .card-viaje:nth-child(4) { animation-delay: 240ms; }
+.paso.activo .filtros:nth-of-type(1) { animation-delay: 80ms; }
+.paso.activo .filtros:nth-of-type(2) { animation-delay: 150ms; }
+.paso.activo .filtros:nth-of-type(3) { animation-delay: 220ms; }
+.paso.activo .cta-principal { animation-delay: 300ms; }
+
+.paso__encabezado {
+    margin-bottom: 24px;
+    max-width: 540px;
+}
+
+.paso__encabezado h2,
+.resultado h2 {
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    font-weight: 300;
+    letter-spacing: -.04em;
+    line-height: 1.05;
+    margin: 8px 0;
+}
+
+.grid-viaje {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1fr;
+}
+
+.card-viaje,
+.opcion-plan,
+.chip,
+.cta-principal,
+.volver {
+    font: inherit;
+}
+
+.card-viaje {
+    --color-card: var(--color-desenchufarme);
+    align-items: center;
+    background:
+        radial-gradient(140% 80% at 20% 0%,
+            color-mix(in srgb, var(--color-card) 10%, transparent) 0%,
+            transparent 55%),
+        linear-gradient(165deg, #191d1a 0%, #0f1210 100%);
+    border: 1px solid var(--linea);
+    border-radius: 20px;
+    box-shadow: var(--sombra-card);
+    color: var(--texto-titulo);
+    cursor: pointer;
+    display: flex;
+    gap: 18px;
+    isolation: isolate;
+    max-width: 100%;
+    min-height: 108px;
+    min-width: 0;
+    overflow: hidden;
+    padding: 18px;
+    position: relative;
+    text-align: left;
+    transition:
+        border-color var(--anim-media) var(--anim-suave),
+        transform var(--anim-lenta) var(--anim-suave),
+        box-shadow var(--anim-lenta) var(--anim-suave),
+        background var(--anim-media) var(--anim-suave);
+}
+
+/* Glow de acento detrás del arte: en reposo respira apenas, al tocar se enciende. */
+.card-viaje::before {
+    background: radial-gradient(60% 60% at 30% 26%,
+        color-mix(in srgb, var(--color-card) 55%, transparent) 0%,
+        transparent 70%);
+    content: "";
+    inset: 0;
+    opacity: .22;
+    pointer-events: none;
+    position: absolute;
+    transition: opacity var(--anim-lenta) var(--anim-suave);
+    z-index: -1;
+}
+
+/* Barrido de luz diagonal que cruza la tarjeta al pasar el mouse. */
+.card-viaje::after {
+    background: linear-gradient(115deg,
+        transparent 32%,
+        color-mix(in srgb, var(--color-card) 22%, transparent) 48%,
+        transparent 64%);
+    content: "";
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+    transform: translateX(-130%);
+    transition: transform var(--anim-lenta) var(--anim-suave);
+    z-index: -1;
+}
+
+.card-viaje:hover,
+.card-viaje:focus-visible {
+    border-color: color-mix(in srgb, var(--color-card) 60%, var(--linea));
+    box-shadow:
+        0 22px 50px -26px color-mix(in srgb, var(--color-card) 65%, black),
+        var(--sombra-card-hover);
+    outline: none;
+    transform: translateY(-6px);
+}
+
+.card-viaje:hover::before,
+.card-viaje:focus-visible::before,
+.card-viaje.seleccionada::before {
+    opacity: .85;
+}
+
+.card-viaje:hover::after,
+.card-viaje:focus-visible::after {
+    transform: translateX(130%);
+}
+
+.card-viaje:active {
+    transform: translateY(-2px) scale(.985);
+    transition-duration: var(--anim-rapida);
+}
+
+.card-viaje.seleccionada {
+    border-color: var(--color-card);
+    box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--color-card) 45%, transparent),
+        0 22px 50px -26px color-mix(in srgb, var(--color-card) 60%, black),
+        var(--sombra-card-hover);
+    outline: none;
+    transform: translateY(-3px);
+}
+
+.card-viaje:focus-visible,
+.chip:focus-visible,
+.opcion-plan:focus-visible,
+.volver:focus-visible,
+.cta-principal:focus-visible {
+    outline: 2px solid var(--color-card, var(--texto-principal));
+    outline-offset: 3px;
+}
+
+/* El título recibe foco por accesibilidad al cambiar de paso; sin recuadro visible. */
+.paso h2:focus,
+.paso h1:focus,
+.titulo-viaje h1:focus {
+    outline: none;
+}
+
+.card-viaje strong,
+.card-viaje small {
+    display: block;
+    overflow-wrap: anywhere;
+}
+
+.card-viaje > span {
+    min-width: 0;
+}
+
+.card-viaje strong {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.card-viaje small {
+    color: var(--texto-secundario);
+    font-size: .82rem;
+    margin-top: 4px;
+}
+
+.card-viaje[data-energia="desenchufarme"] { --color-card: var(--color-desenchufarme); }
+.card-viaje[data-energia="sentirlo"] { --color-card: var(--color-sentirlo); }
+.card-viaje[data-energia="conectar"] { --color-card: var(--color-conectar); }
+.card-viaje[data-energia="misterio"] { --color-card: var(--color-misterio); }
+
+/* Ilustraciones lineales: SVG decorativo, calmo en reposo y expresivo al interactuar. */
+.arte-experiencia {
+    color: var(--color-card);
+    display: block;
+    flex: 0 0 clamp(64px, 18vw, 82px);
+    height: clamp(64px, 18vw, 82px);
+    max-height: 82px;
+    max-width: 82px;
+    overflow: visible;
+    transform-origin: 30% 50%;
+    transition:
+        transform var(--anim-lenta) var(--anim-suave),
+        filter var(--anim-lenta) var(--anim-suave);
+    will-change: transform;
+}
+
+/* Respiración muy sutil en reposo: la tarjeta parece "viva" sin distraer. */
+.card-viaje .arte-experiencia {
+    animation: respirar-arte 7s ease-in-out infinite;
+    animation-delay: var(--desfase-card, 0s);
+}
+
+.arte-trazo {
+    fill: none;
+    stroke: currentColor;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+    vector-effect: non-scaling-stroke;
+    transition: opacity var(--anim-media) var(--anim-suave), stroke-width var(--anim-media) var(--anim-suave);
+}
+
+/* Reposo: arte presente pero atenuado, invita a encenderlo. */
+.arte-trazo--principal { opacity: .62; }
+.arte-trazo--detalle {
+    opacity: .4;
+    stroke: var(--texto-secundario);
+}
+
+.card-viaje:nth-child(1) { --desfase-card: -0s; }
+.card-viaje:nth-child(2) { --desfase-card: -1.6s; }
+.card-viaje:nth-child(3) { --desfase-card: -3.2s; }
+.card-viaje:nth-child(4) { --desfase-card: -4.8s; }
+
+/* Interacción: el trazo se redibuja con florecimiento y toma todo el color. */
+.card-viaje:hover .arte-trazo,
+.card-viaje:focus-visible .arte-trazo,
+.card-viaje.seleccionada .arte-trazo {
+    animation: trazar 1.1s var(--anim-suave) both;
+    opacity: 1;
+    stroke: currentColor;
+    stroke-width: 1.9;
+}
+
+.card-viaje:hover .arte-trazo--detalle,
+.card-viaje:focus-visible .arte-trazo--detalle,
+.card-viaje.seleccionada .arte-trazo--detalle { animation-delay: .18s; }
+
+.card-viaje:hover .arte-experiencia,
+.card-viaje:focus-visible .arte-experiencia,
+.card-viaje.seleccionada .arte-experiencia {
+    animation: none;
+    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--color-card) 70%, transparent));
+    transform: scale(1.1) rotate(-2deg);
+}
+
+/* --- Escenas de energía ---
+   Cada tarjeta dibuja una pequeña escena (no un ícono abstracto): el árbol y el
+   banco de "Desenchufarme", el micrófono y las luces de "Sentirlo", la mesa con
+   café de "Conectar", el farol y el camino de "Misterio". En reposo, los
+   detalles quedan apagados en tono hueso; al tocar la tarjeta, todo se enciende
+   con el color de esa energía, como si la escena cobrara vida. */
+
+.escena-rayo,
+.escena-pajaro,
+.escena-foco,
+.escena-nota,
+.escena-barra,
+.escena-vapor,
+.escena-punto,
+.escena-brillo,
+.escena-estrella {
+    transition: opacity var(--anim-media) var(--anim-suave), fill var(--anim-media) var(--anim-suave), stroke var(--anim-media) var(--anim-suave);
+}
+
+/* Sol: rayos que respiran despacio */
+.escena-rayo {
+    stroke: var(--texto-secundario);
+    stroke-linecap: round;
+    stroke-width: 1.5;
+    opacity: .4;
+    animation: pulsar-rayo 5s ease-in-out infinite;
+}
+.escena-rayo--2 { animation-delay: .5s; }
+.escena-rayo--3 { animation-delay: 1s; }
+
+.card-viaje:hover .escena-rayo,
+.card-viaje:focus-visible .escena-rayo,
+.card-viaje.seleccionada .escena-rayo,
+.opcion-plan:hover .escena-rayo,
+.opcion-plan:focus-visible .escena-rayo {
+    stroke: var(--color-card);
+    opacity: .9;
+    animation-duration: 2.2s;
+}
+
+/* Pájaros: planean en el cielo y se alejan al despertar la escena */
+.escena-pajaro {
+    fill: none;
+    stroke: var(--texto-secundario);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.5;
+    opacity: .5;
+    animation: planear 6s ease-in-out infinite;
+}
+.escena-pajaro--2 { animation-delay: 1.4s; }
+
+.card-viaje:hover .escena-pajaro,
+.card-viaje:focus-visible .escena-pajaro,
+.card-viaje.seleccionada .escena-pajaro,
+.opcion-plan:hover .escena-pajaro,
+.opcion-plan:focus-visible .escena-pajaro {
+    stroke: var(--color-card);
+    opacity: 1;
+    animation: volar 1.8s var(--anim-suave) infinite;
+}
+.card-viaje:hover .escena-pajaro--2,
+.card-viaje:focus-visible .escena-pajaro--2,
+.card-viaje.seleccionada .escena-pajaro--2,
+.opcion-plan:hover .escena-pajaro--2,
+.opcion-plan:focus-visible .escena-pajaro--2 { animation-delay: .3s; }
+
+/* Focos de escenario: destellan anunciando la función */
+.escena-foco {
+    fill: color-mix(in srgb, var(--texto-secundario) 60%, transparent);
+    opacity: .16;
+    animation: destello 4.5s ease-in-out infinite;
+}
+.escena-foco--2 { animation-delay: 1.1s; }
+
+.card-viaje:hover .escena-foco,
+.card-viaje:focus-visible .escena-foco,
+.card-viaje.seleccionada .escena-foco,
+.opcion-plan:hover .escena-foco,
+.opcion-plan:focus-visible .escena-foco {
+    fill: color-mix(in srgb, var(--color-card) 55%, transparent);
+    opacity: .5;
+    animation-duration: 1.6s;
+}
+
+/* Nota musical: flota y se desvanece en loop */
+.escena-nota {
+    fill: none;
+    stroke: var(--texto-secundario);
+    stroke-linecap: round;
+    stroke-width: 1.6;
+    opacity: 0;
+    animation: flotar-nota 4.5s ease-in-out infinite;
+}
+
+.card-viaje:hover .escena-nota,
+.card-viaje:focus-visible .escena-nota,
+.card-viaje.seleccionada .escena-nota,
+.opcion-plan:hover .escena-nota,
+.opcion-plan:focus-visible .escena-nota {
+    stroke: var(--color-card);
+    animation: flotar-nota 1.8s ease-in-out infinite;
+}
+
+/* Ecualizador: pulso musical constante, se acelera al vivir la escena */
+.escena-barra {
+    stroke: var(--texto-secundario);
+    stroke-linecap: round;
+    stroke-width: 3.4;
+    transform-box: fill-box;
+    transform-origin: bottom;
+    opacity: .5;
+    animation: sonar 2.2s ease-in-out infinite;
+}
+.escena-barra--2 { animation-delay: .18s; }
+.escena-barra--3 { animation-delay: .36s; }
+.escena-barra--4 { animation-delay: .54s; }
+
+.card-viaje:hover .escena-barra,
+.card-viaje:focus-visible .escena-barra,
+.card-viaje.seleccionada .escena-barra,
+.opcion-plan:hover .escena-barra,
+.opcion-plan:focus-visible .escena-barra {
+    stroke: var(--color-card);
+    opacity: 1;
+    animation-duration: 1s;
+}
+
+/* Vapor de las tazas: sube y se disuelve */
+.escena-vapor {
+    fill: none;
+    stroke: var(--texto-secundario);
+    stroke-linecap: round;
+    stroke-width: 1.4;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: bottom;
+    animation: subir-vapor 4s ease-in-out infinite;
+}
+.escena-vapor--2 { animation-delay: 1.3s; }
+
+.card-viaje:hover .escena-vapor,
+.card-viaje:focus-visible .escena-vapor,
+.card-viaje.seleccionada .escena-vapor,
+.opcion-plan:hover .escena-vapor,
+.opcion-plan:focus-visible .escena-vapor {
+    stroke: var(--color-card);
+    animation: subir-vapor 1.8s ease-in-out infinite;
+}
+
+/* Puntos de conversación: indicador de "están hablando" */
+.escena-punto {
+    fill: var(--texto-secundario);
+    opacity: .4;
+    animation: hablar 1.6s ease-in-out infinite;
+}
+.escena-punto--2 { animation-delay: .18s; }
+.escena-punto--3 { animation-delay: .36s; }
+
+.card-viaje:hover .escena-punto,
+.card-viaje:focus-visible .escena-punto,
+.card-viaje.seleccionada .escena-punto,
+.opcion-plan:hover .escena-punto,
+.opcion-plan:focus-visible .escena-punto {
+    fill: var(--color-card);
+    animation-duration: .9s;
+}
+
+/* Brillo del farol: late como una invitación en la noche */
+.escena-brillo {
+    fill: var(--color-card);
+    opacity: .14;
+    animation: latir-farol 4.5s ease-in-out infinite;
+}
+
+.card-viaje:hover .escena-brillo,
+.card-viaje:focus-visible .escena-brillo,
+.card-viaje.seleccionada .escena-brillo,
+.opcion-plan:hover .escena-brillo,
+.opcion-plan:focus-visible .escena-brillo {
+    opacity: .55;
+    animation-duration: 2s;
+}
+
+/* Estrellas: titilan despacio */
+.escena-estrella {
+    fill: var(--texto-secundario);
+    opacity: .35;
+    animation: titilar 3.6s ease-in-out infinite;
+}
+.escena-estrella--2 { animation-delay: 1.2s; }
+
+.card-viaje:hover .escena-estrella,
+.card-viaje:focus-visible .escena-estrella,
+.card-viaje.seleccionada .escena-estrella,
+.opcion-plan:hover .escena-estrella,
+.opcion-plan:focus-visible .escena-estrella {
+    fill: var(--color-card);
+    opacity: .9;
+    animation-duration: 1.4s;
+}
+
+.opciones-plan {
+    display: grid;
+    gap: 12px;
+}
+
+.opcion-plan {
+    align-items: center;
+    background:
+        radial-gradient(120% 120% at 8% 50%,
+            color-mix(in srgb, var(--color-card) 10%, transparent) 0%,
+            transparent 45%),
+        linear-gradient(165deg, #181c19 0%, #0f1210 100%);
+    border: 1px solid var(--linea);
+    border-radius: 16px;
+    box-shadow: var(--sombra-card);
+    color: var(--texto-titulo);
+    cursor: pointer;
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 58px minmax(0, 1fr);
+    isolation: isolate;
+    min-height: 64px;
+    overflow: hidden;
+    padding: 14px 16px;
+    position: relative;
+    text-align: left;
+    transition:
+        border-color var(--anim-media) var(--anim-suave),
+        box-shadow var(--anim-lenta) var(--anim-suave),
+        transform var(--anim-media) var(--anim-suave);
+}
+
+.opcion-plan::after {
+    background: linear-gradient(115deg,
+        transparent 32%,
+        color-mix(in srgb, var(--color-card) 20%, transparent) 48%,
+        transparent 64%);
+    content: "";
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+    transform: translateX(-130%);
+    transition: transform var(--anim-lenta) var(--anim-suave);
+    z-index: -1;
+}
+
+.opcion-plan:hover,
+.opcion-plan:focus-visible {
+    border-color: color-mix(in srgb, var(--color-card) 60%, var(--linea));
+    box-shadow:
+        0 18px 40px -24px color-mix(in srgb, var(--color-card) 60%, black),
+        var(--sombra-card-hover);
+    outline: none;
+    transform: translateX(5px);
+}
+
+.opcion-plan:hover::after,
+.opcion-plan:focus-visible::after {
+    transform: translateX(130%);
+}
+
+.opcion-plan:active {
+    transform: translateX(2px) scale(.99);
+    transition-duration: var(--anim-rapida);
+}
+
+.opcion-plan small {
+    color: var(--texto-secundario);
+    display: block;
+    margin-top: 3px;
+    overflow-wrap: anywhere;
+}
+
+.opcion-plan__texto {
+    min-width: 0;
+}
+
+.arte-plan {
+    color: var(--color-card);
+    display: block;
+    height: 58px;
+    overflow: visible;
+    transform-origin: center;
+    transition:
+        transform var(--anim-lenta) var(--anim-suave),
+        filter var(--anim-lenta) var(--anim-suave);
+    width: 58px;
+}
+
+.arte-plan__trazo {
+    fill: none;
+    opacity: .55;
+    stroke: currentColor;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+    transition: opacity var(--anim-media) var(--anim-suave);
+    vector-effect: non-scaling-stroke;
+}
+
+.arte-plan__trazo--2 { opacity: .4; }
+.arte-plan__trazo--2,
+.arte-plan__trazo--3 {
+    stroke: var(--texto-secundario);
+}
+.arte-plan__trazo--3 { opacity: .32; }
+
+.opcion-plan:hover .arte-plan__trazo,
+.opcion-plan:focus-visible .arte-plan__trazo {
+    animation: trazar 1s var(--anim-suave) both;
+    opacity: 1;
+    stroke: currentColor;
+}
+
+.opcion-plan:hover .arte-plan__trazo--2,
+.opcion-plan:focus-visible .arte-plan__trazo--2 { animation-delay: .14s; }
+.opcion-plan:hover .arte-plan__trazo--3,
+.opcion-plan:focus-visible .arte-plan__trazo--3 { animation-delay: .28s; }
+
+.opcion-plan:hover .arte-plan,
+.opcion-plan:focus-visible .arte-plan {
+    filter: drop-shadow(0 0 9px color-mix(in srgb, var(--color-card) 65%, transparent));
+    transform: scale(1.12) rotate(-3deg);
+}
+
+.volver {
+    background: transparent;
+    border: 0;
+    color: var(--texto-secundario);
+    cursor: pointer;
+    margin-bottom: 28px;
+    padding: 4px 0;
+}
+
+.volver:hover { color: var(--texto-principal); }
+
+.filtros {
+    border: 0;
+    margin: 0 0 24px;
+    padding: 0;
+}
+
+.filtros legend {
+    font-size: .9rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.chip {
+    align-items: center;
+    background: transparent;
+    border: 1px solid var(--linea);
+    border-radius: 999px;
+    color: var(--texto-principal);
+    cursor: pointer;
+    display: inline-flex;
+    gap: 7px;
+    padding: 10px 14px;
+    transition:
+        background-color var(--anim-rapida) var(--anim-suave),
+        border-color var(--anim-rapida) var(--anim-suave),
+        color var(--anim-rapida) var(--anim-suave),
+        transform var(--anim-rapida) var(--anim-suave);
+}
+
+.chip.seleccionado {
+    background: var(--color-card);
+    border-color: var(--color-card);
+    color: var(--fondo-principal);
+    transform: translateY(-1px);
+}
+
+.chip:hover {
+    border-color: var(--color-card);
+    transform: translateY(-1px);
+}
+
+.chip:active {
+    transform: translateY(0) scale(.97);
+}
+
+.chip-arte {
+    display: block;
+    height: 24px;
+    width: 24px;
+}
+
+.chip-trazo {
+    animation: revelar-chip 10s var(--anim-easing) infinite;
+    fill: none;
+    stroke: currentColor;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.4;
+    vector-effect: non-scaling-stroke;
+}
+
+.chip-trazo--detalle { animation-delay: -.7s; }
+.chip:nth-child(2) .chip-trazo { animation-delay: -3.3s; }
+.chip:nth-child(2) .chip-trazo--detalle { animation-delay: -4s; }
+.chip:nth-child(3) .chip-trazo { animation-delay: -6.6s; }
+.chip:nth-child(3) .chip-trazo--detalle { animation-delay: -7.3s; }
+
+.chip:hover .chip-arte,
+.chip:focus-visible .chip-arte,
+.chip.seleccionado .chip-arte {
+    transform: scale(1.08);
+    transition: transform 350ms var(--anim-easing);
+}
+
+.cta-principal {
+    background: var(--color-card, var(--texto-principal));
+    border: 1px solid var(--color-card, var(--texto-principal));
+    border-radius: 999px;
+    box-shadow: 0 10px 26px -12px color-mix(in srgb, var(--color-card, #000) 70%, transparent);
+    color: var(--fondo-principal);
+    cursor: pointer;
+    font-weight: 600;
+    margin-top: 8px;
+    padding: 15px 22px;
+    transition:
+        transform var(--anim-media) var(--anim-suave),
+        box-shadow var(--anim-media) var(--anim-suave),
+        background-color var(--anim-media) var(--anim-suave),
+        border-color var(--anim-media) var(--anim-suave);
+}
+
+.cta-principal span {
+    display: inline-block;
+    transition: transform var(--anim-media) var(--anim-suave);
+}
+
+.cta-principal:hover {
+    box-shadow: 0 16px 34px -12px color-mix(in srgb, var(--color-card, #000) 80%, transparent);
+    transform: translateY(-2px);
+}
+
+.cta-principal:hover span {
+    transform: translateX(4px);
+}
+
+.cta-principal:active {
+    transform: translateY(0) scale(.99);
+}
+
+.volver {
+    transition: color var(--anim-rapida) var(--anim-suave), transform var(--anim-rapida) var(--anim-suave);
+}
+
+.volver:active {
+    transform: translateX(-2px);
+}
+
+.resultado {
+    max-width: 540px;
+    text-align: center;
+}
+
+.resultado__pulso {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 30px 0;
+}
+
+.resultado__pulso i {
+    animation: pulso 1.1s ease-in-out infinite;
+    background: var(--color-card);
+    border-radius: 50%;
+    height: 8px;
+    width: 8px;
+}
+
+.resultado__pulso i:nth-child(2) { animation-delay: .15s; }
+.resultado__pulso i:nth-child(3) { animation-delay: .3s; }
+.resultado .volver { margin-top: 28px; }
+
+.resultado__enlaces {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.resultado__enlaces .volver-indice {
+    color: var(--texto-secundario);
+    font-size: .88rem;
+    text-decoration: none;
+    transition: color var(--anim-rapida) var(--anim-suave);
+}
+
+.resultado__enlaces .volver-indice:hover,
+.resultado__enlaces .volver-indice:focus-visible {
+    color: var(--color-card, var(--color-desenchufarme));
+}
+
+.lector {
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    width: 1px;
+}
+
+@keyframes entrar {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes subir {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes trazar {
+    0% { stroke-dashoffset: 100; opacity: .15; }
+    55% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes respirar-arte {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-2px) scale(1.015); }
+}
+
+@keyframes pulsar-rayo {
+    0%, 100% { opacity: .28; }
+    50% { opacity: .6; }
+}
+
+@keyframes planear {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(2px, -2px); }
+}
+
+@keyframes volar {
+    0% { transform: translate(0, 0); opacity: 1; }
+    100% { transform: translate(16px, -12px); opacity: 0; }
+}
+
+@keyframes destello {
+    0%, 100% { opacity: .12; }
+    50% { opacity: .3; }
+}
+
+@keyframes flotar-nota {
+    0% { opacity: 0; transform: translateY(4px); }
+    30% { opacity: .8; }
+    70% { opacity: .8; transform: translateY(-10px); }
+    100% { opacity: 0; transform: translateY(-16px); }
+}
+
+@keyframes sonar {
+    0%, 100% { transform: scaleY(.45); }
+    50% { transform: scaleY(1); }
+}
+
+@keyframes subir-vapor {
+    0% { opacity: 0; transform: translateY(0) scaleY(1); }
+    40% { opacity: .7; }
+    100% { opacity: 0; transform: translateY(-10px) scaleY(1.3); }
+}
+
+@keyframes hablar {
+    0%, 100% { transform: translateY(0); opacity: .3; }
+    50% { transform: translateY(-3px); opacity: 1; }
+}
+
+@keyframes latir-farol {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+}
+
+@keyframes titilar {
+    0%, 100% { opacity: .2; }
+    50% { opacity: .8; }
+}
+
+@keyframes aparecer-evento {
+    from { opacity: 0; transform: translateY(12px) scale(.99); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes revelar-trazo {
+    0%, 12% {
+        opacity: .28;
+        stroke-dashoffset: 70;
+    }
+    42%, 76% {
+        opacity: 1;
+        stroke-dashoffset: 0;
+    }
+    94%, 100% {
+        opacity: .28;
+        stroke-dashoffset: -70;
+    }
+}
+
+@keyframes revelar-plan {
+    0%, 10% {
+        opacity: .25;
+        stroke-dashoffset: 72;
+    }
+    38%, 80% {
+        opacity: 1;
+        stroke-dashoffset: 0;
+    }
+    96%, 100% {
+        opacity: .25;
+        stroke-dashoffset: -72;
+    }
+}
+
+@keyframes revelar-chip {
+    0%, 10% { opacity: .3; stroke-dashoffset: 70; }
+    35%, 82% { opacity: 1; stroke-dashoffset: 0; }
+    96%, 100% { opacity: .3; stroke-dashoffset: -70; }
+}
+
+@keyframes pulso {
+    50% { opacity: .35; transform: scale(.65); }
+}
+
+.eventos {
+    display: grid;
+    gap: 14px;
+    margin: 24px 0;
+}
+
+.evento-card {
+    animation: aparecer-evento var(--anim-media) var(--anim-suave) backwards;
+    background: var(--fondo-card);
+    border: 1px solid var(--linea);
+    border-radius: 18px;
+    box-shadow: var(--sombra-card);
+    padding: 16px;
+    text-align: left;
+    transition: transform var(--anim-media) var(--anim-suave), box-shadow var(--anim-media) var(--anim-suave);
+}
+
+.evento-card:nth-child(1) { animation-delay: 40ms; }
+.evento-card:nth-child(2) { animation-delay: 100ms; }
+.evento-card:nth-child(3) { animation-delay: 160ms; }
+.evento-card:nth-child(4) { animation-delay: 220ms; }
+.evento-card:nth-child(5) { animation-delay: 280ms; }
+.evento-card:nth-child(6) { animation-delay: 340ms; }
+
+.evento-card:hover {
+    box-shadow: var(--sombra-card-hover);
+    transform: translateY(-3px);
+}
+
+.evento-card__meta {
+    color: var(--texto-secundario);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: .72rem;
+    gap: 8px;
+    letter-spacing: .04em;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.evento-card__icono {
+    color: var(--color-card, var(--texto-principal));
+}
+
+.evento-card__chip-peques {
+    background: color-mix(in srgb, var(--color-conectar) 22%, transparent);
+    border-radius: 999px;
+    color: var(--color-conectar);
+    padding: 2px 8px;
+}
+
+.evento-card__titulo {
+    color: var(--texto-titulo);
+    display: -webkit-box;
+    font-size: 1.05rem;
+    font-weight: 600;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-height: 1.25;
+    margin: 0 0 6px;
+    overflow: hidden;
+}
+
+.evento-card__descripcion {
+    color: var(--texto-secundario);
+    display: -webkit-box;
+    font-size: .88rem;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-height: 1.4;
+    margin: 0 0 10px;
+    overflow: hidden;
+}
+
+.evento-card__detalle {
+    margin: 0 0 10px;
+}
+
+.evento-card__detalle summary {
+    color: var(--color-card, var(--texto-principal));
+    cursor: pointer;
+    font-size: .82rem;
+    font-weight: 600;
+    list-style: none;
+    margin-bottom: 4px;
+}
+
+.evento-card__detalle summary::-webkit-details-marker {
+    display: none;
+}
+
+.evento-card__detalle p {
+    color: var(--texto-secundario);
+    font-size: .86rem;
+    line-height: 1.4;
+    margin: 6px 0 0;
+}
+
+.evento-card__datos {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0 0 12px;
+}
+
+.evento-card__datos dt {
+    color: var(--texto-secundario);
+    font-size: .68rem;
+    letter-spacing: .08em;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+}
+
+.evento-card__datos dd {
+    color: var(--texto-titulo);
+    display: -webkit-box;
+    font-size: .86rem;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    margin: 0;
+    overflow: hidden;
+}
+
+.evento-card__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.evento-card__opcion {
+    appearance: none;
+    background: transparent;
+    border: 1px solid color-mix(in srgb, var(--texto-secundario) 28%, transparent);
+    border-radius: 999px;
+    color: var(--texto-secundario);
+    cursor: pointer;
+    font-size: .8rem;
+    font-weight: 500;
+    line-height: 1.2;
+    padding: 6px 11px;
+    text-decoration: none;
+    transition:
+        background 220ms var(--anim-suave, ease),
+        border-color 220ms var(--anim-suave, ease),
+        color 220ms var(--anim-suave, ease);
+}
+
+.evento-card__opcion:hover,
+.evento-card__opcion:focus-visible {
+    background: color-mix(in srgb, var(--texto-secundario) 8%, transparent);
+    border-color: color-mix(in srgb, var(--color-card, var(--texto-principal)) 35%, transparent);
+    color: var(--texto-principal);
+    outline: none;
+}
+
+.evento-card__opcion--compartir.activo {
+    background: color-mix(in srgb, var(--color-card, var(--texto-principal)) 12%, transparent);
+    border-color: color-mix(in srgb, var(--color-card, var(--texto-principal)) 45%, transparent);
+    color: var(--color-card, var(--texto-principal));
+}
+
+.evento-card__opcion--info {
+    font-weight: 500;
+}
+
+.evento-card__redes {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid color-mix(in srgb, var(--linea) 80%, transparent);
+}
+
+.evento-card__redes-etiqueta {
+    color: var(--texto-secundario);
+    font-size: .74rem;
+    letter-spacing: .04em;
+    margin-right: 2px;
+    text-transform: uppercase;
+}
+
+.evento-card__red-social {
+    appearance: none;
+    background: transparent;
+    border: 1px solid color-mix(in srgb, var(--texto-secundario) 30%, transparent);
+    border-radius: 999px;
+    color: var(--texto-principal);
+    cursor: pointer;
+    font-size: .8rem;
+    font-weight: 600;
+    line-height: 1.2;
+    padding: 6px 12px;
+    transition: background 220ms var(--anim-suave, ease), border-color 220ms var(--anim-suave, ease);
+}
+
+.evento-card__red-social--whatsapp {
+    border-color: color-mix(in srgb, #25d366 40%, transparent);
+    color: #9fe8b8;
+}
+
+.evento-card__red-social--instagram {
+    border-color: color-mix(in srgb, #e879a8 40%, transparent);
+    color: #f0b4d0;
+}
+
+.evento-card__red-social:hover,
+.evento-card__red-social:focus-visible {
+    background: color-mix(in srgb, var(--texto-secundario) 8%, transparent);
+    outline: none;
+}
+
+.evento-card__red-social:disabled {
+    cursor: wait;
+    opacity: .65;
+}
+
+.evento-card__link {
+    color: var(--color-card, var(--texto-principal));
+    font-size: .86rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.evento-card__link--secundario {
+    color: var(--texto-secundario);
+    font-weight: 500;
+}
+
+.evento-card__link:hover,
+.evento-card__link:focus-visible {
+    text-decoration: underline;
+}
+
+.evento-card__opcion--salen:hover,
+.evento-card__opcion--salen:focus-visible {
+    border-color: color-mix(in srgb, var(--color-conectar) 40%, transparent);
+    color: #e8d49a;
+}
+
+.eventos-cargando,
+.eventos-vacio,
+.eventos-error {
+    color: var(--texto-secundario);
+    line-height: 1.5;
+    margin: 20px 0;
+}
+
+.eventos-cargando .resultado__pulso {
+    display: inline-flex;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.clima-card {
+    align-items: center;
+    background: var(--fondo-card);
+    border: 1px solid var(--linea);
+    border-left: 3px solid var(--color-card, var(--color-desenchufarme));
+    border-radius: 16px;
+    box-shadow: var(--sombra-card);
+    display: flex;
+    gap: 14px;
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    text-align: left;
+}
+
+.clima-card__temp {
+    color: var(--texto-titulo);
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1;
+    margin: 0;
+    min-width: 4ch;
+}
+
+.clima-card__estado {
+    color: var(--texto-titulo);
+    font-size: .92rem;
+    margin: 0 0 4px;
+}
+
+.clima-card__consejo {
+    color: var(--texto-secundario);
+    font-size: .84rem;
+    line-height: 1.35;
+    margin: 0;
+}
+
+/* --- Ícono de clima ---
+   La escena cambia según la condición real (código de Open-Meteo +
+   temperatura): sol, nube, lluvia, frío o calor, cada una con su propia
+   animación. Apagado por defecto (texto-secundario) salvo cuando la
+   condición tiene un tono propio (sol cálido, lluvia azulada, frío celeste). */
+
+.clima-icono {
+    color: var(--texto-secundario);
+    flex: 0 0 36px;
+    height: 38px;
+    overflow: visible;
+    width: 36px;
+}
+
+.clima-trazo,
+.clima-copo,
+.clima-onda,
+.clima-gota,
+.clima-rayo {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.6;
+    transform-box: fill-box;
+    transform-origin: center;
+    vector-effect: non-scaling-stroke;
+}
+
+.clima-trazo--sol {
+    fill: color-mix(in srgb, currentColor 22%, transparent);
+}
+
+/* Despejado: sol cálido que respira despacio */
+.clima-icono--despejado {
+    color: #d8be67;
+}
+.clima-icono--despejado .clima-trazo--sol,
+.clima-icono--despejado .clima-rayo {
+    animation: sol-respirar 5s ease-in-out infinite;
+}
+.clima-icono--despejado .clima-rayo--diagonal { animation-delay: .3s; }
+
+/* Nublado (y frío-nublado): nube que deriva */
+.clima-icono--nublado,
+.clima-icono--frio-nublado {
+    color: var(--texto-secundario);
+}
+.clima-icono--nublado .clima-trazo--nube,
+.clima-icono--frio-nublado .clima-trazo--nube {
+    animation: nube-derivar 8s ease-in-out infinite;
+}
+
+/* Lluvia: nube más densa, gotas cayendo en cascada */
+.clima-icono--lluvia { color: #7b96ad; }
+.clima-icono--lluvia .clima-trazo--nube { fill: color-mix(in srgb, currentColor 18%, transparent); }
+.clima-icono--lluvia .clima-gota {
+    animation: gota-caer 1.6s ease-in infinite;
+    opacity: 0;
+}
+.clima-icono--lluvia .clima-gota--2 { animation-delay: .35s; }
+.clima-icono--lluvia .clima-gota--3 { animation-delay: .7s; }
+
+/* Frío (y frío-nublado): copo de nieve que gira despacio */
+.clima-icono--frio,
+.clima-icono--frio-nublado {
+    color: #8fc4e0;
+}
+.clima-icono--frio .clima-copo {
+    animation: copo-girar 9s linear infinite;
+}
+.clima-icono--frio .clima-copo--chico,
+.clima-icono--frio-nublado .clima-copo--chico {
+    animation: copo-caer 3s ease-in-out infinite;
+}
+
+/* Calor: sol grande que late fuerte + ondas de calor subiendo */
+.clima-icono--calor { color: #e08a52; }
+.clima-icono--calor .clima-trazo--sol,
+.clima-icono--calor .clima-rayo {
+    animation: sol-respirar 2.6s ease-in-out infinite;
+}
+.clima-icono--calor .clima-onda {
+    animation: calor-vibrar 2.2s ease-in-out infinite;
+    opacity: 0;
+}
+.clima-icono--calor .clima-onda--2 { animation-delay: .5s; }
+
+@keyframes sol-respirar {
+    0%, 100% { opacity: .7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.08); }
+}
+
+@keyframes nube-derivar {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(2.5px); }
+}
+
+@keyframes gota-caer {
+    0% { opacity: 0; transform: translateY(-2px); }
+    30% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(6px); }
+}
+
+@keyframes copo-girar {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes copo-caer {
+    0%, 100% { opacity: .5; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(2px); }
+}
+
+@keyframes calor-vibrar {
+    0% { opacity: 0; transform: translateY(2px); }
+    40% { opacity: .8; }
+    100% { opacity: 0; transform: translateY(-4px); }
+}
+
+.complementos {
+    margin-top: 28px;
+}
+
+.complementos__titulo {
+    color: var(--texto-titulo);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 6px;
+}
+
+.complementos__ayuda {
+    color: var(--texto-secundario);
+    font-size: .86rem;
+    line-height: 1.4;
+    margin: 0 0 14px;
+}
+
+.evento-card--complemento {
+    background: color-mix(in srgb, var(--fondo-card) 88%, var(--color-card, #79c995) 12%);
+}
+
+@media (min-width: 640px) {
+    .grid-viaje { grid-template-columns: repeat(2, 1fr); }
+    .card-viaje {
+        align-items: flex-start;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 220px;
+    }
+    .card-viaje > span:last-child {
+        min-height: 52px;
+    }
+    .opcion-plan {
+        min-height: 96px;
+    }
+    .opciones-plan { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 980px) {
+    .grid-viaje { grid-template-columns: repeat(4, 1fr); }
+    .opciones-plan { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 420px) {
+    .titulo-viaje { margin-bottom: 28px; }
+    .titulo-viaje h1 { font-size: clamp(2.15rem, 14vw, 3rem); }
+    .progreso { gap: 6px; }
+    .progreso__paso { font-size: .72rem; gap: 4px; }
+    .progreso__paso b { display: none; }
+    .card-viaje { gap: 14px; padding: 14px; }
+    .arte-experiencia {
+        flex-basis: 62px;
+        height: 62px;
+        width: 62px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .arte-trazo,
+    .arte-plan__trazo,
+    .chip-trazo {
+        animation: none;
+        opacity: 1;
+        stroke-dashoffset: 0;
+    }
+
+    .escena-rayo,
+    .escena-pajaro,
+    .escena-foco,
+    .escena-nota,
+    .escena-barra,
+    .escena-vapor,
+    .escena-punto,
+    .escena-brillo,
+    .escena-estrella,
+    .clima-rayo,
+    .clima-copo,
+    .clima-onda,
+    .clima-gota,
+    .clima-trazo--nube {
+        animation: none;
+        opacity: .6;
+        transform: none;
+    }
+
+    .paso,
+    .paso.activo .card-viaje,
+    .paso.activo .opcion-plan,
+    .paso.activo .filtros,
+    .paso.activo .cta-principal,
+    .card-viaje .arte-experiencia,
+    .card-viaje:hover .arte-trazo,
+    .card-viaje:focus-visible .arte-trazo,
+    .card-viaje.seleccionada .arte-trazo,
+    .evento-card {
+        animation: none;
+    }
+
+    .card-viaje,
+    .card-viaje::after,
+    .card-viaje .arte-experiencia,
+    .opcion-plan,
+    .evento-card,
+    .cta-principal {
+        transition-duration: 1ms;
+    }
+
+    .card-viaje .arte-trazo { opacity: 1; }
+}
