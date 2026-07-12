@@ -11,6 +11,7 @@ const { agregarSuscripcion } = require('./lib/suscripciones');
 const { crearCompartido, obtenerCompartido } = require('./lib/compartir');
 const { crearSalida, listarSalidas, sumarse } = require('./lib/salidasComunidad');
 const { registrarPerfil, ingresarPerfil } = require('./lib/perfiles');
+const { probarConexion, estaConfigurada } = require('./lib/db');
 const {
     enriquecerConDistancia,
     filtrarPorDistancia,
@@ -460,7 +461,7 @@ async function manejarPerfilRegistrar(req, respuesta) {
     try {
         const cuerpo = await leerCuerpo(req);
         const datos = cuerpo ? JSON.parse(cuerpo) : {};
-        const perfil = registrarPerfil(datos.nombre);
+        const perfil = await registrarPerfil(datos.nombre);
         enviarJson(respuesta, 201, { ok: true, perfil });
     } catch (error) {
         const codigo = error.codigo || 400;
@@ -472,7 +473,7 @@ async function manejarPerfilIngresar(req, respuesta) {
     try {
         const cuerpo = await leerCuerpo(req);
         const datos = cuerpo ? JSON.parse(cuerpo) : {};
-        const perfil = ingresarPerfil(datos.nombre, datos.codigo);
+        const perfil = await ingresarPerfil(datos.nombre, datos.codigo);
         enviarJson(respuesta, 200, { ok: true, perfil });
     } catch (error) {
         const codigo = error.codigo || 400;
@@ -522,7 +523,12 @@ const servidor = http.createServer(async (req, respuesta) => {
     }
 
     if (req.method === 'GET' && url.pathname === '/api/health') {
-        enviarJson(respuesta, 200, { ok: true, ciudades: ['rosario', 'buenos-aires'] });
+        const baseDatos = estaConfigurada() ? await probarConexion() : { ok: false, motivo: 'json_local' };
+        enviarJson(respuesta, 200, {
+            ok: true,
+            ciudades: ['rosario', 'buenos-aires'],
+            almacenamiento: baseDatos.ok ? 'postgresql' : baseDatos.motivo
+        });
         return;
     }
 

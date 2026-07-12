@@ -5,7 +5,7 @@ services:
     name: asi-salgo
     runtime: node
     rootDir: server
-    buildCommand: echo "Sin dependencias npm — solo Node nativo"
+    buildCommand: npm install
     startCommand: node index.js
     healthCheckPath: /api/health
     plan: free

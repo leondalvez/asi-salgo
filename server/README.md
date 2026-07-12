@@ -75,9 +75,88 @@ Contacto documentado del WS municipal: `equipoweb@rosario.gob.ar`
 
 Este proxy Node reemplaza temporalmente el backend Java planificado. La interfaz unificada ya está pensada para migrar a JAX-RS + PostGIS más adelante.
 
+## Supabase / PostgreSQL (perfiles de comunidad)
+
+Los perfiles (`Camila#4821`) se guardan en **PostgreSQL** cuando existe la variable `DATABASE_URL`. Si no está configurada, el server usa JSON local (`server/data/`) para desarrollo.
+
+### 1. Crear la tabla en Supabase
+
+1. Entrá a [supabase.com](https://supabase.com) → tu proyecto.
+2. Menú izquierdo → **SQL Editor** → **New query**.
+3. Abrí en tu proyecto el archivo `server/sql/001-crear-tabla-perfiles.sql`.
+4. Copiá **todo** el SQL (desde `CREATE TABLE` hasta el `CREATE INDEX`) y pegá en Supabase.
+5. Clic **Run** → debe decir **Success**.
+6. Opcional: ejecutá `002-verificar-perfiles.sql` para confirmar que la tabla existe.
+
+### 2. Obtener la connection string
+
+1. **Project Settings** (engranaje) → **Database**.
+2. En **Connection string**, elegí **URI**.
+3. Marcá **Use connection pooling** → modo **Session** (recomendado para Render).
+4. Copiá la URI y reemplazá `[YOUR-PASSWORD]` por la contraseña de la base (la definiste al crear el proyecto; si la olvidaste: **Reset database password** en la misma pantalla).
+
+Ejemplo de forma (no uses este valor literal):
+
+```
+postgresql://postgres.abcdefgh:[TU-CLAVE]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+```
+
+### 3. Variable en Render
+
+1. Render → tu servicio **asi-salgo** → **Environment**.
+2. **Add Environment Variable**:
+   - **Key:** `DATABASE_URL`
+   - **Value:** la URI completa (con la contraseña ya puesta).
+3. **Save Changes** → Render redeploya solo.
+
+### 4. Variable en local (opcional)
+
+```powershell
+cd server
+copy .env.example .env
+# Editá .env y pegá tu DATABASE_URL
+npm install
+npm start
+```
+
+En Windows PowerShell también podés:
+
+```powershell
+$env:DATABASE_URL="postgresql://..."
+npm start
+```
+
+### 5. Verificar que conectó
+
+Abrí:
+
+```
+https://TU-URL.onrender.com/api/health
+```
+
+Deberías ver:
+
+```json
+{
+  "ok": true,
+  "ciudades": ["rosario", "buenos-aires"],
+  "almacenamiento": "postgresql"
+}
+```
+
+Si dice `"almacenamiento": "json_local"` o `"sin DATABASE_URL"`, la variable no llegó al server.
+
+### Flujo de registro (sin cambiar el frontend)
+
+1. Usuario elige nombre en `entrar.html`.
+2. `POST /api/perfiles/registrar` → `INSERT` en tabla `perfiles`.
+3. Respuesta con `id`, `nombre`, `codigo`, `nombreVisible`.
+4. El navegador guarda eso en `localStorage` (`asi-salgo-perfil`).
+5. En otro dispositivo: **Ya tengo código** → `POST /api/perfiles/ingresar` → `SELECT` por nombre + código.
+
 ## Deploy gratuito (sin pagar hosting)
 
-El proyecto está listo para subir **sin base de datos paga**: un solo proceso Node sirve el frontend y la API. No hay dependencias en `package.json` (solo módulos nativos de Node).
+El proyecto usa Node + el paquete `pg` para PostgreSQL. Un solo proceso sirve el frontend y la API.
 
 ### Opción A — Render.com Free (recomendada para el TP)
 
@@ -88,7 +167,7 @@ URL fija con HTTPS, por ejemplo `https://asi-salgo.onrender.com`.
 3. En Render: **New → Web Service** → conectá el repo.
 4. Configuración:
    - **Root Directory:** `server`
-   - **Build Command:** (vacío o `echo ok`)
+   - **Build Command:** `npm install`
    - **Start Command:** `node index.js`
    - **Plan:** Free
 5. Render inyecta `PORT` automáticamente; el server ya usa `process.env.PORT`.
@@ -99,7 +178,7 @@ También podés importar el `render.yaml` de la raíz del repo (Blueprint).
 **Limitaciones del tier gratis (no son bugs):**
 
 - Tras ~15 min sin visitas el servicio **duerme**. El primer acceso puede tardar **30–60 s**.
-- El disco es **efímero**: suscripciones, perfiles y salidas publicadas se reinician al redeploy. Para el TP alcanza; la comunidad arranca con datos demo automáticos.
+- El disco de Render es **efímero** para JSON; los **perfiles** persisten en Supabase si configuraste `DATABASE_URL`.
 - La carpeta `server/data/` está en `.gitignore` a propósito (datos locales). En producción free se generan archivos nuevos al usarse.
 
 ### Opción B — Cloudflare Tunnel (demo desde tu PC, $0)
