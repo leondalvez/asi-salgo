@@ -17,6 +17,12 @@ const {
     filtrarPorDistancia,
     ordenarPorCercania
 } = require('./lib/geo');
+const {
+    rechazarOrigenEscritura,
+    combinarCabeceras,
+    esUrlSegura,
+    leerCuerpo
+} = require('./lib/seguridad');
 
 const PUERTO = process.env.PORT || 3000;
 const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
@@ -63,52 +69,65 @@ const MIME = {
     '.json': 'application/json; charset=utf-8'
 };
 
-function enviarJson(respuesta, codigo, datos) {
+function enviarJson(respuesta, codigo, datos, req, { escritura = false } = {}) {
     const cuerpo = JSON.stringify(datos);
-    respuesta.writeHead(codigo, {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type'
-    });
+    respuesta.writeHead(
+        codigo,
+        combinarCabeceras(req, { 'Content-Type': 'application/json; charset=utf-8' }, { escritura })
+    );
     respuesta.end(cuerpo);
 }
 
-function leerCuerpo(req) {
-    return new Promise((resolve, reject) => {
-        let datos = '';
-        req.on('data', (chunk) => {
-            datos += chunk;
-        });
-        req.on('end', () => resolve(datos));
-        req.on('error', reject);
-    });
+function rechazarEscritura(req, respuesta) {
+    if (!rechazarOrigenEscritura(req)) return false;
+    enviarJson(respuesta, 403, { error: 'Origen no permitido.' }, req, { escritura: true });
+    return true;
 }
 
-function servirArchivo(rutaSolicitada, respuesta) {
+async function leerJson(req, respuesta) {
+    try {
+        const cuerpo = await leerCuerpo(req);
+        return cuerpo ? JSON.parse(cuerpo) : {};
+    } catch (error) {
+        if (error.codigo === 413) {
+            enviarJson(respuesta, 413, { error: 'La solicitud es demasiado grande.' }, req, { escritura: true });
+            return null;
+        }
+        if (error instanceof SyntaxError) {
+            enviarJson(respuesta, 400, { error: 'JSON inválido.' }, req, { escritura: true });
+            return null;
+        }
+        throw error;
+    }
+}
+
+function servirArchivo(rutaSolicitada, respuesta, req) {
     const rutaSegura = path.normalize(rutaSolicitada).replace(/^(\.\.[/\\])+/, '');
     const rutaCompleta = path.join(FRONTEND_DIR, rutaSegura);
 
     if (!rutaCompleta.startsWith(FRONTEND_DIR)) {
-        respuesta.writeHead(403);
+        respuesta.writeHead(403, combinarCabeceras(req));
         respuesta.end('Forbidden');
         return;
     }
 
     fs.readFile(rutaCompleta, (error, contenido) => {
         if (error) {
-            respuesta.writeHead(404);
+            respuesta.writeHead(404, combinarCabeceras(req));
             respuesta.end('Not found');
             return;
         }
 
         const extension = path.extname(rutaCompleta).toLowerCase();
-        respuesta.writeHead(200, { 'Content-Type': MIME[extension] || 'application/octet-stream' });
+        respuesta.writeHead(
+            200,
+            combinarCabeceras(req, { 'Content-Type': MIME[extension] || 'application/octet-stream' })
+        );
         respuesta.end(contenido);
     });
 }
 
-async function manejarEventos(url, respuesta) {
+async function manejarEventos(url, respuesta, req) {
     const ciudad = url.searchParams.get('ciudad') || 'rosario';
     const momento = url.searchParams.get('momento') || 'hoy';
     const plan = url.searchParams.get('plan') || '';
@@ -124,7 +143,7 @@ async function manejarEventos(url, respuesta) {
         enviarJson(respuesta, 400, {
             error: 'Ciudad no soportada',
             ciudades: IDS_CIUDADES
-        });
+        }, req);
         return;
     }
 
@@ -195,19 +214,19 @@ async function manejarEventos(url, respuesta) {
             clima,
             complementos,
             eventos
-        });
+        }, req);
     } catch (error) {
         console.error('[api/eventos]', error);
         enviarJson(respuesta, 502, {
             error: 'No pudimos armar tu salida en este momento.',
             detalle: error.message
-        });
+        }, req);
     }
 }
 
 const ETIQUETAS_VALIDAS = ['parques', 'plazas', 'deporte', 'turismo', 'cultural'];
 
-async function manejarLugares(url, respuesta) {
+async function manejarLugares(url, respuesta, req) {
     const ciudad = url.searchParams.get('ciudad') || 'rosario';
     const etiquetasParam = url.searchParams.get('etiquetas') || '';
     const lat = Number(url.searchParams.get('lat'));
@@ -218,7 +237,7 @@ async function manejarLugares(url, respuesta) {
         enviarJson(respuesta, 400, {
             error: 'Ciudad no soportada',
             ciudades: IDS_CIUDADES
-        });
+        }, req);
         return;
     }
 
@@ -247,13 +266,13 @@ async function manejarLugares(url, respuesta) {
                 ? null
                 : 'No pudimos traer lugares en este momento. Probá de nuevo en unos minutos.',
             lugares
-        });
+        }, req);
     } catch (error) {
         console.error('[api/lugares]', error);
         enviarJson(respuesta, 502, {
             error: 'No pudimos cargar el mapa de salidas en este momento.',
             detalle: error.message
-        });
+        }, req);
     }
 }
 
@@ -313,6 +332,7 @@ function construirHtmlCompartido(registro, base) {
     const maps = `https://www.google.com/maps/dir/?${mapsParams}`;
     const entrada =
         evento.gratis === true ? 'Entrada gratis' : evento.gratis === false ? 'Entrada paga' : '';
+    const linkEvento = esUrlSegura(evento.link);
 
     return `<!DOCTYPE html>
 <html lang="es">
@@ -399,7 +419,7 @@ function construirHtmlCompartido(registro, base) {
         </dl>
         <div class="acciones">
             <a href="${escaparHtml(maps)}" target="_blank" rel="noopener noreferrer">Cómo llegar</a>
-            ${evento.link ? `<a href="${escaparHtml(evento.link)}" target="_blank" rel="noopener noreferrer">Ver más del evento</a>` : ''}
+            ${linkEvento ? `<a href="${escaparHtml(linkEvento)}" target="_blank" rel="noopener noreferrer">Ver más del evento</a>` : ''}
         </div>
         <a class="cta" href="/viaje.html">Encontrá tu propia salida en Así Salgo!</a>
     </article>
@@ -408,36 +428,41 @@ function construirHtmlCompartido(registro, base) {
 }
 
 async function manejarCrearCompartir(req, respuesta) {
+    if (rechazarEscritura(req, respuesta)) return;
+
     try {
-        const cuerpo = await leerCuerpo(req);
-        const datos = cuerpo ? JSON.parse(cuerpo) : {};
+        const datos = await leerJson(req, respuesta);
+        if (!datos) return;
+
         const registro = crearCompartido(datos);
         const base = urlBase(req);
         enviarJson(respuesta, 201, {
             ok: true,
             id: registro.id,
             url: `${base}/compartir/${registro.id}`
-        });
+        }, req, { escritura: true });
     } catch (error) {
         const codigo = error.codigo || 400;
-        enviarJson(respuesta, codigo, { error: error.message || 'No pudimos preparar el link.' });
+        enviarJson(respuesta, codigo, { error: error.message || 'No pudimos preparar el link.' }, req, {
+            escritura: true
+        });
     }
 }
 
 function manejarPaginaCompartir(id, req, respuesta) {
     const registro = obtenerCompartido(id);
     if (!registro) {
-        respuesta.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
+        respuesta.writeHead(404, combinarCabeceras(req, { 'Content-Type': 'text/html; charset=utf-8' }));
         respuesta.end('<!DOCTYPE html><html lang="es"><body><p>Esta invitación ya no está disponible.</p><p><a href="/viaje.html">Ir a Así Salgo!</a></p></body></html>');
         return;
     }
 
     const html = construirHtmlCompartido(registro, urlBase(req));
-    respuesta.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    respuesta.writeHead(200, combinarCabeceras(req, { 'Content-Type': 'text/html; charset=utf-8' }));
     respuesta.end(html);
 }
 
-async function manejarSalenListado(url, respuesta) {
+async function manejarSalenListado(url, respuesta, req) {
     const ciudad = url.searchParams.get('ciudad') || '';
     let salidas = listarSalidas({ ciudad: ciudad || undefined });
     await conLimiteDeTiempo(
@@ -446,70 +471,95 @@ async function manejarSalenListado(url, respuesta) {
         }),
         8000
     );
-    enviarJson(respuesta, 200, { total: salidas.length, salidas });
+    enviarJson(respuesta, 200, { total: salidas.length, salidas }, req);
 }
 
 async function manejarSalenPublicar(req, respuesta) {
+    if (rechazarEscritura(req, respuesta)) return;
+
     try {
-        const cuerpo = await leerCuerpo(req);
-        const datos = cuerpo ? JSON.parse(cuerpo) : {};
+        const datos = await leerJson(req, respuesta);
+        if (!datos) return;
+
         const salida = crearSalida(datos);
-        enviarJson(respuesta, 201, { ok: true, salida });
+        enviarJson(respuesta, 201, { ok: true, salida }, req, { escritura: true });
     } catch (error) {
         const codigo = error.codigo || 400;
-        enviarJson(respuesta, codigo, { error: error.message || 'No pudimos publicar tu salida.' });
+        enviarJson(respuesta, codigo, { error: error.message || 'No pudimos publicar tu salida.' }, req, {
+            escritura: true
+        });
     }
 }
 
 async function manejarPerfilRegistrar(req, respuesta) {
+    if (rechazarEscritura(req, respuesta)) return;
+
     try {
-        const cuerpo = await leerCuerpo(req);
-        const datos = cuerpo ? JSON.parse(cuerpo) : {};
+        const datos = await leerJson(req, respuesta);
+        if (!datos) return;
+
         const perfil = await registrarPerfil(datos.nombre);
-        enviarJson(respuesta, 201, { ok: true, perfil });
+        enviarJson(respuesta, 201, { ok: true, perfil }, req, { escritura: true });
     } catch (error) {
         const codigo = error.codigo || 400;
-        enviarJson(respuesta, codigo, { error: error.message || 'No pudimos crear tu perfil.' });
+        enviarJson(respuesta, codigo, { error: error.message || 'No pudimos crear tu perfil.' }, req, {
+            escritura: true
+        });
     }
 }
 
 async function manejarPerfilIngresar(req, respuesta) {
+    if (rechazarEscritura(req, respuesta)) return;
+
     try {
-        const cuerpo = await leerCuerpo(req);
-        const datos = cuerpo ? JSON.parse(cuerpo) : {};
+        const datos = await leerJson(req, respuesta);
+        if (!datos) return;
+
         const perfil = await ingresarPerfil(datos.nombre, datos.codigo);
-        enviarJson(respuesta, 200, { ok: true, perfil });
+        enviarJson(respuesta, 200, { ok: true, perfil }, req, { escritura: true });
     } catch (error) {
         const codigo = error.codigo || 400;
-        enviarJson(respuesta, codigo, { error: error.message || 'No pudimos encontrar tu perfil.' });
+        enviarJson(respuesta, codigo, { error: error.message || 'No pudimos encontrar tu perfil.' }, req, {
+            escritura: true
+        });
     }
 }
 
 async function manejarSalenSumo(id, req, respuesta) {
+    if (rechazarEscritura(req, respuesta)) return;
+
     try {
-        const cuerpo = await leerCuerpo(req);
-        const datos = cuerpo ? JSON.parse(cuerpo) : {};
+        const datos = await leerJson(req, respuesta);
+        if (!datos) return;
+
         const resultado = sumarse(id, datos);
         enviarJson(respuesta, 200, {
             ok: true,
             yaEstaba: resultado.yaEstaba,
             salida: resultado.salida
-        });
+        }, req, { escritura: true });
     } catch (error) {
         const codigo = error.codigo || 400;
-        enviarJson(respuesta, codigo, { error: error.message || 'No pudimos sumarte a esta salida.' });
+        enviarJson(respuesta, codigo, { error: error.message || 'No pudimos sumarte a esta salida.' }, req, {
+            escritura: true
+        });
     }
 }
 
 async function manejarSuscripcion(req, respuesta) {
+    if (rechazarEscritura(req, respuesta)) return;
+
     try {
-        const cuerpo = await leerCuerpo(req);
-        const datos = cuerpo ? JSON.parse(cuerpo) : {};
+        const datos = await leerJson(req, respuesta);
+        if (!datos) return;
+
         const registro = agregarSuscripcion(datos);
-        enviarJson(respuesta, 201, { ok: true, suscripcion: { email: registro.email } });
+        enviarJson(respuesta, 201, { ok: true, suscripcion: { email: registro.email } }, req, { escritura: true });
     } catch (error) {
         const codigo = error.codigo || 400;
-        enviarJson(respuesta, codigo, { error: error.message || 'No pudimos guardar tu suscripción.' });
+        enviarJson(respuesta, codigo, { error: error.message || 'No pudimos guardar tu suscripción.' }, req, {
+            escritura: true
+        });
     }
 }
 
@@ -517,11 +567,13 @@ const servidor = http.createServer(async (req, respuesta) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
 
     if (req.method === 'OPTIONS') {
-        respuesta.writeHead(204, {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type'
-        });
+        if (rechazarOrigenEscritura(req)) {
+            respuesta.writeHead(403, combinarCabeceras(req));
+            respuesta.end();
+            return;
+        }
+
+        respuesta.writeHead(204, combinarCabeceras(req, {}, { escritura: true }));
         respuesta.end();
         return;
     }
@@ -532,22 +584,22 @@ const servidor = http.createServer(async (req, respuesta) => {
             ok: true,
             ciudades: IDS_CIUDADES,
             almacenamiento: baseDatos.ok ? 'postgresql' : baseDatos.motivo
-        });
+        }, req);
         return;
     }
 
     if (req.method === 'GET' && url.pathname === '/api/ciudades') {
-        enviarJson(respuesta, 200, { ciudades: listarCiudades() });
+        enviarJson(respuesta, 200, { ciudades: listarCiudades() }, req);
         return;
     }
 
     if (req.method === 'GET' && url.pathname === '/api/eventos') {
-        await manejarEventos(url, respuesta);
+        await manejarEventos(url, respuesta, req);
         return;
     }
 
     if (req.method === 'GET' && url.pathname === '/api/lugares') {
-        await manejarLugares(url, respuesta);
+        await manejarLugares(url, respuesta, req);
         return;
     }
 
@@ -572,7 +624,7 @@ const servidor = http.createServer(async (req, respuesta) => {
     }
 
     if (req.method === 'GET' && url.pathname === '/api/salen') {
-        await manejarSalenListado(url, respuesta);
+        await manejarSalenListado(url, respuesta, req);
         return;
     }
 
@@ -595,12 +647,20 @@ const servidor = http.createServer(async (req, respuesta) => {
 
     if (req.method === 'GET') {
         const ruta = url.pathname === '/' ? '/index.html' : url.pathname;
-        servirArchivo(ruta, respuesta);
+        servirArchivo(ruta, respuesta, req);
         return;
     }
 
-    await leerCuerpo(req);
-    respuesta.writeHead(405);
+    try {
+        await leerCuerpo(req);
+    } catch (error) {
+        if (error.codigo === 413) {
+            enviarJson(respuesta, 413, { error: 'La solicitud es demasiado grande.' }, req, { escritura: true });
+            return;
+        }
+    }
+
+    respuesta.writeHead(405, combinarCabeceras(req));
     respuesta.end('Method not allowed');
 });
 

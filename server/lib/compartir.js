@@ -7,6 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { esUrlSegura } = require('./seguridad');
 
 const ARCHIVO = path.join(__dirname, '..', 'data', 'compartidos.json');
 const MAX_REGISTROS = 400;
@@ -72,7 +73,7 @@ function validarEvento(evento) {
             gratis: evento.gratis === true ? true : evento.gratis === false ? false : null,
             aptoNinos: evento.aptoNinos === true ? true : null,
             tipo: limpiarTexto(evento.tipo, 40) || 'evento',
-            link: limpiarTexto(evento.link, 500) || null,
+            link: esUrlSegura(limpiarTexto(evento.link, 500)),
             fuente: limpiarTexto(evento.fuente, 80) || null
         }
     };

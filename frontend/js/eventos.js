@@ -52,9 +52,10 @@ function accionesTarjeta(evento, enlaceLlegar, enlaceVerMas = null) {
     }
 
     const id = escaparHtml(evento.id);
+    const linkSeguro = esUrlSegura(enlaceVerMas);
     const verMas =
-        enlaceVerMas && necesitaVerMas(evento)
-            ? `<a class="evento-card__opcion evento-card__opcion--info" href="${enlaceVerMas}" target="_blank" rel="noopener noreferrer">Ver más</a>`
+        linkSeguro && necesitaVerMas(evento)
+            ? `<a class="evento-card__opcion evento-card__opcion--info" href="${escaparHtml(linkSeguro)}" target="_blank" rel="noopener noreferrer">Ver más</a>`
             : '';
 
     return `
@@ -87,6 +88,24 @@ function escaparHtml(texto = '') {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
+}
+
+function esUrlSegura(url) {
+    if (!url || typeof url !== 'string') return null;
+
+    const limpia = url.trim();
+    if (!limpia) return null;
+
+    try {
+        const parsed = new URL(limpia);
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+            return limpia;
+        }
+    } catch {
+        /* URL inválida */
+    }
+
+    return null;
 }
 
 function recortarTexto(texto = '', maximo) {
