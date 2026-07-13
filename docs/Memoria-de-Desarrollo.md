@@ -14,7 +14,7 @@
 
 El sitio tiene nueve pantallas principales: Home, Entrar (identidad), El Viaje (cuestionario), Mapa de lugares, Salen (comunidad), Sobre, Contacto, Este mes y Con Peques.
 
-**Ciudades soportadas (julio 2026):** Rosario, Santa Fe, Córdoba, Mendoza y Buenos Aires. No todas tienen la misma profundidad de datos: priorizamos fuentes abiertas y gratuitas, y somos explícitos cuando una ciudad no publica agenda en API.
+**Ciudades activas (julio 2026):** Rosario y Buenos Aires. Santa Fe, Córdoba y Mendoza quedaron fuera del selector por falta de APIs estables en tier gratuito; los adapters siguen en el repo para reactivarlos cuando haya fuente confiable o presupuesto para API paga.
 
 ---
 
@@ -73,13 +73,13 @@ No linkeamos cuentas institucionales de Instagram o similares (decisión de marc
 
 ### Cobertura por ciudad (honesta)
 
-| Ciudad | Eventos con fecha | Lugares / complementos | Notas |
-|--------|-------------------|------------------------|-------|
-| **Rosario** | Sí — agenda municipal JSON | Datos útiles municipales | Fuente principal del TP |
-| **Santa Fe** | Sí — iCal municipal (`?ical=1`) | Overpass + SINCA | Pedido de docentes; API REST de eventos requiere login |
-| **Buenos Aires** | Sí — Linda | Overpass | Rango mensual limitado en Linda |
-| **Córdoba** | Intentamos API histórica; hoy caída | Overpass + SINCA | Aviso al usuario si no hay agenda |
-| **Mendoza** | No hay API viva gratuita | Overpass + SINCA | Mostramos espacios culturales, no cartelera en tiempo real |
+| Ciudad | Estado en app | Notas |
+|--------|---------------|-------|
+| **Rosario** | Activa | Agenda municipal JSON + datos útiles |
+| **Buenos Aires** | Activa | Linda BA + Overpass |
+| **Santa Fe** | Desactivada (código conservado) | iCal municipal; sin selector en UI |
+| **Córdoba** | Desactivada (código conservado) | API histórica inestable |
+| **Mendoza** | Desactivada (código conservado) | Sin cartelera API gratuita viva |
 
 ---
 
@@ -113,12 +113,15 @@ No linkeamos cuentas institucionales de Instagram o similares (decisión de marc
 - **Mapa en Salen**: planes geocodificados + capa opcional de espacios culturales.
 - Planes de El Viaje enriquecidos con sedes culturales para Rosario.
 
-### Fase 6 — Expansión nacional (ciudades que lo permiten)
-- **Santa Fe**, **Córdoba** y **Mendoza** sumadas al selector de ciudad.
-- Santa Fe: parser iCal de `agenda.santafeciudad.gov.ar` (7+ eventos verificados en prueba local).
-- Córdoba: adapter con fallback cuando la API histórica no responde.
-- Mendoza: sin agenda viva; complementos vía Mapa Cultural (SINCA) + OpenStreetMap.
-- Registro central `server/lib/ciudades.js` + `GET /api/ciudades`.
+### Fase 6 — Símbolo puerta, comunidad en mapa y cierre de TP
+- **Puerta** como identidad visual: logo del nav, CTA de inicio y botón **Me sumo** (antes “Voy a salir”) con animación de apertura.
+- Mapa en Salen con marcadores de compañeros, popup y enfoque tras sumarse.
+- Recorte a **Rosario y Buenos Aires** en UI (adapters de otras ciudades conservados en repo).
+- Fix: `frontend/js/ciudades.js` en IIFE — redeclaraciones globales rompían `viaje.js` y las tarjetas no respondían.
+- OG image PNG 1200×630, meta sociales en 9 páginas, skip link y ajustes tablet.
+
+### Fase 6 (histórico) — Expansión nacional
+- Santa Fe, Córdoba y Mendoza se probaron en desarrollo; hoy **desactivadas** en producción por APIs inestables o sin tier gratuito.
 
 ---
 
@@ -133,7 +136,8 @@ No linkeamos cuentas institucionales de Instagram o similares (decisión de marc
 | Cold start Render | Primera visita tras ~15 min tarda ~30 s | Documentado para el informe; no es bug de la app |
 | Salidas sin ubicación en mapa | La comunidad publica texto libre (“Costanera”) | Geocodificación al listar + persistencia de lat/lng en JSON |
 | Linda sin rango mensual | API solo ofrece hasta “esta semana” | Aviso explícito en Buenos Aires cuando se pide “este mes” |
-| Profesores preguntan por Santa Fe / Córdoba / Mendoza | Solo Rosario y BA al inicio | Investigación de APIs; Santa Fe vía iCal; Córdoba/Mendoza con avisos + SINCA/OSM |
+| Profesores preguntan por Santa Fe / Córdoba / Mendoza | APIs inestables o sin tier gratuito | Adapters en repo; selector limitado a Rosario y BA hasta tener fuente estable |
+| Tarjetas de El Viaje sin click | `ciudades.js` redeclaraba constantes globales → SyntaxError en scripts siguientes | IIFE en `ciudades.js`; solo `window.CiudadesApi` expuesto |
 | JSON efímero en Render | Newsletter y salidas se pierden al redeploy | Perfiles ya en Supabase; migración del resto marcada como opcional |
 
 ---
@@ -167,18 +171,24 @@ No integramos APIs de venta de entradas porque no ofrecen tier gratuito estable 
 
 ## 9. Estado actual y trabajo pendiente
 
-### Listo en producción
+### Listo en producción (o listo en repo, pendiente deploy)
 - URL pública con HTTPS.
 - Perfiles persistentes en PostgreSQL.
 - El Viaje, mapa de lugares, comunidad Salen, compartir, Este mes, Con Peques.
-- Mapa comunitario en Salen con capa cultural.
+- Mapa comunitario en Salen con capa cultural y contador de compañeros.
+- Símbolo **puerta** (logo, CTA inicio, Me sumo) con animación de apertura.
+- Solo **Rosario y Buenos Aires** en el selector de ciudades.
+- Fix crítico: `ciudades.js` encapsulado en IIFE para evitar redeclaraciones que rompían las tarjetas de El Viaje.
+- `og:image` PNG 1200×630 (`frontend/og-salida.png`) y meta OG/Twitter en las 9 páginas.
+- Skip link “Saltar al contenido” + `id` en `<main>` vía `nav.js`.
+- Ajustes CSS tablet 768–1024 px en páginas de contenido y El Viaje.
 
 ### Pendiente para cerrar el TP
-- `og:image` en PNG 1200×630 para todas las páginas.
-- Medición formal con PageSpeed Insights.
-- Testing cross-browser y tablet (768–1024 px).
-- Auditoría de accesibilidad (Tab, contraste, Lighthouse).
-- Pulir fallos menores que aún aparecen en algunas secciones en producción.
+- **Deploy** a Render con los cambios recientes (tarjetas, puerta, OG, accesibilidad).
+- Medición formal con [PageSpeed Insights](https://pagespeed.web.dev/) + captura para la entrega (ver `docs/entrega-evidencias.md`).
+- Testing cross-browser manual (Chrome, Firefox, Safari/Edge) y tablet 768–1024 px con checklist.
+- Auditoría de accesibilidad con Lighthouse (Tab, contraste, landmarks).
+- Pulir fallos menores que aún aparezcan en producción tras el deploy.
 - Opcional: migrar newsletter y salidas comunidad a Supabase.
 
 ---
@@ -205,8 +215,8 @@ En producción, Render ejecuta el mismo `node index.js` desde la carpeta `server
 | `Concepto/Guia-de-Marca.md` | Tono, decisiones de UX y anti-patrones |
 | `Concepto/Planificación Proyecto Final.txt` | Requisitos de la cátedra |
 | `server/README.md` | Deploy, variables de entorno, túnel local |
+| `docs/entrega-evidencias.md` | Checklist PageSpeed, tablet, accesibilidad y deploy |
 | `server/sql/` | Scripts para Supabase |
-| `canvases/asi-salgo-checklist.canvas.tsx` | Checklist vivo de cumplimiento del TP |
 
 ---
 

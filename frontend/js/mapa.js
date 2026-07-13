@@ -8,9 +8,6 @@
 
 const CENTRO_POR_CIUDAD = window.CiudadesApi?.CENTRO_POR_CIUDAD || {
     rosario: [-32.9468, -60.6393],
-    'santa-fe': [-31.6333, -60.7],
-    cordoba: [-31.4201, -64.1888],
-    mendoza: [-32.8908, -68.8272],
     'buenos-aires': [-34.6037, -58.3816]
 };
 

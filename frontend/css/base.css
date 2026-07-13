@@ -1,4 +1,5 @@
-/* --- Así Salgo! · Sistema de diseño base --- */
+@import url('puerta.css');
+
 
 :root {
     --fondo-principal: #0d0f0d;
@@ -153,72 +154,6 @@ textarea {
     100% { background-position: -30% 0; }
 }
 
-/* --- Puertita que se abre dentro del CTA al hacer click --- */
-
-.cta-principal__puerta {
-    flex-shrink: 0;
-    height: 22px;
-    position: relative;
-    width: 18px;
-    z-index: 1;
-}
-
-.puerta-marco {
-    fill: none;
-    opacity: .75;
-    stroke: currentColor;
-    stroke-width: 1.4;
-    vector-effect: non-scaling-stroke;
-}
-
-.puerta-luz {
-    fill: #fff6de;
-    opacity: 0;
-    transition: opacity 320ms var(--anim-suave) 80ms;
-}
-
-.puerta-hoja {
-    fill: currentColor;
-    transform-box: fill-box;
-    transition: transform 520ms var(--anim-suave);
-}
-
-.puerta-hoja--izq {
-    transform-origin: left center;
-}
-
-.puerta-hoja--der {
-    transform-origin: right center;
-}
-
-.cta-principal.abriendo .puerta-luz {
-    opacity: .95;
-}
-
-.cta-principal.abriendo .puerta-hoja--izq {
-    transform: rotateY(80deg);
-}
-
-.cta-principal.abriendo .puerta-hoja--der {
-    transform: rotateY(-80deg);
-}
-
-.cta-principal.abriendo {
-    pointer-events: none;
-}
-
-.cta-principal.abriendo span {
-    opacity: .6;
-    transform: translateX(6px);
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .puerta-hoja,
-    .puerta-luz {
-        transition: none;
-    }
-}
-
 .cta-principal span {
     display: inline-block;
     transition: transform var(--anim-media) var(--anim-suave);
@@ -267,6 +202,31 @@ textarea {
 
 .volver:active {
     transform: translateX(-2px);
+}
+
+.skip-link {
+    background: var(--texto-titulo);
+    border-radius: 8px;
+    color: var(--fondo-principal);
+    font-size: .9rem;
+    font-weight: 600;
+    left: 16px;
+    padding: 10px 16px;
+    position: absolute;
+    text-decoration: none;
+    top: -120%;
+    transition: top var(--anim-rapida) var(--anim-suave);
+    z-index: 10000;
+}
+
+.skip-link:focus {
+    outline: 2px solid var(--color-desenchufarme);
+    outline-offset: 2px;
+    top: 16px;
+}
+
+main:focus {
+    outline: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,6 +1,10 @@
 /**
  * Registro central de ciudades soportadas. Cada entrada define coordenadas,
  * contexto de geocodificación y qué adapter de eventos/lugares usar.
+ *
+ * Por ahora solo Rosario y Buenos Aires (APIs gratuitas estables). Los adapters
+ * de Santa Fe, Córdoba y Mendoza quedan en server/adapters/ para reactivarlos
+ * más adelante si sumamos una fuente paga o municipal confiable.
  */
 
 const CIUDADES = {
@@ -21,33 +25,6 @@ const CIUDADES = {
         lng: -58.3816,
         eventos: 'buenos-aires',
         lugares: 'buenos-aires'
-    },
-    'santa-fe': {
-        id: 'santa-fe',
-        nombre: 'Santa Fe',
-        provincia: 'Santa Fe',
-        lat: -31.6333,
-        lng: -60.7,
-        eventos: 'santa-fe',
-        lugares: 'overpass'
-    },
-    cordoba: {
-        id: 'cordoba',
-        nombre: 'Córdoba',
-        provincia: 'Córdoba',
-        lat: -31.4201,
-        lng: -64.1888,
-        eventos: 'cordoba',
-        lugares: 'overpass'
-    },
-    mendoza: {
-        id: 'mendoza',
-        nombre: 'Mendoza',
-        provincia: 'Mendoza',
-        lat: -32.8908,
-        lng: -68.8272,
-        eventos: 'mendoza',
-        lugares: 'overpass'
     }
 };
 
@@ -74,7 +51,7 @@ function listarCiudades() {
         provincia: CIUDADES[id].provincia,
         lat: CIUDADES[id].lat,
         lng: CIUDADES[id].lng,
-        eventosEnVivo: ['rosario', 'buenos-aires', 'santa-fe', 'cordoba'].includes(id)
+        eventosEnVivo: id === 'rosario' || id === 'buenos-aires'
     }));
 }
 

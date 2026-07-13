@@ -14,9 +14,6 @@ const iconosEtiqueta = {
 
 const CIUDAD_ETIQUETA = window.CiudadesApi?.CIUDAD_ETIQUETA || {
     rosario: 'Rosario',
-    'santa-fe': 'Santa Fe',
-    cordoba: 'Córdoba',
-    mendoza: 'Mendoza',
     'buenos-aires': 'Buenos Aires'
 };
 
@@ -39,6 +36,10 @@ function textoLimpio(texto = '') {
 function necesitaVerMas(evento) {
     if (!evento?.link) return false;
     return textoLimpio(evento.descripcion).length > MAX_DESCRIPCION;
+}
+
+function iconoPuertaSumo() {
+    return window.PuertaApi?.renderIcono() || '';
 }
 
 function accionesTarjeta(evento, enlaceLlegar, enlaceVerMas = null) {
@@ -66,7 +67,7 @@ function accionesTarjeta(evento, enlaceLlegar, enlaceVerMas = null) {
             </button>
             <button class="evento-card__opcion evento-card__opcion--salen" type="button"
                 data-publicar-salida data-evento-id="${id}">
-                Voy a salir
+                ${iconoPuertaSumo()}<span>Me sumo</span>
             </button>
             ${verMas}
         </div>
@@ -400,11 +401,20 @@ function enlazarPublicarSalidaEnContenedores() {
         nodo.addEventListener('click', (eventoClick) => {
             const boton = eventoClick.target.closest('[data-publicar-salida]');
             if (!boton) return;
-            const payload = obtenerSalidaCache(boton.dataset.eventoId);
-            if (payload?.evento) {
-                sessionStorage.setItem('asi-salgo-publicar', JSON.stringify(payload.evento));
+
+            const irAPublicar = () => {
+                const payload = obtenerSalidaCache(boton.dataset.eventoId);
+                if (payload?.evento) {
+                    sessionStorage.setItem('asi-salgo-publicar', JSON.stringify(payload.evento));
+                }
+                window.location.href = 'salen.html#publicar';
+            };
+
+            if (window.PuertaApi?.ejecutarConPuerta) {
+                window.PuertaApi.ejecutarConPuerta(boton, irAPublicar);
+            } else {
+                irAPublicar();
             }
-            window.location.href = 'salen.html#publicar';
         });
     });
 }

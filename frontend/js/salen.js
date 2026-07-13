@@ -2,17 +2,11 @@ const CLAVE_PUBLICAR = 'asi-salgo-publicar';
 
 const CENTRO_POR_CIUDAD = window.CiudadesApi?.CENTRO_POR_CIUDAD || {
     rosario: [-32.9468, -60.6393],
-    'santa-fe': [-31.6333, -60.7],
-    cordoba: [-31.4201, -64.1888],
-    mendoza: [-32.8908, -68.8272],
     'buenos-aires': [-34.6037, -58.3816]
 };
 
 const CIUDAD_ETIQUETA = window.CiudadesApi?.CIUDAD_ETIQUETA || {
     rosario: 'Rosario',
-    'santa-fe': 'Santa Fe',
-    cordoba: 'Córdoba',
-    mendoza: 'Mendoza',
     'buenos-aires': 'Buenos Aires'
 };
 
@@ -33,6 +27,11 @@ const estadoMapaSalen = {
 let mapaSalen = null;
 let capaComunidad = null;
 let capaCultural = null;
+const marcadoresSalida = new Map();
+
+function iconoPuertaMeSumo() {
+    return window.PuertaApi?.renderIcono() || '';
+}
 
 function inicializarMapaSalen() {
     const contenedor = document.querySelector('#mapa-salen');
@@ -50,17 +49,39 @@ function inicializarMapaSalen() {
     capaCultural = L.layerGroup();
 }
 
-function iconoMapaSalen(color) {
+function iconoMapaSalen(total) {
+    const etiqueta = total > 0 ? `<b class="marcador-comunidad__total">${total}</b>` : '';
     return L.divIcon({
         className: 'marcador-lugar marcador-lugar--comunidad',
-        html: `<span style="background:${color}"></span>`,
-        iconSize: [18, 18],
-        popupAnchor: [0, -8]
+        html: `<span class="marcador-comunidad"><i></i>${etiqueta}</span>`,
+        iconSize: [22, 22],
+        popupAnchor: [0, -10]
     });
 }
 
+function listarCompanerosHtml(sumados = []) {
+    if (!sumados.length) {
+        return '<p class="popup-lugar__companeros popup-lugar__companeros--vacio">Todavía nadie se sumó. Sé la primera persona.</p>';
+    }
+
+    const items = sumados
+        .map((persona) => {
+            const clase = persona.esOrganizador ? 'popup-companero popup-companero--organiza' : 'popup-companero';
+            const rol = persona.esOrganizador ? ' · organiza' : '';
+            return `<li class="${clase}">${escaparHtml(persona.nombre)}${rol}</li>`;
+        })
+        .join('');
+
+    return `
+        <div class="popup-lugar__companeros">
+            <span class="popup-lugar__companeros-titulo">Compañeros de salida</span>
+            <ul>${items}</ul>
+        </div>`;
+}
+
 function popupSalida(salida) {
-    const total = (salida.sumados || []).length;
+    const sumados = salida.sumados || [];
+    const total = sumados.length;
     const donde = salida.direccion || salida.lugar || CIUDAD_ETIQUETA[salida.ciudad] || '';
     const enlace = `https://www.google.com/maps/dir/?api=1&destination=${salida.lat},${salida.lng}&travelmode=walking`;
     return `
@@ -68,9 +89,28 @@ function popupSalida(salida) {
             <strong>${escaparHtml(salida.titulo)}</strong>
             <p>Organiza ${escaparHtml(salida.organizador)} · ${total} ${total === 1 ? 'persona' : 'personas'}</p>
             ${donde ? `<p>${escaparHtml(donde)}</p>` : ''}
+            ${listarCompanerosHtml(sumados)}
             <a href="${enlace}" target="_blank" rel="noopener noreferrer">Cómo llegar</a>
         </div>
     `;
+}
+
+function enfocarSalidaEnMapa(id, { abrirPopup = true } = {}) {
+    const marcador = marcadoresSalida.get(id);
+    if (!marcador || !mapaSalen) return false;
+
+    mapaSalen.setView(marcador.getLatLng(), Math.max(mapaSalen.getZoom(), 14), { animate: true });
+    if (abrirPopup) marcador.openPopup();
+
+    const icono = marcador.getElement()?.querySelector('.marcador-comunidad');
+    if (icono) {
+        icono.classList.remove('marcador-comunidad--pulso');
+        void icono.offsetWidth;
+        icono.classList.add('marcador-comunidad--pulso');
+    }
+
+    document.querySelector('#mapa-salen')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return true;
 }
 
 function popupLugarCultural(lugar) {
@@ -110,6 +150,7 @@ function renderizarMapaSalen() {
 
     capaComunidad.clearLayers();
     capaCultural.clearLayers();
+    marcadoresSalida.clear();
 
     const mostrarComunidad = document.querySelector('#capa-comunidad')?.checked !== false;
     const mostrarCultural = document.querySelector('#capa-cultural')?.checked === true;
@@ -118,9 +159,13 @@ function renderizarMapaSalen() {
         estadoMapaSalen.salidas
             .filter((salida) => salida.lat != null && salida.lng != null)
             .forEach((salida) => {
-                L.marker([salida.lat, salida.lng], { icon: iconoMapaSalen('#7eb8da') })
+                const total = (salida.sumados || []).length;
+                const marcador = L.marker([salida.lat, salida.lng], {
+                    icon: iconoMapaSalen(total)
+                })
                     .bindPopup(popupSalida(salida))
                     .addTo(capaComunidad);
+                marcadoresSalida.set(salida.id, marcador);
             });
     }
 
@@ -276,19 +321,24 @@ function crearTarjetaSalida(salida, identidad) {
 
     let botonSumo = '';
     if (!identidad) {
-        botonSumo = `<a class="salen-sumo salen-sumo--entrar" href="${window.PerfilApi?.urlEntrar('salen.html') || 'entrar.html?dest=salen.html'}">Entrá para sumarte</a>`;
+        botonSumo = `<a class="salen-sumo salen-sumo--entrar" href="${window.PerfilApi?.urlEntrar('salen.html') || 'entrar.html?dest=salen.html'}">${iconoPuertaMeSumo()}<span>Entrá para sumarte</span></a>`;
     } else if (esOrganizador) {
         botonSumo = '<span class="salen-ya-sumado">Vos organizás esta salida</span>';
     } else if (yaSumado) {
-        botonSumo = '<span class="salen-ya-sumado">Ya te sumaste</span>';
+        botonSumo = '<span class="salen-ya-sumado">Ya te sumaste — mirá el mapa</span>';
     } else {
-        botonSumo = `<button class="salen-sumo" type="button" data-sumo-id="${escaparHtml(salida.id)}">Me sumo</button>`;
+        botonSumo = `<button class="salen-sumo" type="button" data-sumo-id="${escaparHtml(salida.id)}">${iconoPuertaMeSumo()}<span>Me sumo</span></button>`;
     }
+
+    const tieneMapa = salida.lat != null && salida.lng != null;
+    const verMapa = tieneMapa
+        ? `<button class="salen-ver-mapa" type="button" data-mapa-id="${escaparHtml(salida.id)}">Ver en el mapa</button>`
+        : '';
 
     const donde = salida.direccion || salida.lugar || CIUDAD_ETIQUETA[salida.ciudad] || '';
 
     return `
-        <article class="salen-card">
+        <article class="salen-card" data-salida-id="${escaparHtml(salida.id)}">
             <div class="salen-card__meta">
                 <span class="salen-card__ciudad">${escaparHtml(CIUDAD_ETIQUETA[salida.ciudad] || salida.ciudad)}</span>
                 <span>${formatearFechaRelativa(salida.creado)}</span>
@@ -304,7 +354,10 @@ function crearTarjetaSalida(salida, identidad) {
                 ${chips || '<span class="salen-chip salen-chip--vacio">Sé la primera persona en sumarte</span>'}
                 ${mas}
             </div>
-            <div class="salen-card__acciones">${botonSumo}</div>
+            <div class="salen-card__acciones">
+                ${botonSumo}
+                ${verMapa}
+            </div>
         </article>
     `;
 }
@@ -364,40 +417,52 @@ async function sumarseASalida(id) {
     }
 
     const boton = document.querySelector(`[data-sumo-id="${id}"]`);
-    if (boton) {
-        boton.disabled = true;
-        boton.textContent = 'Sumando…';
-    }
-
-    try {
-        const respuesta = await fetch(`${window.location.origin}/api/salen/${id}/sumo`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                nombre: identidad.nombreVisible,
-                nombreVisible: identidad.nombreVisible,
-                perfilId: identidad.perfilId
-            })
-        });
-
-        if (!respuesta.ok) {
-            const error = await respuesta.json().catch(() => ({}));
-            throw new Error(error.error || 'No pudimos sumarte.');
-        }
-
-        const datos = await respuesta.json();
-        if (datos.yaEstaba) {
-            window.Toast?.mostrar('Ya figurás en este plan.', { tipo: 'info' });
-        } else {
-            window.Toast?.mostrar(`¡Listo, ${identidad.nombre}! Te sumaste a la salida.`, { tipo: 'exito' });
-        }
-        await cargarSalidas();
-    } catch (error) {
-        window.Toast?.mostrar(error.message, { tipo: 'error' });
+    const ejecutar = async () => {
         if (boton) {
-            boton.disabled = false;
-            boton.textContent = 'Me sumo';
+            boton.disabled = true;
+            const etiqueta = boton.querySelector('span');
+            if (etiqueta) etiqueta.textContent = 'Sumando…';
         }
+
+        try {
+            const respuesta = await fetch(`${window.location.origin}/api/salen/${id}/sumo`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nombre: identidad.nombreVisible,
+                    nombreVisible: identidad.nombreVisible,
+                    perfilId: identidad.perfilId
+                })
+            });
+
+            if (!respuesta.ok) {
+                const error = await respuesta.json().catch(() => ({}));
+                throw new Error(error.error || 'No pudimos sumarte.');
+            }
+
+            const datos = await respuesta.json();
+            if (datos.yaEstaba) {
+                window.Toast?.mostrar('Ya figurás en este plan.', { tipo: 'info' });
+            } else {
+                window.Toast?.mostrar(`¡Listo, ${identidad.nombre}! Abrimos la puerta a tu salida.`, { tipo: 'exito' });
+            }
+            await cargarSalidas();
+            enfocarSalidaEnMapa(id);
+        } catch (error) {
+            window.Toast?.mostrar(error.message, { tipo: 'error' });
+            if (boton) {
+                boton.disabled = false;
+                boton.classList.remove('abriendo');
+                const etiqueta = boton.querySelector('span');
+                if (etiqueta) etiqueta.textContent = 'Me sumo';
+            }
+        }
+    };
+
+    if (window.PuertaApi?.ejecutarConPuerta && boton) {
+        window.PuertaApi.ejecutarConPuerta(boton, ejecutar);
+    } else {
+        await ejecutar();
     }
 }
 
@@ -447,12 +512,17 @@ async function publicarSalida(evento) {
             throw new Error(error.error || 'No pudimos publicar tu salida.');
         }
 
+        const datos = await respuesta.json();
         window.Toast?.mostrar('Tu salida ya está visible para la comunidad.', { tipo: 'exito' });
         formulario.reset();
         delete formulario.dataset.eventoId;
         document.querySelector('#filtro-ciudad').value = payload.ciudad;
         await cargarSalidas();
-        document.querySelector('#lista-salen')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (datos.salida?.id) {
+            enfocarSalidaEnMapa(datos.salida.id);
+        } else {
+            document.querySelector('#lista-salen')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     } catch (error) {
         window.Toast?.mostrar(error.message, { tipo: 'error' });
     } finally {
@@ -502,9 +572,16 @@ function inicializarSalen() {
     document.querySelector('#capas-mapa-salen')?.addEventListener('change', onCambioCapasMapa);
 
     document.querySelector('#lista-salen')?.addEventListener('click', (eventoClick) => {
-        const boton = eventoClick.target.closest('[data-sumo-id]');
-        if (!boton) return;
-        sumarseASalida(boton.dataset.sumoId);
+        const botonSumo = eventoClick.target.closest('[data-sumo-id]');
+        if (botonSumo) {
+            sumarseASalida(botonSumo.dataset.sumoId);
+            return;
+        }
+
+        const botonMapa = eventoClick.target.closest('[data-mapa-id]');
+        if (botonMapa) {
+            enfocarSalidaEnMapa(botonMapa.dataset.mapaId);
+        }
     });
 
     document.querySelector('#form-publicar-salida')?.addEventListener('submit', publicarSalida);

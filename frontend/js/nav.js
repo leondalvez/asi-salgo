@@ -116,16 +116,23 @@ function construirNav(paginaActual) {
             </a>`;
     }).join('');
 
+    const logoPuerta = window.PuertaApi?.renderLogo?.() || `
+        <svg class="puerta-svg puerta-svg--logo" viewBox="0 0 32 34" aria-hidden="true">
+            <rect class="puerta-luz" x="6.5" y="5.5" width="19" height="23" rx="1" />
+            <g class="puerta-grupo puerta-grupo--izq">
+                <rect class="puerta-hoja" x="0" y="-11" width="9" height="22" rx="0.5" />
+            </g>
+            <g class="puerta-grupo puerta-grupo--der">
+                <rect class="puerta-hoja" x="-9" y="-11" width="9" height="22" rx="0.5" />
+            </g>
+            <line class="puerta-union" x1="16" y1="7" x2="16" y2="27" />
+            <rect class="puerta-marco" x="4" y="3" width="24" height="28" rx="3" />
+        </svg>`;
+
     return `
         <div class="nav-sitio__contenido">
             <a class="nav-sitio__marca" href="index.html">
-                <svg class="nav-sitio__logo" viewBox="0 0 32 32" aria-hidden="true">
-                    <rect class="nav-logo-marco" x="4" y="6" width="24" height="22" rx="4" />
-                    <path class="nav-logo-puerta-izq" d="M4 11 V23" />
-                    <path class="nav-logo-puerta-der" d="M28 11 V23" />
-                    <circle class="nav-logo-luz" cx="16" cy="16" r="5" />
-                    <path class="nav-logo-destello" d="M16 9 L16.8 12.2 L20 13 L16.8 13.8 L16 17 L15.2 13.8 L12 13 L15.2 12.2 Z" />
-                </svg>
+                ${logoPuerta}
                 <span class="nav-sitio__marca-texto">
                     <span class="nav-sitio__marca-nombre">
                         Así Salgo<span class="nav-sitio__marca-suave">!</span>
@@ -153,10 +160,7 @@ function construirPie() {
     return `
         <div class="pie-sitio__contenido">
             <div class="pie-sitio__marca">
-                <svg class="pie-sitio__logo" viewBox="0 0 32 32" aria-hidden="true">
-                    <rect class="nav-logo-marco" x="4" y="6" width="24" height="22" rx="4" />
-                    <circle class="nav-logo-luz" cx="16" cy="16" r="5" />
-                </svg>
+                ${window.PuertaApi?.renderLogo?.() || ''}
                 <div>
                     <strong>Así Salgo!</strong>
                     <span>La app para dejar las apps.</span>
@@ -173,7 +177,26 @@ function construirPie() {
     `;
 }
 
+function prepararAccesibilidad() {
+    const main = document.querySelector('main');
+    if (!main) return;
+
+    if (!main.id) {
+        main.id = 'contenido-principal';
+    }
+
+    if (document.querySelector('.skip-link')) return;
+
+    const skip = document.createElement('a');
+    skip.className = 'skip-link';
+    skip.href = `#${main.id}`;
+    skip.textContent = 'Saltar al contenido';
+    document.body.insertBefore(skip, document.body.firstChild);
+}
+
 function inicializarNav() {
+    prepararAccesibilidad();
+
     const raiz = document.querySelector('#nav-raiz');
     const pie = document.querySelector('#pie-raiz');
     const paginaActual = document.body.dataset.pagina || '';

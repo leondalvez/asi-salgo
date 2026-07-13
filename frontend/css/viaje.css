@@ -1431,6 +1431,12 @@
     .opciones-plan { grid-template-columns: repeat(3, 1fr); }
 }
 
+@media (min-width: 768px) and (max-width: 1024px) {
+    .grid-viaje { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .opciones-plan { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .viaje { padding-inline: clamp(16px, 4vw, 32px); }
+}
+
 @media (max-width: 420px) {
     .titulo-viaje { margin-bottom: 28px; }
     .titulo-viaje h1 { font-size: clamp(2.15rem, 14vw, 3rem); }

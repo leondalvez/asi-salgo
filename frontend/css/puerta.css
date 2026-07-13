@@ -1,0 +1,167 @@
+/* --- Puerta: logo, CTA de inicio y botón Me sumo --- */
+
+.puerta-svg {
+    display: block;
+    flex-shrink: 0;
+    overflow: visible;
+}
+
+.puerta-marco {
+    fill: none;
+    opacity: .8;
+    stroke: currentColor;
+    stroke-width: 1.4;
+    vector-effect: non-scaling-stroke;
+}
+
+.puerta-luz {
+    fill: #fff6de;
+    opacity: 0;
+    transition: opacity 320ms var(--anim-suave) 80ms;
+}
+
+.puerta-hoja {
+    fill: currentColor;
+    transform-box: fill-box;
+    transition: transform 520ms var(--anim-suave);
+}
+
+.puerta-hoja--izq {
+    transform-origin: left center;
+}
+
+.puerta-hoja--der {
+    transform-origin: right center;
+}
+
+/* Logo: doble hoja negra, línea central blanca; al hover se abre hacia los costados */
+.puerta-svg--logo {
+    height: 34px;
+    overflow: visible;
+    width: 32px;
+}
+
+.puerta-svg--logo .puerta-luz {
+    fill: #fffef5;
+    opacity: 0;
+    transition: opacity 400ms var(--anim-suave) 140ms;
+}
+
+.puerta-svg--logo .puerta-hoja {
+    fill: #000;
+}
+
+.puerta-svg--logo .puerta-grupo {
+    transition: transform 560ms var(--anim-suave);
+}
+
+.puerta-svg--logo .puerta-grupo--izq {
+    transform: translate(7px, 17px) rotate(0deg);
+    transform-origin: 0 0;
+}
+
+.puerta-svg--logo .puerta-grupo--der {
+    transform: translate(25px, 17px) rotate(0deg);
+    transform-origin: 0 0;
+}
+
+.puerta-svg--logo .puerta-union {
+    opacity: .9;
+    stroke: #f4f0e7;
+    stroke-linecap: round;
+    stroke-width: 1.2;
+    transition: opacity 220ms var(--anim-suave);
+    vector-effect: non-scaling-stroke;
+}
+
+.puerta-svg--logo .puerta-marco {
+    opacity: .9;
+    stroke: var(--texto-secundario);
+}
+
+.nav-sitio__marca:hover .puerta-svg--logo .puerta-grupo--izq,
+.nav-sitio__marca:focus-visible .puerta-svg--logo .puerta-grupo--izq {
+    transform: translate(7px, 17px) rotate(-68deg);
+}
+
+.nav-sitio__marca:hover .puerta-svg--logo .puerta-grupo--der,
+.nav-sitio__marca:focus-visible .puerta-svg--logo .puerta-grupo--der {
+    transform: translate(25px, 17px) rotate(68deg);
+}
+
+.nav-sitio__marca:hover .puerta-svg--logo .puerta-union,
+.nav-sitio__marca:focus-visible .puerta-svg--logo .puerta-union {
+    opacity: 0;
+}
+
+.nav-sitio__marca:hover .puerta-svg--logo .puerta-luz,
+.nav-sitio__marca:focus-visible .puerta-svg--logo .puerta-luz {
+    opacity: 1;
+    transition-delay: 80ms;
+}
+
+.nav-sitio__marca:not(:hover):not(:focus-visible) .puerta-svg--logo .puerta-luz {
+    transition-delay: 0ms;
+}
+
+/* CTA principal (inicio del viaje) */
+.cta-principal__puerta {
+    height: 22px;
+    position: relative;
+    width: 20px;
+    z-index: 1;
+}
+
+.cta-principal.abriendo .puerta-luz,
+.salen-sumo.abriendo .puerta-luz,
+.evento-card__opcion--salen.abriendo .puerta-luz {
+    opacity: .95;
+}
+
+.cta-principal.abriendo .puerta-hoja--izq,
+.salen-sumo.abriendo .puerta-hoja--izq,
+.evento-card__opcion--salen.abriendo .puerta-hoja--izq {
+    transform: rotateY(80deg);
+}
+
+.cta-principal.abriendo .puerta-hoja--der,
+.salen-sumo.abriendo .puerta-hoja--der,
+.evento-card__opcion--salen.abriendo .puerta-hoja--der {
+    transform: rotateY(-80deg);
+}
+
+.cta-principal.abriendo {
+    pointer-events: none;
+}
+
+.cta-principal.abriendo span {
+    opacity: .6;
+    transform: translateX(6px);
+}
+
+/* Icono inline en Me sumo / Voy a salir */
+.puerta-svg--icono {
+    height: 16px;
+    width: 15px;
+}
+
+.salen-sumo,
+.evento-card__opcion--salen {
+    align-items: center;
+    display: inline-flex;
+    gap: 8px;
+}
+
+.salen-sumo.abriendo,
+.evento-card__opcion--salen.abriendo {
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .puerta-grupo,
+    .puerta-hoja,
+    .puerta-luz,
+    .puerta-union {
+        transition: none;
+    }
+}

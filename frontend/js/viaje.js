@@ -53,9 +53,6 @@ const respuestas = {
 
 const CIUDADES = window.CiudadesApi?.CIUDAD_ETIQUETA || {
     rosario: 'Rosario',
-    'santa-fe': 'Santa Fe',
-    cordoba: 'Córdoba',
-    mendoza: 'Mendoza',
     'buenos-aires': 'Buenos Aires'
 };
 
