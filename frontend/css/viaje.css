@@ -10,8 +10,17 @@
     text-align: center;
 }
 
-.titulo-viaje--oculto {
+.titulo-viaje--solo-escritorio {
     display: none;
+}
+
+.titulo-viaje--solo-escritorio:not([hidden]) {
+    display: block;
+}
+
+.titulo-viaje--oculto,
+.titulo-viaje--solo-escritorio[hidden] {
+    display: none !important;
 }
 
 .titulo-viaje__bajada,

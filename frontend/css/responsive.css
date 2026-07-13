@@ -10,17 +10,107 @@
     }
 }
 
-@media (max-width: 768px) {
-    :root {
-        --nav-altura-viaje: 58px;
+@media (max-width: 1023px) {
+    body[data-pagina='viaje'] .nav-sitio__marca-tag {
+        display: none;
+    }
+
+    body[data-pagina='viaje'] #titulo-viaje-presentacion {
+        display: none !important;
     }
 
     body[data-pagina='viaje'] {
-        --sitio-bloque: 12px;
+        --sitio-bloque: 10px;
     }
 
     body[data-pagina='viaje'] .nav-sitio {
-        margin-bottom: 8px;
+        margin-bottom: 6px;
+    }
+
+    body[data-pagina='viaje'] .viaje-toolbar {
+        background: color-mix(in srgb, var(--fondo-principal) 94%, transparent);
+        border-bottom: 1px solid color-mix(in srgb, var(--linea) 80%, transparent);
+        margin: 0 calc(-1 * var(--sitio-gutter)) 10px;
+        padding: 6px var(--sitio-gutter) 8px;
+        position: sticky;
+        top: var(--nav-altura-viaje, 56px);
+        z-index: 55;
+    }
+
+    body[data-pagina='viaje'] .viaje-toolbar__contexto {
+        font-size: .66rem;
+        margin-bottom: 6px;
+    }
+
+    body[data-pagina='viaje'] .progreso {
+        gap: 6px;
+        margin-bottom: 0;
+        max-width: 100%;
+    }
+
+    body[data-pagina='viaje'] .progreso__paso {
+        font-size: .72rem;
+    }
+
+    body[data-pagina='viaje'] .progreso__paso b {
+        display: none;
+    }
+
+    body[data-pagina='viaje'] .paso__encabezado {
+        margin-bottom: 10px;
+        max-width: none;
+        text-align: left;
+    }
+
+    body[data-pagina='viaje'] .paso__encabezado > span,
+    body[data-pagina='viaje'] .paso[data-paso='1'] .paso__encabezado > p,
+    body[data-pagina='viaje'] .paso[data-paso='2'] .paso__encabezado > p,
+    body[data-pagina='viaje'] .paso[data-paso='3'] .paso__encabezado > p {
+        display: none;
+    }
+
+    body[data-pagina='viaje'] .paso__encabezado h2 {
+        font-size: 1.22rem;
+        line-height: 1.15;
+        margin: 0;
+    }
+
+    /* Paso 1: 4 energías en 2×2 para ver todas sin tanto scroll */
+    body[data-pagina='viaje'] .paso[data-paso='1'] .grid-viaje {
+        gap: 8px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body[data-pagina='viaje'] .paso[data-paso='1'] .card-viaje {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+        justify-content: flex-start;
+        min-height: 112px;
+        padding: 10px;
+    }
+
+    body[data-pagina='viaje'] .paso[data-paso='1'] .arte-experiencia {
+        flex: 0 0 40px;
+        height: 40px;
+        width: 40px;
+    }
+
+    body[data-pagina='viaje'] .paso[data-paso='1'] .card-viaje strong {
+        font-size: .82rem;
+        line-height: 1.2;
+    }
+
+    body[data-pagina='viaje'] .paso[data-paso='1'] .card-viaje small {
+        font-size: .68rem;
+        line-height: 1.25;
+        margin-top: 2px;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --nav-altura-viaje: 58px;
     }
 
     .titulo-viaje {
@@ -207,7 +297,8 @@
 /* --- Móvil estándar --- */
 
 @media (max-width: 640px) {
-    .card-viaje {
+    .paso[data-paso='2'] .card-viaje,
+    .paso[data-paso='3'] .card-viaje {
         align-items: center;
         flex-direction: row;
         min-height: 108px;
