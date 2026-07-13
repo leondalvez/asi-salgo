@@ -6,17 +6,38 @@
 }
 
 .titulo-viaje {
-    margin-bottom: 36px;
+    margin-bottom: 28px;
     text-align: center;
 }
 
-.eyebrow,
-.paso__encabezado > span {
+.titulo-viaje--oculto {
+    display: none;
+}
+
+.titulo-viaje__bajada,
+.titulo-viaje > p:last-child {
     color: var(--texto-secundario);
-    font-size: .75rem;
+    line-height: 1.5;
+    margin: 0 auto;
+    max-width: 520px;
+}
+
+.viaje-toolbar {
+    margin-bottom: 20px;
+}
+
+.viaje-toolbar__contexto {
+    color: var(--texto-secundario);
+    font-size: .72rem;
     font-weight: 600;
-    letter-spacing: .12em;
+    letter-spacing: .1em;
+    margin: 0 0 10px;
+    text-align: center;
     text-transform: uppercase;
+}
+
+.viaje-toolbar__contexto .eyebrow {
+    display: inline;
 }
 
 .titulo-viaje h1 {
@@ -35,11 +56,20 @@
     line-height: 1.5;
 }
 
+.eyebrow,
+.paso__encabezado > span {
+    color: var(--texto-secundario);
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
 .progreso {
     align-items: center;
     display: flex;
     gap: 10px;
-    margin: 0 auto 32px;
+    margin: 0 auto;
     max-width: 420px;
 }
 

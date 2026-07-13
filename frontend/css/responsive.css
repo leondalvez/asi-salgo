@@ -1,5 +1,135 @@
 /* --- Proporciones y layout transversal (móvil → pantallas grandes) --- */
 
+@media (min-width: 769px) {
+    .viaje-toolbar {
+        background: none;
+        border: 0;
+        margin-bottom: 24px;
+        padding: 0;
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --nav-altura-viaje: 58px;
+    }
+
+    body[data-pagina='viaje'] {
+        --sitio-bloque: 12px;
+    }
+
+    body[data-pagina='viaje'] .nav-sitio {
+        margin-bottom: 8px;
+    }
+
+    .titulo-viaje {
+        display: none;
+    }
+
+    .viaje-toolbar {
+        background: color-mix(in srgb, var(--fondo-principal) 94%, transparent);
+        border-bottom: 1px solid color-mix(in srgb, var(--linea) 80%, transparent);
+        margin: 0 calc(-1 * var(--sitio-gutter)) 14px;
+        padding: 8px var(--sitio-gutter) 10px;
+        position: sticky;
+        top: var(--nav-altura-viaje);
+        z-index: 55;
+    }
+
+    .viaje-toolbar__contexto {
+        margin-bottom: 8px;
+    }
+
+    .progreso {
+        margin-bottom: 0;
+        max-width: 100%;
+    }
+
+    .paso__encabezado {
+        margin-bottom: 14px;
+        max-width: none;
+        text-align: left;
+    }
+
+    .paso__encabezado > span,
+    .paso[data-paso='1'] .paso__encabezado > p,
+    .paso[data-paso='2'] .paso__encabezado > p,
+    .paso[data-paso='3'] .paso__encabezado > p {
+        display: none;
+    }
+
+    .paso__encabezado h2,
+    .resultado h2 {
+        font-size: 1.35rem;
+        line-height: 1.15;
+        margin: 0;
+    }
+
+    .volver {
+        font-size: .86rem;
+        margin-bottom: 12px;
+    }
+
+    .filtros {
+        margin-bottom: 16px;
+    }
+
+    .filtros legend {
+        font-size: .82rem;
+        margin-bottom: 8px;
+    }
+
+    .chip {
+        font-size: .86rem;
+        padding: 8px 12px;
+    }
+
+    .chip-arte {
+        height: 20px;
+        width: 20px;
+    }
+
+    .opcion-plan {
+        gap: 12px;
+        grid-template-columns: 48px minmax(0, 1fr);
+        min-height: 58px;
+        padding: 12px 14px;
+    }
+
+    .arte-plan {
+        height: 48px;
+        width: 48px;
+    }
+
+    body[data-pagina='viaje'] .pagina-hero--chica,
+    body[data-pagina='salen'] .pagina-hero--chica,
+    body[data-pagina='contacto'] .pagina-hero--chica,
+    body[data-pagina='entrar'] .pagina-hero--chica,
+    body[data-pagina='mapa'] .pagina-hero--chica {
+        padding-bottom: 4px;
+        padding-top: 4px;
+        text-align: left;
+    }
+
+    body[data-pagina='salen'] .pagina-hero--chica h1,
+    body[data-pagina='contacto'] .pagina-hero--chica h1,
+    body[data-pagina='entrar'] .pagina-hero--chica h1,
+    body[data-pagina='mapa'] .pagina-hero--chica h1 {
+        font-size: 1.55rem;
+        margin: 4px 0;
+    }
+
+    body[data-pagina='salen'] .pagina-hero__lead,
+    body[data-pagina='contacto'] .pagina-hero__lead,
+    body[data-pagina='entrar'] .pagina-hero__lead,
+    body[data-pagina='mapa'] .pagina-hero__lead {
+        font-size: .92rem;
+        line-height: 1.45;
+        margin-bottom: 8px;
+    }
+}
+
 /* --- Móvil pequeño --- */
 
 @media (max-width: 480px) {
@@ -40,6 +170,27 @@
 
     .titulo-viaje h1 {
         font-size: clamp(1.95rem, 10vw, 2.5rem);
+    }
+
+    .paso[data-paso='1'] .paso__encabezado h2 {
+        font-size: 1.28rem;
+    }
+
+    .grid-viaje {
+        gap: 8px;
+    }
+
+    .card-viaje {
+        min-height: 96px;
+        padding: 12px;
+    }
+
+    .card-viaje strong {
+        font-size: .95rem;
+    }
+
+    .card-viaje small {
+        font-size: .78rem;
     }
 
     .paso__encabezado h2,

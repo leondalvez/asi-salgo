@@ -143,6 +143,13 @@ function mostrarPaso(numero) {
         linea.style.setProperty('--relleno', pasoVisual > indice + 1 ? '100%' : '0%');
     });
 
+    const presentacion = document.querySelector('#titulo-viaje-presentacion');
+    if (presentacion) {
+        presentacion.classList.toggle('titulo-viaje--oculto', numero !== 1);
+    }
+
+    document.body.dataset.viajePaso = String(numero);
+
     const seccion = document.querySelector(`.paso[data-paso="${numero}"]`);
     const titulo = seccion?.querySelector('h2, h1');
     if (titulo) {
@@ -299,6 +306,7 @@ window.CiudadesApi?.renderizarChipsCiudad(document.querySelector('#chips-ciudad-
     ciudadInicial: respuestas.ciudad
 });
 actualizarCiudadVisible();
+document.body.dataset.viajePaso = '1';
 
 document.addEventListener('click', (evento) => {
     const energia = evento.target.closest('.card-viaje');

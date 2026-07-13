@@ -30,19 +30,24 @@
 
     <div id="nav-raiz" class="nav-sitio"></div>
 
-    <header class="titulo-viaje">
-        <p class="eyebrow">El viaje · <span id="ciudad-actual">Rosario</span></p>
+    <header class="titulo-viaje" id="titulo-viaje-presentacion">
         <h1>Menos scroll.<br>Más ciudad.</h1>
-        <p>En tres decisiones encontramos una salida que te dé ganas de ir.</p>
+        <p class="titulo-viaje__bajada">En tres decisiones encontramos una salida que te dé ganas de ir.</p>
     </header>
 
     <main class="viaje" id="viaje">
-        <div class="progreso" aria-label="Progreso del viaje">
-            <span class="progreso__paso activo">1 <b>Energía</b></span>
-            <span class="progreso__linea" aria-hidden="true"></span>
-            <span class="progreso__paso">2 <b>Plan</b></span>
-            <span class="progreso__linea" aria-hidden="true"></span>
-            <span class="progreso__paso">3 <b>Ahora</b></span>
+        <div class="viaje-toolbar">
+            <p class="viaje-toolbar__contexto">
+                <span class="eyebrow">El viaje</span>
+                · <span id="ciudad-actual">Rosario</span>
+            </p>
+            <div class="progreso" aria-label="Progreso del viaje">
+                <span class="progreso__paso activo">1 <b>Energía</b></span>
+                <span class="progreso__linea" aria-hidden="true"></span>
+                <span class="progreso__paso">2 <b>Plan</b></span>
+                <span class="progreso__linea" aria-hidden="true"></span>
+                <span class="progreso__paso">3 <b>Ahora</b></span>
+            </div>
         </div>
 
         <p class="lector" id="estado-viaje" aria-live="polite"></p>

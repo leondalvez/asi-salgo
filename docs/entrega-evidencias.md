@@ -57,6 +57,7 @@ Revisar en DevTools con estos anchos (y en celular real si podés):
 
 - [ ] Home: resplandor y título proporcionados en móvil.
 - [ ] El Viaje: 4 columnas solo desde ~1100 px (antes 2 columnas).
+- [ ] El Viaje móvil: sin hero “Menos scroll”; tarjetas de energía justo debajo de la pregunta.
 - [ ] Salen: formulario y mapa sin desborde.
 - [ ] Header/footer ocupan todo el ancho sin barra de scroll horizontal.
 
