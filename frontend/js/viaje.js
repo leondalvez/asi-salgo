@@ -127,18 +127,6 @@ function crearArtePlan(clave) {
     `;
 }
 
-const UMBRAL_HERO_VIAJE = 1024;
-
-function actualizarPresentacionViaje(numero) {
-    const presentacion = document.querySelector('#titulo-viaje-presentacion');
-    if (!presentacion) return;
-
-    const escritorio = window.matchMedia(`(min-width: ${UMBRAL_HERO_VIAJE}px)`).matches;
-    const mostrar = escritorio && numero === 1;
-    presentacion.hidden = !mostrar;
-    presentacion.classList.toggle('titulo-viaje--oculto', !mostrar);
-}
-
 function mostrarPaso(numero) {
     document.querySelectorAll('.paso').forEach((paso) => {
         const activo = paso.dataset.paso === String(numero);
@@ -156,7 +144,6 @@ function mostrarPaso(numero) {
     });
 
     document.body.dataset.viajePaso = String(numero);
-    actualizarPresentacionViaje(numero);
 
     const seccion = document.querySelector(`.paso[data-paso="${numero}"]`);
     const titulo = seccion?.querySelector('h2, h1');
@@ -315,15 +302,6 @@ window.CiudadesApi?.renderizarChipsCiudad(document.querySelector('#chips-ciudad-
 });
 actualizarCiudadVisible();
 document.body.dataset.viajePaso = '1';
-actualizarPresentacionViaje(1);
-
-let cronometroPresentacion = null;
-window.addEventListener('resize', () => {
-    window.clearTimeout(cronometroPresentacion);
-    cronometroPresentacion = window.setTimeout(() => {
-        actualizarPresentacionViaje(Number(document.body.dataset.viajePaso || 1));
-    }, 120);
-});
 
 document.addEventListener('click', (evento) => {
     const energia = evento.target.closest('.card-viaje');

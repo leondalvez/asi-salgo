@@ -23,20 +23,17 @@
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="css/toast.css">
-    <link rel="stylesheet" href="css/viaje.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/viaje.css">
 </head>
 
 <body data-pagina="viaje">
 
     <div id="nav-raiz" class="nav-sitio"></div>
 
-    <header class="titulo-viaje titulo-viaje--solo-escritorio" id="titulo-viaje-presentacion" hidden>
-        <h1>Menos scroll.<br>Más ciudad.</h1>
-        <p class="titulo-viaje__bajada">En tres decisiones encontramos una salida que te dé ganas de ir.</p>
-    </header>
-
     <main class="viaje" id="viaje">
+        <h1 class="lector">El Viaje — elegí tu salida</h1>
+
         <div class="viaje-toolbar">
             <p class="viaje-toolbar__contexto">
                 <span class="eyebrow">El viaje</span>
@@ -54,10 +51,8 @@
         <p class="lector" id="estado-viaje" aria-live="polite"></p>
 
         <section class="paso activo" data-paso="1" aria-labelledby="pregunta-energia">
-            <div class="paso__encabezado">
-                <span>01 · Empezá por vos</span>
+            <div class="paso__encabezado paso__encabezado--compacto">
                 <h2 id="pregunta-energia">¿Qué necesitás sentir hoy?</h2>
-                <p>No buscás un evento: buscás cómo querés volver a casa.</p>
             </div>
 
             <div class="grid-viaje" role="group" aria-label="Elegí la energía de tu salida">
