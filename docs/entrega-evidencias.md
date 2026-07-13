@@ -3,7 +3,8 @@
 Checklist para cerrar los ítems que la cátedra suele pedir con captura o informe breve.
 
 **URL de producción:** https://asi-salgo.onrender.com  
-**URL local:** http://localhost:3000
+**URL local:** http://localhost:3000  
+**Última verificación automática:** julio 2026 — producción responde; El Viaje muestra tarjetas como botones y skip link visible.
 
 ---
 
@@ -18,6 +19,15 @@ Checklist para cerrar los ítems que la cátedra suele pedir con captura o infor
 4. Si Performance en móvil baja por cold start de Render Free, anotá que el hosting gratuito duerme tras inactividad.
 
 **Meta orientativa:** Accessibility y SEO ≥ 90; Performance depende del cold start.
+
+### Plantilla para pegar resultados
+
+| URL | Dispositivo | Performance | Accessibility | Best Practices | SEO |
+|-----|-------------|-------------|---------------|----------------|-----|
+| Home | Móvil | | | | |
+| Home | Escritorio | | | | |
+| El Viaje | Móvil | | | | |
+| Salen | Móvil | | | | |
 
 ---
 
@@ -50,6 +60,7 @@ En DevTools (o iPad real), probá ancho **768**, **834** y **1024** px:
 - [ ] **Escape** cierra el menú móvil del header.
 - [ ] Lighthouse → Accessibility en Home ≥ 90.
 - [ ] Contraste: texto secundario legible sobre fondo `#0d0f0d` / cards `#141715`.
+- [ ] Landmarks: `banner` (header), `main`, `contentinfo` (footer), nav con `aria-label`.
 
 ---
 
@@ -57,17 +68,32 @@ En DevTools (o iPad real), probá ancho **768**, **834** y **1024** px:
 
 - [ ] Compartir `https://asi-salgo.onrender.com/` en WhatsApp/Telegram muestra imagen con puerta + título.
 - [ ] Imagen servida: `/og-salida.png` (1200×630). Regenerar con `cd server && npm run og:png` si se cambia el SVG.
+- [ ] Links compartidos (`/compartir/:id`) usan el mismo PNG en `og:image`.
 
 ---
 
-## 6. Deploy
+## 6. Deploy y producción
 
-Tras commitear y pushear a `main`, Render redeploya solo. Verificar en producción:
+Verificado en código y desplegado en Render (julio 2026):
 
-- [ ] Clicks en tarjetas de El Viaje funcionan.
-- [ ] Logo puerta abre al hover.
-- [ ] Solo Rosario y Buenos Aires en selector de ciudad.
+- [x] Clicks en tarjetas de El Viaje funcionan (botones de energía visibles en accesibilidad).
+- [x] Skip link “Saltar al contenido” presente.
+- [x] Solo Rosario y Buenos Aires en selector de ciudad.
+- [ ] Logo puerta abre al hover (verificar visualmente tras cold start).
+- [ ] Formulario contacto envía sin error.
+- [ ] Me sumo en Salen actualiza lista.
 
 ---
 
-*Completá las casillas y adjuntá capturas al ZIP o informe del TP.*
+## 7. Seguridad (referencia para informe)
+
+Implementado en `server/lib/seguridad.js`:
+
+- [x] CORS restrictivo en POST (orígenes: producción + localhost).
+- [x] Cabeceras: CSP, `X-Frame-Options`, `nosniff`, `Referrer-Policy`.
+- [x] Límite body JSON 32 KB.
+- [x] URLs externas solo `http`/`https` en compartir y tarjetas “Ver más”.
+
+---
+
+*Completá las casillas manuales y adjuntá capturas al ZIP o informe del TP.*

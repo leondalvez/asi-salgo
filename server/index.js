@@ -320,7 +320,7 @@ function construirHtmlCompartido(registro, base) {
     ].join(' · ');
     const descripcion = evento.descripcion || 'Una salida real para salir de la pantalla y disfrutar la ciudad.';
     const url = `${base}/compartir/${registro.id}`;
-    const imagen = `${base}/og-salida.svg`;
+    const imagen = `${base}/og-salida.png`;
     const mapsParams = new URLSearchParams({
         api: '1',
         destination:

@@ -19,7 +19,13 @@ function mostrarExito(perfil) {
     if (inicial) inicial.textContent = letra;
     if (nombre) nombre.textContent = perfil.nombreVisible;
     if (detalle) {
-        detalle.innerHTML = `Guardá tu código <em>#${perfil.codigo}</em> por si querés volver en otro dispositivo.`;
+        const codigo = document.createElement('em');
+        codigo.textContent = `#${perfil.codigo}`;
+        detalle.replaceChildren(
+            document.createTextNode('Guardá tu código '),
+            codigo,
+            document.createTextNode(' por si querés volver en otro dispositivo.')
+        );
     }
 }
 

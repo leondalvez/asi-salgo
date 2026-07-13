@@ -185,12 +185,24 @@ function prepararAccesibilidad() {
         main.id = 'contenido-principal';
     }
 
+    if (!main.hasAttribute('role')) {
+        main.setAttribute('role', 'main');
+    }
+
+    if (!main.hasAttribute('tabindex')) {
+        main.setAttribute('tabindex', '-1');
+    }
+
     if (document.querySelector('.skip-link')) return;
 
     const skip = document.createElement('a');
     skip.className = 'skip-link';
     skip.href = `#${main.id}`;
     skip.textContent = 'Saltar al contenido';
+    skip.addEventListener('click', (evento) => {
+        evento.preventDefault();
+        main.focus({ preventScroll: false });
+    });
     document.body.insertBefore(skip, document.body.firstChild);
 }
 
@@ -203,6 +215,7 @@ function inicializarNav() {
 
     if (raiz) {
         raiz.innerHTML = construirNav(paginaActual);
+        raiz.setAttribute('role', 'banner');
 
         const nav = raiz.querySelector('.nav-sitio') || raiz;
         const disparador = raiz.querySelector('.nav-sitio__disparador');
@@ -244,6 +257,7 @@ function inicializarNav() {
 
     if (pie) {
         pie.innerHTML = construirPie();
+        pie.setAttribute('role', 'contentinfo');
     }
 }
 

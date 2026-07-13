@@ -171,24 +171,24 @@ No integramos APIs de venta de entradas porque no ofrecen tier gratuito estable 
 
 ## 9. Estado actual y trabajo pendiente
 
-### Listo en producción (o listo en repo, pendiente deploy)
-- URL pública con HTTPS.
-- Perfiles persistentes en PostgreSQL.
+### Listo en producción
+- URL pública con HTTPS (Render) con deploy automático desde `main`.
+- Perfiles persistentes en PostgreSQL (Supabase).
 - El Viaje, mapa de lugares, comunidad Salen, compartir, Este mes, Con Peques.
 - Mapa comunitario en Salen con capa cultural y contador de compañeros.
 - Símbolo **puerta** (logo, CTA inicio, Me sumo) con animación de apertura.
 - Solo **Rosario y Buenos Aires** en el selector de ciudades.
-- Fix crítico: `ciudades.js` encapsulado en IIFE para evitar redeclaraciones que rompían las tarjetas de El Viaje.
-- `og:image` PNG 1200×630 (`frontend/og-salida.png`) y meta OG/Twitter en las 9 páginas.
-- Skip link “Saltar al contenido” + `id` en `<main>` vía `nav.js`.
-- Ajustes CSS tablet 768–1024 px en páginas de contenido y El Viaje.
+- Fix crítico: `ciudades.js` en IIFE (tarjetas de El Viaje responden).
+- `og:image` PNG 1200×630 y meta OG/Twitter en las 9 páginas.
+- Accesibilidad: skip link, `role="main"`, landmarks, foco visible.
+- Ajustes CSS tablet 768–1024 px.
+- Seguridad: CORS restrictivo en POST, cabeceras HTTP, límite body 32 KB, URLs `http`/`https` only.
 
-### Pendiente para cerrar el TP
-- **Deploy** a Render con los cambios recientes (tarjetas, puerta, OG, accesibilidad).
-- Medición formal con [PageSpeed Insights](https://pagespeed.web.dev/) + captura para la entrega (ver `docs/entrega-evidencias.md`).
-- Testing cross-browser manual (Chrome, Firefox, Safari/Edge) y tablet 768–1024 px con checklist.
-- Auditoría de accesibilidad con Lighthouse (Tab, contraste, landmarks).
-- Pulir fallos menores que aún aparezcan en producción tras el deploy.
+### Pendiente para cerrar el TP (manual / evidencia)
+- Medición formal con [PageSpeed Insights](https://pagespeed.web.dev/) + capturas (ver `docs/entrega-evidencias.md`).
+- Testing cross-browser y tablet 768–1024 px con checklist del mismo doc.
+- Auditoría Lighthouse accesibilidad con captura (objetivo ≥ 90 en Home).
+- Completar casillas de verificación en producción (OG en WhatsApp, hover puerta, formularios).
 - Opcional: migrar newsletter y salidas comunidad a Supabase.
 
 ---

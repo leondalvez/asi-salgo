@@ -219,14 +219,30 @@ textarea {
     z-index: 10000;
 }
 
-.skip-link:focus {
+.skip-link:focus,
+.skip-link:focus-visible {
     outline: 2px solid var(--color-desenchufarme);
     outline-offset: 2px;
     top: 16px;
 }
 
+a:focus-visible,
+button:focus-visible,
+.cta-principal:focus-visible,
+.card-viaje:focus-visible,
+.evento-card__opcion:focus-visible,
+.salen-sumo:focus-visible {
+    outline: 2px solid var(--color-desenchufarme);
+    outline-offset: 2px;
+}
+
 main:focus {
     outline: none;
+}
+
+main:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--color-desenchufarme) 70%, transparent);
+    outline-offset: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {
