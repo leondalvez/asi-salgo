@@ -119,10 +119,11 @@ function servirArchivo(rutaSolicitada, respuesta, req) {
         }
 
         const extension = path.extname(rutaCompleta).toLowerCase();
-        respuesta.writeHead(
-            200,
-            combinarCabeceras(req, { 'Content-Type': MIME[extension] || 'application/octet-stream' })
-        );
+        const cabeceras = { 'Content-Type': MIME[extension] || 'application/octet-stream' };
+        if (extension === '.html') {
+            cabeceras['Cache-Control'] = 'no-cache, must-revalidate';
+        }
+        respuesta.writeHead(200, combinarCabeceras(req, cabeceras));
         respuesta.end(contenido);
     });
 }

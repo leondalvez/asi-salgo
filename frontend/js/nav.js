@@ -137,7 +137,7 @@ function construirNav(paginaActual) {
                     <span class="nav-sitio__marca-nombre">
                         Así Salgo<span class="nav-sitio__marca-suave">!</span>
                     </span>
-                    <span class="nav-sitio__marca-tag">Menos scroll. Más ciudad.</span>
+                    ${paginaActual === 'viaje' ? '' : '<span class="nav-sitio__marca-tag">Menos scroll. Más ciudad.</span>'}
                 </span>
             </a>
             <button class="nav-sitio__disparador" type="button" aria-expanded="false" aria-controls="nav-sitio-menu">

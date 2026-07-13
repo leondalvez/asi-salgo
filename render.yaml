@@ -5,7 +5,7 @@ services:
     name: asi-salgo
     runtime: node
     rootDir: server
-    buildCommand: npm install
+    buildCommand: npm install && node -e "const fs=require('fs');const html=fs.readFileSync('../frontend/viaje.html','utf8');if(html.includes('class=\"titulo-viaje\"')||!html.includes('viaje-toolbar')){console.error('frontend/viaje.html desactualizado en el deploy');process.exit(1)}"
     startCommand: node index.js
     healthCheckPath: /api/health
     plan: free
