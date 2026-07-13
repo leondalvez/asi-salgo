@@ -1,15 +1,15 @@
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
-const { fetchEventosRosario } = require('./adapters/rosario');
-const { fetchEventosBuenosAires } = require('./adapters/buenosAires');
+const { fetchEventosCiudad } = require('./lib/fetchEventosCiudad');
 const { fetchClima } = require('./adapters/clima');
 const { fetchComplementos, fetchLugaresParaMapa } = require('./adapters/lugares');
+const { esCiudadValida, listarCiudades, IDS_CIUDADES } = require('./lib/ciudades');
 const { ordenarPorRelevancia } = require('./lib/relevancia');
 const { geocodificarEventos } = require('./lib/geocoder');
 const { agregarSuscripcion } = require('./lib/suscripciones');
 const { crearCompartido, obtenerCompartido } = require('./lib/compartir');
-const { crearSalida, listarSalidas, sumarse } = require('./lib/salidasComunidad');
+const { crearSalida, listarSalidas, sumarse, enriquecerCoordenadasSalidas } = require('./lib/salidasComunidad');
 const { registrarPerfil, ingresarPerfil } = require('./lib/perfiles');
 const { probarConexion, estaConfigurada } = require('./lib/db');
 const {
@@ -120,19 +120,17 @@ async function manejarEventos(url, respuesta) {
     const lng = Number(url.searchParams.get('lng'));
     const tieneUbicacion = Number.isFinite(lat) && Number.isFinite(lng);
 
-    if (ciudad !== 'rosario' && ciudad !== 'buenos-aires') {
+    if (!esCiudadValida(ciudad)) {
         enviarJson(respuesta, 400, {
             error: 'Ciudad no soportada',
-            ciudades: ['rosario', 'buenos-aires']
+            ciudades: IDS_CIUDADES
         });
         return;
     }
 
     try {
         const [resultado, clima, complementosRaw] = await Promise.all([
-            ciudad === 'buenos-aires'
-                ? fetchEventosBuenosAires({ momento, plan })
-                : fetchEventosRosario({ momento }),
+            fetchEventosCiudad({ ciudad, momento, plan }),
             fetchClima(ciudad).catch((error) => {
                 console.warn('[clima]', error.message);
                 return null;
@@ -207,7 +205,7 @@ async function manejarEventos(url, respuesta) {
     }
 }
 
-const ETIQUETAS_VALIDAS = ['parques', 'plazas', 'deporte', 'turismo'];
+const ETIQUETAS_VALIDAS = ['parques', 'plazas', 'deporte', 'turismo', 'cultural'];
 
 async function manejarLugares(url, respuesta) {
     const ciudad = url.searchParams.get('ciudad') || 'rosario';
@@ -216,10 +214,10 @@ async function manejarLugares(url, respuesta) {
     const lng = Number(url.searchParams.get('lng'));
     const tieneUbicacion = Number.isFinite(lat) && Number.isFinite(lng);
 
-    if (ciudad !== 'rosario' && ciudad !== 'buenos-aires') {
+    if (!esCiudadValida(ciudad)) {
         enviarJson(respuesta, 400, {
             error: 'Ciudad no soportada',
-            ciudades: ['rosario', 'buenos-aires']
+            ciudades: IDS_CIUDADES
         });
         return;
     }
@@ -441,7 +439,13 @@ function manejarPaginaCompartir(id, req, respuesta) {
 
 async function manejarSalenListado(url, respuesta) {
     const ciudad = url.searchParams.get('ciudad') || '';
-    const salidas = listarSalidas({ ciudad: ciudad || undefined });
+    let salidas = listarSalidas({ ciudad: ciudad || undefined });
+    await conLimiteDeTiempo(
+        enriquecerCoordenadasSalidas(salidas, { maxConsultas: 4 }).catch((error) => {
+            console.warn('[salen/geocoder]', error.message);
+        }),
+        8000
+    );
     enviarJson(respuesta, 200, { total: salidas.length, salidas });
 }
 
@@ -526,9 +530,14 @@ const servidor = http.createServer(async (req, respuesta) => {
         const baseDatos = estaConfigurada() ? await probarConexion() : { ok: false, motivo: 'json_local' };
         enviarJson(respuesta, 200, {
             ok: true,
-            ciudades: ['rosario', 'buenos-aires'],
+            ciudades: IDS_CIUDADES,
             almacenamiento: baseDatos.ok ? 'postgresql' : baseDatos.motivo
         });
+        return;
+    }
+
+    if (req.method === 'GET' && url.pathname === '/api/ciudades') {
+        enviarJson(respuesta, 200, { ciudades: listarCiudades() });
         return;
     }
 

@@ -72,6 +72,10 @@ async function usarUbicacionPeques(boton) {
 }
 
 function inicializarPeques() {
+    window.CiudadesApi?.renderizarChipsCiudad(document.querySelector('#chips-ciudad-peques'), {
+        ciudadInicial: estadoPeques.ciudad
+    });
+
     document.addEventListener('click', (evento) => {
         const chip = evento.target.closest('#chips-momento-peques .chip, #chips-ciudad-peques .chip');
         const ubicacionBtn = evento.target.closest('#usar-ubicacion-peques');

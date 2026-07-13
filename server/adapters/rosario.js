@@ -57,8 +57,12 @@ function inferirAptoNinos(titulo = '', descripcion = '') {
     return REGEX_APTO_NINOS.test(texto) ? true : null;
 }
 
+function textoEntrada(ticket = '', ticketValue = '') {
+    return `${ticket || ''} ${ticketValue || ''}`.replace(/\s+/g, ' ').trim();
+}
+
 function inferirGratis(ticket = '', ticketValue = '') {
-    const texto = `${ticket || ''} ${ticketValue || ''}`.replace(/\s+/g, ' ').trim();
+    const texto = textoEntrada(ticket, ticketValue);
     if (!texto) return null;
 
     const esGratis = /\b(gratis|gratuit[oa]s?|sin cargo|entrada libre|libre y gratuita)\b/i.test(texto);
@@ -69,6 +73,21 @@ function inferirGratis(ticket = '', ticketValue = '') {
     if (esGratis && !esPago) return true;
     if (esPago && !esGratis) return false;
     return null;
+}
+
+/**
+ * La agenda municipal suele incluir eventos comerciales con URL de venta
+ * (Passline, Ticketek, etc.) embebida en el campo de entrada. No vendemos
+ * entradas: solo exponemos el link para que quien salga pueda ver más info.
+ */
+function extraerLinkEntrada(ticket = '', ticketValue = '') {
+    const texto = textoEntrada(ticket, ticketValue);
+    if (!texto) return null;
+
+    const match = texto.match(/https?:\/\/[^\s<>"']+/i);
+    if (!match) return null;
+
+    return match[0].replace(/[),.;]+$/, '');
 }
 
 function normalizarOcurrencia(item, incluidos) {
@@ -95,7 +114,8 @@ function normalizarOcurrencia(item, incluidos) {
             `${attrs.text?.value || ''} ${attrs.summary?.value || ''}`
         ),
         fuente: 'agenda-municipal-rosario',
-        tipo: 'evento'
+        tipo: 'evento',
+        link: extraerLinkEntrada(attrs.ticket, attrs.ticket_value)
     };
 }
 

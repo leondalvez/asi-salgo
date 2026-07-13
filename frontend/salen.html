@@ -19,6 +19,9 @@
     <link rel="stylesheet" href="css/toast.css">
     <link rel="stylesheet" href="css/paginas.css">
     <link rel="stylesheet" href="css/salen.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <link rel="stylesheet" href="css/mapa.css">
 </head>
 
 <body data-pagina="salen">
@@ -38,13 +41,34 @@
         <section class="salen-herramientas" aria-label="Filtros y tu perfil">
             <div class="campo campo--inline">
                 <label for="filtro-ciudad">Ciudad</label>
-                <select id="filtro-ciudad" name="ciudad">
-                    <option value="">Todas</option>
-                    <option value="rosario" selected>Rosario</option>
-                    <option value="buenos-aires">Buenos Aires</option>
-                </select>
+                <select id="filtro-ciudad" name="ciudad"></select>
             </div>
             <div class="salen-perfil" id="salen-perfil" aria-live="polite"></div>
+        </section>
+
+        <section class="salen-mapa" aria-labelledby="titulo-mapa-salen">
+            <div class="salen-mapa__encabezado">
+                <h2 id="titulo-mapa-salen">Mapa de la comunidad</h2>
+                <p class="salen-mapa__lead">
+                    Los planes publicados aparecen en el mapa cuando tienen un lugar indicado.
+                    Podés sumar espacios culturales de referencia para orientarte.
+                </p>
+            </div>
+
+            <div class="salen-mapa__capas" id="capas-mapa-salen">
+                <label class="checkbox">
+                    <input type="checkbox" id="capa-comunidad" checked>
+                    Planes publicados
+                </label>
+                <label class="checkbox">
+                    <input type="checkbox" id="capa-cultural">
+                    Espacios culturales
+                </label>
+            </div>
+
+            <p id="estado-mapa-salen" role="status" class="lector">Cargando mapa…</p>
+            <div class="mapa-contenedor mapa-contenedor--salen" id="mapa-salen"
+                role="img" aria-label="Mapa de salidas de la comunidad"></div>
         </section>
 
         <section class="salen-feed" aria-labelledby="titulo-feed">
@@ -78,10 +102,7 @@
                 <div class="salen-publicar__fila">
                     <div class="campo">
                         <label for="pub-ciudad">Ciudad</label>
-                        <select id="pub-ciudad" name="ciudad">
-                            <option value="rosario">Rosario</option>
-                            <option value="buenos-aires">Buenos Aires</option>
-                        </select>
+                        <select id="pub-ciudad" name="ciudad"></select>
                     </div>
                     <div class="campo">
                         <label for="pub-lugar">Lugar <span class="campo__opcional">(opcional)</span></label>
@@ -104,6 +125,9 @@
 
     <footer id="pie-raiz" class="pie-sitio"></footer>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="js/ciudades.js"></script>
     <script src="js/perfil.js"></script>
     <script src="js/nav.js"></script>
     <script src="js/toast.js"></script>

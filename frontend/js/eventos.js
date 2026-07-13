@@ -8,11 +8,15 @@ const iconosEtiqueta = {
     plaza: '⬡',
     deporte: '◎',
     'punto-turistico': '◇',
+    cultural: '◈',
     lugar: '○'
 };
 
-const CIUDAD_ETIQUETA = {
+const CIUDAD_ETIQUETA = window.CiudadesApi?.CIUDAD_ETIQUETA || {
     rosario: 'Rosario',
+    'santa-fe': 'Santa Fe',
+    cordoba: 'Córdoba',
+    mendoza: 'Mendoza',
     'buenos-aires': 'Buenos Aires'
 };
 

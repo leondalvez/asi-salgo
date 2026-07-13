@@ -1,7 +1,4 @@
-const CIUDADES = {
-    rosario: { lat: -32.9468, lng: -60.6393, nombre: 'Rosario' },
-    'buenos-aires': { lat: -34.6037, lng: -58.3816, nombre: 'Buenos Aires' }
-};
+const { obtenerCiudad } = require('../lib/ciudades');
 
 const CLIMA_TEXTO = {
     0: 'Cielo despejado',
@@ -37,7 +34,7 @@ function consejoSalida(codigo, temperatura, precipitacion) {
 }
 
 async function fetchClima(ciudad) {
-    const config = CIUDADES[ciudad] || CIUDADES.rosario;
+    const config = obtenerCiudad(ciudad) || obtenerCiudad('rosario');
     const params = new URLSearchParams({
         latitude: String(config.lat),
         longitude: String(config.lng),

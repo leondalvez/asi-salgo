@@ -13,14 +13,11 @@
  *    demorar la respuesta más de unos segundos.
  */
 
+const { contextoGeocoder } = require('./ciudades');
+
 const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
 const INTERVALO_MINIMO_MS = 1100;
 const MAX_CONSULTAS_NUEVAS_POR_REQUEST = 6;
-
-const CONTEXTO_CIUDAD = {
-    rosario: 'Rosario, Santa Fe',
-    'buenos-aires': 'Buenos Aires'
-};
 
 const cache = new Map();
 let ultimaConsulta = 0;
@@ -84,7 +81,7 @@ async function consultarNominatim(consulta) {
  * Muta y devuelve el mismo array recibido.
  */
 async function geocodificarEventos(eventos, ciudad) {
-    const contexto = CONTEXTO_CIUDAD[ciudad] || ciudad || 'Argentina';
+    const contexto = contextoGeocoder(ciudad);
     const grupos = new Map();
 
     for (const evento of eventos) {
@@ -128,6 +125,56 @@ async function geocodificarEventos(eventos, ciudad) {
     return eventos;
 }
 
+/**
+ * Misma lógica que geocodificarEventos, pero para cualquier ítem con
+ * direccion/lugar (salidas comunitarias, etc.).
+ */
+async function geocodificarItems(items, ciudad, { maxConsultas = 6 } = {}) {
+    const contexto = contextoGeocoder(ciudad);
+    const grupos = new Map();
+
+    for (const item of items) {
+        if (item.lat != null && item.lng != null) continue;
+
+        const texto = item.direccion || item.lugar;
+        if (!texto) continue;
+
+        const consulta = `${texto}, ${contexto}, Argentina`;
+        const clave = normalizarClave(consulta);
+
+        if (!grupos.has(clave)) {
+            grupos.set(clave, { consulta, items: [] });
+        }
+        grupos.get(clave).items.push(item);
+    }
+
+    let consultasNuevas = 0;
+
+    for (const [clave, grupo] of grupos) {
+        let coordenadas;
+
+        if (cache.has(clave)) {
+            coordenadas = cache.get(clave);
+        } else {
+            if (consultasNuevas >= maxConsultas) continue;
+            consultasNuevas += 1;
+            coordenadas = await consultarNominatim(grupo.consulta);
+            cache.set(clave, coordenadas);
+        }
+
+        if (!coordenadas) continue;
+
+        for (const item of grupo.items) {
+            item.lat = coordenadas.lat;
+            item.lng = coordenadas.lng;
+            item.geocodificado = true;
+        }
+    }
+
+    return items;
+}
+
 module.exports = {
-    geocodificarEventos
+    geocodificarEventos,
+    geocodificarItems
 };

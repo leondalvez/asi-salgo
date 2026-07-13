@@ -167,21 +167,7 @@
             </fieldset>
             <fieldset class="filtros">
                 <legend>Ciudad</legend>
-                <div class="chips" role="group" aria-label="Ciudad">
-                    <button type="button" class="chip seleccionado" data-ciudad="rosario">
-                        <svg class="chip-arte" viewBox="0 0 28 28" aria-hidden="true">
-                            <path class="chip-trazo" pathLength="100" d="M4 23 H24 M7 23 V12 L14 7 L21 12 V23" />
-                        </svg>
-                        Rosario
-                    </button>
-                    <button type="button" class="chip" data-ciudad="buenos-aires">
-                        <svg class="chip-arte" viewBox="0 0 28 28" aria-hidden="true">
-                            <path class="chip-trazo" pathLength="100" d="M6 23 H22 M8 23 V10 L14 5 L20 10 V23" />
-                            <path class="chip-trazo chip-trazo--detalle" pathLength="100" d="M11 14 H17" />
-                        </svg>
-                        Buenos Aires
-                    </button>
-                </div>
+                <div class="chips" role="group" aria-label="Ciudad" id="chips-ciudad-viaje"></div>
             </fieldset>
             <fieldset class="filtros">
                 <legend>Distancia</legend>
@@ -235,6 +221,7 @@
 
     <footer id="pie-raiz" class="pie-sitio"></footer>
 
+    <script src="js/ciudades.js"></script>
     <script src="js/nav.js"></script>
     <script src="js/toast.js"></script>
     <script src="js/compartir.js"></script>

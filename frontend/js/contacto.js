@@ -35,6 +35,8 @@ function inicializarFormularioContacto() {
     const formulario = document.querySelector('#form-contacto');
     if (!formulario) return;
 
+    window.CiudadesApi?.poblarSelect(document.querySelector('#campo-ciudad'), { valorInicial: 'rosario' });
+
     const botonEnviar = document.querySelector('#btn-enviar');
 
     formulario.addEventListener('submit', async (evento) => {

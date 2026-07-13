@@ -6,8 +6,11 @@
  * global (no son módulos).
  */
 
-const CENTRO_POR_CIUDAD = {
+const CENTRO_POR_CIUDAD = window.CiudadesApi?.CENTRO_POR_CIUDAD || {
     rosario: [-32.9468, -60.6393],
+    'santa-fe': [-31.6333, -60.7],
+    cordoba: [-31.4201, -64.1888],
+    mendoza: [-32.8908, -68.8272],
     'buenos-aires': [-34.6037, -58.3816]
 };
 
@@ -16,7 +19,9 @@ const COLOR_POR_TIPO = {
     plaza: '#d8be67',
     deporte: '#d98c7d',
     'punto-turistico': '#a99ac7',
-    lugar: '#9aa097'
+    cultural: '#c49ad9',
+    lugar: '#9aa097',
+    comunidad: '#7eb8da'
 };
 
 const estadoMapa = {
@@ -169,6 +174,9 @@ async function usarUbicacionMapa(boton) {
 }
 
 function inicializarMapa() {
+    window.CiudadesApi?.renderizarChipsCiudad(document.querySelector('#chips-ciudad-mapa'), {
+        ciudadInicial: estadoMapa.ciudad
+    });
     inicializarMapaLeaflet();
 
     document.addEventListener('click', (evento) => {

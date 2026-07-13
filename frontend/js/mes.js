@@ -68,6 +68,10 @@ async function usarUbicacionMes(boton) {
 }
 
 function inicializarMes() {
+    window.CiudadesApi?.renderizarChipsCiudad(document.querySelector('#chips-ciudad'), {
+        ciudadInicial: estadoMes.ciudad
+    });
+
     document.addEventListener('click', (evento) => {
         const chip = evento.target.closest('#chips-ciudad .chip');
         const ubicacionBtn = evento.target.closest('#usar-ubicacion');

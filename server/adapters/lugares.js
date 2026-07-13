@@ -1,4 +1,6 @@
 const { etiquetasParaPlan } = require('../lib/planLugares');
+const { obtenerCiudad } = require('../lib/ciudades');
+const { fetchEspaciosCiudad } = require('./sinca');
 
 const BASE_LUGARES =
     'http://ws.rosario.gov.ar/ubicaciones/public/geojson/lugaresDatosUtiles/all/true/0';
@@ -7,10 +9,11 @@ const TIPO_POR_ETIQUETA = {
     parques: 'parque',
     plazas: 'plaza',
     deporte: 'deporte',
-    turismo: 'punto-turistico'
+    turismo: 'punto-turistico',
+    cultural: 'cultural'
 };
 
-const TODAS_ETIQUETAS = ['parques', 'plazas', 'deporte', 'turismo'];
+const TODAS_ETIQUETAS = ['parques', 'plazas', 'deporte', 'turismo', 'cultural'];
 
 async function convertirCoordenadas(x, y) {
     try {
@@ -93,41 +96,104 @@ async function fetchLugaresRosario({ plan, energia, limite = 4 }) {
     return acumulado;
 }
 
-async function fetchLugaresBuenosAires({ limite = 4 }) {
+async function fetchLugaresOverpass({ ciudadId, lat, lng, etiquetas, limite = 12, radio = 4500 }) {
+    const consultas = etiquetas
+        .map((etiqueta) => OVERPASS_FILTRO_POR_ETIQUETA[etiqueta])
+        .filter(Boolean)
+        .map((filtro) => `node${filtro}(around:${radio},${lat},${lng});`)
+        .join('\n');
+
+    if (!consultas) return [];
+
     try {
-        const respuesta = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(`
-            [out:json][timeout:15];
-            node["leisure"="park"](around:3000,-34.6037,-58.3816);
-            out body 8;
-        `)}`, { signal: AbortSignal.timeout(18000) });
+        const respuesta = await fetch(
+            `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(`
+            [out:json][timeout:20];
+            (
+                ${consultas}
+            );
+            out body ${limite};
+        `)}`,
+            { signal: AbortSignal.timeout(18000) }
+        );
 
         if (!respuesta.ok) return [];
 
         const datos = await respuesta.json();
-        return (datos.elements || []).slice(0, limite).map((item) => ({
-            id: `lugar-ba-${item.id}`,
-            titulo: item.tags?.name || 'Espacio verde',
-            descripcion: item.tags?.description || 'Parque o plaza para salir al aire libre.',
-            direccion: null,
-            barrio: item.tags?.['addr:street'] || null,
-            etiqueta: 'parques',
-            tipo: 'parque',
-            transporte: [],
-            ciudad: 'buenos-aires',
-            fuente: 'openstreetmap',
-            lat: item.lat ?? null,
-            lng: item.lon ?? null
-        }));
+        return (datos.elements || []).slice(0, limite).map((item) => {
+            const etiqueta = etiquetaDesdeTagsOsm(item.tags);
+            return {
+                id: `lugar-${ciudadId}-${item.id}`,
+                titulo: item.tags?.name || 'Espacio público',
+                descripcion: item.tags?.description || 'Espacio público para salir cerca tuyo.',
+                direccion: item.tags?.['addr:street'] || null,
+                barrio: item.tags?.['addr:suburb'] || null,
+                etiqueta,
+                tipo: TIPO_POR_ETIQUETA[etiqueta] || 'lugar',
+                transporte: [],
+                ciudad: ciudadId,
+                fuente: 'openstreetmap',
+                lat: item.lat ?? null,
+                lng: item.lon ?? null
+            };
+        });
     } catch {
         return [];
     }
 }
 
+async function fetchLugaresCiudadGenerica({ ciudad, plan, energia, limite = 4 }) {
+    const config = obtenerCiudad(ciudad);
+    if (!config) return [];
+
+    const etiquetas = etiquetasParaPlan(plan, energia);
+    const overpass = await fetchLugaresOverpass({
+        ciudadId: ciudad,
+        lat: config.lat,
+        lng: config.lng,
+        etiquetas,
+        limite: limite + 2,
+        radio: 5000
+    });
+
+    const acumulado = overpass.filter((l) => l.lat != null && l.lng != null);
+
+    if (acumulado.length < limite) {
+        const sinca = await fetchEspaciosCiudad(ciudad, { limite: limite - acumulado.length });
+        const vistos = new Set(acumulado.map((l) => l.titulo));
+        for (const lugar of sinca) {
+            if (acumulado.length >= limite) break;
+            if (vistos.has(lugar.titulo)) continue;
+            acumulado.push(lugar);
+        }
+    }
+
+    return acumulado.slice(0, limite);
+}
+
+async function fetchLugaresBuenosAires({ limite = 4 }) {
+    const config = obtenerCiudad('buenos-aires');
+    return fetchLugaresOverpass({
+        ciudadId: 'buenos-aires',
+        lat: config.lat,
+        lng: config.lng,
+        etiquetas: ['parques'],
+        limite,
+        radio: 3000
+    });
+}
+
 async function fetchComplementos({ ciudad, plan, energia, limite = 4 }) {
-    if (ciudad === 'buenos-aires') {
+    const config = obtenerCiudad(ciudad);
+    if (!config) return [];
+
+    if (config.lugares === 'rosario') {
+        return fetchLugaresRosario({ plan, energia, limite });
+    }
+    if (config.lugares === 'buenos-aires') {
         return fetchLugaresBuenosAires({ limite });
     }
-    return fetchLugaresRosario({ plan, energia, limite });
+    return fetchLugaresCiudadGenerica({ ciudad, plan, energia, limite });
 }
 
 /**
@@ -173,10 +239,15 @@ const OVERPASS_FILTRO_POR_ETIQUETA = {
     parques: '["leisure"~"^(park|garden)$"]',
     plazas: '["place"="square"]',
     deporte: '["leisure"~"^(pitch|sports_centre|stadium)$"]',
-    turismo: '["tourism"~"^(attraction|museum|viewpoint|gallery)$"]'
+    turismo: '["tourism"~"^(attraction|museum|viewpoint|gallery)$"]',
+    cultural:
+        '["amenity"~"^(theatre|cinema|arts_centre|library|community_centre)$"]'
 };
 
 function etiquetaDesdeTagsOsm(tags = {}) {
+    if (['theatre', 'cinema', 'arts_centre', 'library', 'community_centre'].includes(tags.amenity)) {
+        return 'cultural';
+    }
     if (tags.tourism) return 'turismo';
     if (['pitch', 'sports_centre', 'stadium'].includes(tags.leisure)) return 'deporte';
     if (tags.place === 'square') return 'plazas';
@@ -184,57 +255,57 @@ function etiquetaDesdeTagsOsm(tags = {}) {
 }
 
 async function fetchLugaresParaMapaBuenosAires({ etiquetas = TODAS_ETIQUETAS, limite = 24 } = {}) {
-    const consultas = etiquetas
-        .map((etiqueta) => OVERPASS_FILTRO_POR_ETIQUETA[etiqueta])
-        .filter(Boolean)
-        .map((filtro) => `node${filtro}(around:4000,-34.6037,-58.3816);`)
-        .join('\n');
+    const config = obtenerCiudad('buenos-aires');
+    return fetchLugaresOverpass({
+        ciudadId: 'buenos-aires',
+        lat: config.lat,
+        lng: config.lng,
+        etiquetas,
+        limite,
+        radio: 4000
+    });
+}
 
-    if (!consultas) return [];
+async function fetchLugaresParaMapaGenerico(ciudad, { etiquetas = TODAS_ETIQUETAS, limite = 24 } = {}) {
+    const config = obtenerCiudad(ciudad);
+    if (!config) return [];
 
-    try {
-        const respuesta = await fetch(
-            `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(`
-            [out:json][timeout:20];
-            (
-                ${consultas}
-            );
-            out body ${limite};
-        `)}`,
-            { signal: AbortSignal.timeout(18000) }
-        );
+    const overpass = await fetchLugaresOverpass({
+        ciudadId: ciudad,
+        lat: config.lat,
+        lng: config.lng,
+        etiquetas,
+        limite: Math.ceil(limite * 0.7),
+        radio: 5000
+    });
 
-        if (!respuesta.ok) return [];
+    const acumulado = overpass.filter((l) => l.lat != null && l.lng != null);
 
-        const datos = await respuesta.json();
-        return (datos.elements || []).slice(0, limite).map((item) => {
-            const etiqueta = etiquetaDesdeTagsOsm(item.tags);
-            return {
-                id: `lugar-ba-${item.id}`,
-                titulo: item.tags?.name || 'Espacio público',
-                descripcion: item.tags?.description || 'Espacio público para salir cerca tuyo.',
-                direccion: item.tags?.['addr:street'] || null,
-                barrio: item.tags?.['addr:suburb'] || null,
-                etiqueta,
-                tipo: TIPO_POR_ETIQUETA[etiqueta] || 'lugar',
-                transporte: [],
-                ciudad: 'buenos-aires',
-                fuente: 'openstreetmap',
-                lat: item.lat ?? null,
-                lng: item.lon ?? null
-            };
-        });
-    } catch {
-        return [];
+    if (acumulado.length < limite && etiquetas.includes('cultural')) {
+        const sinca = await fetchEspaciosCiudad(ciudad, { limite: limite - acumulado.length });
+        const vistos = new Set(acumulado.map((l) => l.titulo));
+        for (const lugar of sinca) {
+            if (acumulado.length >= limite) break;
+            if (vistos.has(lugar.titulo)) continue;
+            acumulado.push(lugar);
+        }
     }
+
+    return acumulado.slice(0, limite);
 }
 
 async function fetchLugaresParaMapa({ ciudad, etiquetas, limite = 24 } = {}) {
     const etiquetasFinales = etiquetas?.length ? etiquetas : TODAS_ETIQUETAS;
-    if (ciudad === 'buenos-aires') {
+    const config = obtenerCiudad(ciudad);
+
+    if (!config) return [];
+    if (config.lugares === 'rosario') {
+        return fetchLugaresParaMapaRosario({ etiquetas: etiquetasFinales, limite });
+    }
+    if (config.lugares === 'buenos-aires') {
         return fetchLugaresParaMapaBuenosAires({ etiquetas: etiquetasFinales, limite });
     }
-    return fetchLugaresParaMapaRosario({ etiquetas: etiquetasFinales, limite });
+    return fetchLugaresParaMapaGenerico(ciudad, { etiquetas: etiquetasFinales, limite });
 }
 
 module.exports = {

@@ -34,29 +34,14 @@
             <p class="eyebrow">Espacios públicos</p>
             <h1>Mapa de Salidas</h1>
             <p class="pagina-hero__lead">
-                Parques, plazas, espacios deportivos y puntos turísticos de Rosario y Buenos Aires. No son eventos
-                con fecha, son lugares que siempre están — una salida posible sin depender de ninguna agenda.
+                Parques, plazas, espacios deportivos, puntos turísticos y espacios culturales de Rosario y Buenos Aires.
             </p>
         </header>
 
         <div class="controles-mapa">
             <fieldset class="filtros">
                 <legend>Ciudad</legend>
-                <div class="chips" role="group" aria-label="Ciudad" id="chips-ciudad-mapa">
-                    <button type="button" class="chip seleccionado" data-ciudad="rosario">
-                        <svg class="chip-arte" viewBox="0 0 28 28" aria-hidden="true">
-                            <path class="chip-trazo" pathLength="100" d="M4 23 H24 M7 23 V12 L14 7 L21 12 V23" />
-                        </svg>
-                        Rosario
-                    </button>
-                    <button type="button" class="chip" data-ciudad="buenos-aires">
-                        <svg class="chip-arte" viewBox="0 0 28 28" aria-hidden="true">
-                            <path class="chip-trazo" pathLength="100" d="M6 23 H22 M8 23 V10 L14 5 L20 10 V23" />
-                            <path class="chip-trazo chip-trazo--detalle" pathLength="100" d="M11 14 H17" />
-                        </svg>
-                        Buenos Aires
-                    </button>
-                </div>
+                <div class="chips" role="group" aria-label="Ciudad" id="chips-ciudad-mapa"></div>
             </fieldset>
 
             <fieldset class="filtros filtros--categorias">
@@ -77,6 +62,10 @@
                     <label class="checkbox">
                         <input type="checkbox" value="turismo" checked>
                         Turismo
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" value="cultural">
+                        Cultura
                     </label>
                 </div>
             </fieldset>
@@ -101,6 +90,7 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="js/ciudades.js"></script>
     <script src="js/nav.js"></script>
     <script src="js/toast.js"></script>
     <script src="js/eventos.js"></script>

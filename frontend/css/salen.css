@@ -1,7 +1,7 @@
 /* --- A dónde salen: feed comunitario y botón Me sumo --- */
 
 .pagina-salen {
-    width: min(100%, 720px);
+    width: min(100%, 820px);
 }
 
 .salen-herramientas {
@@ -9,7 +9,45 @@
     display: flex;
     flex-wrap: wrap;
     gap: 14px;
-    margin-bottom: 28px;
+    margin-bottom: 20px;
+}
+
+.salen-mapa {
+    margin-bottom: 36px;
+}
+
+.salen-mapa__encabezado {
+    margin-bottom: 12px;
+}
+
+.salen-mapa__encabezado h2 {
+    color: var(--texto-titulo);
+    font-size: 1.25rem;
+    font-weight: 300;
+    margin: 0 0 6px;
+}
+
+.salen-mapa__lead {
+    color: var(--texto-secundario);
+    font-size: .9rem;
+    line-height: 1.55;
+    margin: 0;
+}
+
+.salen-mapa__capas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin-bottom: 8px;
+}
+
+.mapa-contenedor--salen {
+    margin-top: 4px;
+}
+
+.marcador-lugar--comunidad span {
+    height: 16px;
+    width: 16px;
 }
 
 .campo--inline {

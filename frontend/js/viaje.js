@@ -51,8 +51,11 @@ const respuestas = {
     ciudad: 'rosario'
 };
 
-const CIUDADES = {
+const CIUDADES = window.CiudadesApi?.CIUDAD_ETIQUETA || {
     rosario: 'Rosario',
+    'santa-fe': 'Santa Fe',
+    cordoba: 'Córdoba',
+    mendoza: 'Mendoza',
     'buenos-aires': 'Buenos Aires'
 };
 
@@ -295,6 +298,9 @@ function reiniciarViaje() {
     mostrarPaso(1);
 }
 
+window.CiudadesApi?.renderizarChipsCiudad(document.querySelector('#chips-ciudad-viaje'), {
+    ciudadInicial: respuestas.ciudad
+});
 actualizarCiudadVisible();
 
 document.addEventListener('click', (evento) => {

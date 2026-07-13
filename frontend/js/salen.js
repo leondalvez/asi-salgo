@@ -1,7 +1,18 @@
 const CLAVE_PUBLICAR = 'asi-salgo-publicar';
 
-const CIUDAD_ETIQUETA = {
+const CENTRO_POR_CIUDAD = window.CiudadesApi?.CENTRO_POR_CIUDAD || {
+    rosario: [-32.9468, -60.6393],
+    'santa-fe': [-31.6333, -60.7],
+    cordoba: [-31.4201, -64.1888],
+    mendoza: [-32.8908, -68.8272],
+    'buenos-aires': [-34.6037, -58.3816]
+};
+
+const CIUDAD_ETIQUETA = window.CiudadesApi?.CIUDAD_ETIQUETA || {
     rosario: 'Rosario',
+    'santa-fe': 'Santa Fe',
+    cordoba: 'Córdoba',
+    mendoza: 'Mendoza',
     'buenos-aires': 'Buenos Aires'
 };
 
@@ -11,6 +22,173 @@ function escaparHtml(texto = '') {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
+}
+
+const estadoMapaSalen = {
+    salidas: [],
+    lugaresCulturales: [],
+    ciudad: 'rosario'
+};
+
+let mapaSalen = null;
+let capaComunidad = null;
+let capaCultural = null;
+
+function inicializarMapaSalen() {
+    const contenedor = document.querySelector('#mapa-salen');
+    if (!contenedor || typeof L === 'undefined') return;
+
+    mapaSalen = L.map('mapa-salen', { scrollWheelZoom: false }).setView(CENTRO_POR_CIUDAD.rosario, 13);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    }).addTo(mapaSalen);
+
+    capaComunidad = L.layerGroup().addTo(mapaSalen);
+    capaCultural = L.layerGroup();
+}
+
+function iconoMapaSalen(color) {
+    return L.divIcon({
+        className: 'marcador-lugar marcador-lugar--comunidad',
+        html: `<span style="background:${color}"></span>`,
+        iconSize: [18, 18],
+        popupAnchor: [0, -8]
+    });
+}
+
+function popupSalida(salida) {
+    const total = (salida.sumados || []).length;
+    const donde = salida.direccion || salida.lugar || CIUDAD_ETIQUETA[salida.ciudad] || '';
+    const enlace = `https://www.google.com/maps/dir/?api=1&destination=${salida.lat},${salida.lng}&travelmode=walking`;
+    return `
+        <div class="popup-lugar">
+            <strong>${escaparHtml(salida.titulo)}</strong>
+            <p>Organiza ${escaparHtml(salida.organizador)} · ${total} ${total === 1 ? 'persona' : 'personas'}</p>
+            ${donde ? `<p>${escaparHtml(donde)}</p>` : ''}
+            <a href="${enlace}" target="_blank" rel="noopener noreferrer">Cómo llegar</a>
+        </div>
+    `;
+}
+
+function popupLugarCultural(lugar) {
+    const enlace = `https://www.google.com/maps/dir/?api=1&destination=${lugar.lat},${lugar.lng}&travelmode=walking`;
+    return `
+        <div class="popup-lugar">
+            <strong>${escaparHtml(lugar.titulo || 'Espacio cultural')}</strong>
+            <p>${escaparHtml((lugar.descripcion || '').slice(0, 110) || 'Teatro, cine o centro cultural de referencia.')}</p>
+            <a href="${enlace}" target="_blank" rel="noopener noreferrer">Cómo llegar</a>
+        </div>
+    `;
+}
+
+function ajustarVistaMapaSalen() {
+    if (!mapaSalen) return;
+
+    const capasActivas = [];
+    if (document.querySelector('#capa-comunidad')?.checked) {
+        capasActivas.push(...capaComunidad.getLayers());
+    }
+    if (document.querySelector('#capa-cultural')?.checked) {
+        capasActivas.push(...capaCultural.getLayers());
+    }
+
+    if (!capasActivas.length) {
+        const ciudad = document.querySelector('#filtro-ciudad')?.value || estadoMapaSalen.ciudad || 'rosario';
+        mapaSalen.setView(CENTRO_POR_CIUDAD[ciudad] || CENTRO_POR_CIUDAD.rosario, 12);
+        return;
+    }
+
+    const grupo = L.featureGroup(capasActivas);
+    mapaSalen.fitBounds(grupo.getBounds().pad(0.18), { maxZoom: 15 });
+}
+
+function renderizarMapaSalen() {
+    if (!mapaSalen) return;
+
+    capaComunidad.clearLayers();
+    capaCultural.clearLayers();
+
+    const mostrarComunidad = document.querySelector('#capa-comunidad')?.checked !== false;
+    const mostrarCultural = document.querySelector('#capa-cultural')?.checked === true;
+
+    if (mostrarComunidad) {
+        estadoMapaSalen.salidas
+            .filter((salida) => salida.lat != null && salida.lng != null)
+            .forEach((salida) => {
+                L.marker([salida.lat, salida.lng], { icon: iconoMapaSalen('#7eb8da') })
+                    .bindPopup(popupSalida(salida))
+                    .addTo(capaComunidad);
+            });
+    }
+
+    if (mostrarCultural) {
+        if (!mapaSalen.hasLayer(capaCultural)) {
+            capaCultural.addTo(mapaSalen);
+        }
+        estadoMapaSalen.lugaresCulturales.forEach((lugar) => {
+            L.marker([lugar.lat, lugar.lng], { icon: iconoMapaSalen('#c49ad9') })
+                .bindPopup(popupLugarCultural(lugar))
+                .addTo(capaCultural);
+        });
+    } else if (mapaSalen.hasLayer(capaCultural)) {
+        mapaSalen.removeLayer(capaCultural);
+    }
+
+    ajustarVistaMapaSalen();
+}
+
+async function cargarCapaCultural() {
+    const ciudad = document.querySelector('#filtro-ciudad')?.value || 'rosario';
+    const ciudadFinal = ciudad || 'rosario';
+    estadoMapaSalen.ciudad = ciudadFinal;
+
+    const params = new URLSearchParams({
+        ciudad: ciudadFinal,
+        etiquetas: 'cultural',
+        limite: '16'
+    });
+
+    try {
+        const respuesta = await fetch(`${window.location.origin}/api/lugares?${params}`);
+        if (!respuesta.ok) return;
+        const datos = await respuesta.json();
+        estadoMapaSalen.lugaresCulturales = (datos.lugares || []).filter(
+            (lugar) => lugar.lat != null && lugar.lng != null
+        );
+    } catch {
+        estadoMapaSalen.lugaresCulturales = [];
+    }
+}
+
+function actualizarEstadoMapaSalen() {
+    const estado = document.querySelector('#estado-mapa-salen');
+    if (!estado) return;
+
+    const conCoords = estadoMapaSalen.salidas.filter((salida) => salida.lat != null && salida.lng != null).length;
+    const partes = [`${conCoords} ${conCoords === 1 ? 'plan' : 'planes'} en el mapa`];
+
+    if (document.querySelector('#capa-cultural')?.checked) {
+        partes.push(`${estadoMapaSalen.lugaresCulturales.length} espacios culturales`);
+    }
+
+    estado.textContent = partes.join(' · ');
+}
+
+async function refrescarMapaSalen() {
+    renderizarMapaSalen();
+    actualizarEstadoMapaSalen();
+}
+
+async function onCambioCapasMapa() {
+    const estado = document.querySelector('#estado-mapa-salen');
+    if (document.querySelector('#capa-cultural')?.checked && !estadoMapaSalen.lugaresCulturales.length) {
+        if (estado) estado.textContent = 'Cargando espacios culturales…';
+        await cargarCapaCultural();
+    }
+    await refrescarMapaSalen();
 }
 
 function formatearFechaRelativa(fechaIso) {
@@ -148,6 +326,8 @@ async function cargarSalidas() {
 
         const datos = await respuesta.json();
         const salidas = datos.salidas || [];
+        estadoMapaSalen.salidas = salidas;
+        estadoMapaSalen.ciudad = ciudad || 'rosario';
 
         if (!salidas.length) {
             lista.innerHTML = `
@@ -156,14 +336,18 @@ async function cargarSalidas() {
                     Sé la primera persona en contar a dónde vas.
                 </p>`;
             estado.textContent = 'Sin planes por ahora.';
+            await refrescarMapaSalen();
             return;
         }
 
         lista.innerHTML = salidas.map((salida) => crearTarjetaSalida(salida, identidad)).join('');
         estado.textContent = `${salidas.length} ${salidas.length === 1 ? 'plan activo' : 'planes activos'}.`;
+        await refrescarMapaSalen();
     } catch (error) {
         lista.innerHTML = `<p class="salen-vacio">${escaparHtml(error.message)}</p>`;
         estado.textContent = 'Error al cargar.';
+        estadoMapaSalen.salidas = [];
+        await refrescarMapaSalen();
     }
 }
 
@@ -288,7 +472,7 @@ function aplicarBorradorEvento(evento) {
 
     if (titulo) titulo.value = evento.titulo || '';
     if (descripcion) descripcion.value = (evento.descripcion || '').slice(0, 320);
-    if (ciudad) ciudad.value = evento.ciudad === 'buenos-aires' ? 'buenos-aires' : 'rosario';
+    if (ciudad) ciudad.value = evento.ciudad && CIUDAD_ETIQUETA[evento.ciudad] ? evento.ciudad : 'rosario';
     if (lugar) lugar.value = evento.lugar || evento.direccion || '';
     if (formulario && evento.id) formulario.dataset.eventoId = evento.id;
 
@@ -296,6 +480,13 @@ function aplicarBorradorEvento(evento) {
 }
 
 function inicializarSalen() {
+    window.CiudadesApi?.poblarSelect(document.querySelector('#filtro-ciudad'), {
+        valorInicial: 'rosario',
+        incluirTodas: true
+    });
+    window.CiudadesApi?.poblarSelect(document.querySelector('#pub-ciudad'), { valorInicial: 'rosario' });
+
+    inicializarMapaSalen();
     actualizarBannerPerfil();
     aplicarBorradorEvento(leerBorradorEvento());
 
@@ -303,7 +494,12 @@ function inicializarSalen() {
         document.querySelector('#publicar')?.scrollIntoView({ behavior: 'smooth' });
     }
 
-    document.querySelector('#filtro-ciudad')?.addEventListener('change', cargarSalidas);
+    document.querySelector('#filtro-ciudad')?.addEventListener('change', async () => {
+        estadoMapaSalen.lugaresCulturales = [];
+        await cargarSalidas();
+    });
+
+    document.querySelector('#capas-mapa-salen')?.addEventListener('change', onCambioCapasMapa);
 
     document.querySelector('#lista-salen')?.addEventListener('click', (eventoClick) => {
         const boton = eventoClick.target.closest('[data-sumo-id]');

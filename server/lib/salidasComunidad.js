@@ -1,12 +1,8 @@
-/**
- * Salidas publicadas por la comunidad ("A dónde salen"). Sin cuentas: cada
- * persona usa un nombre visible y puede sumarse a planes ajenos con "Me sumo".
- * Persistencia en JSON local (mismo alcance que suscripciones).
- */
-
 const fs = require('fs');
+const { esCiudadValida } = require('./ciudades');
 const path = require('path');
 const crypto = require('crypto');
+const { geocodificarItems } = require('./geocoder');
 
 const ARCHIVO = path.join(__dirname, '..', 'data', 'salidas-comunidad.json');
 const MAX_SALIDAS = 120;
@@ -23,6 +19,8 @@ const SEMILLAS = [
         fechaInicio: null,
         lugar: 'Costanera',
         direccion: 'Costanera Este, Rosario',
+        lat: -32.9442,
+        lng: -60.6505,
         eventoId: null,
         creado: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
         sumados: [
@@ -40,6 +38,8 @@ const SEMILLAS = [
         fechaInicio: null,
         lugar: 'Centro',
         direccion: 'Centro, Rosario',
+        lat: -32.9468,
+        lng: -60.6393,
         eventoId: null,
         creado: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
         sumados: [{ nombre: 'Juli#7782', perfilId: 'demo-juli', fecha: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString() }]
@@ -108,11 +108,13 @@ function validarPublicar(datos) {
             perfilId,
             titulo,
             descripcion: limpiarTexto(datos.descripcion, 320),
-            ciudad: datos.ciudad === 'buenos-aires' ? 'buenos-aires' : 'rosario',
+            ciudad: esCiudadValida(datos.ciudad) ? datos.ciudad : 'rosario',
             fechaInicio: datos.fechaInicio || null,
             lugar: limpiarTexto(datos.lugar, 120),
             direccion: limpiarTexto(datos.direccion, 160),
-            eventoId: limpiarTexto(datos.eventoId, 80) || null
+            eventoId: limpiarTexto(datos.eventoId, 80) || null,
+            lat: datos.lat ?? null,
+            lng: datos.lng ?? null
         }
     };
 }
@@ -145,7 +147,7 @@ function crearSalida(datos) {
 
 function listarSalidas({ ciudad } = {}) {
     let salidas = leerTodas();
-    if (ciudad === 'rosario' || ciudad === 'buenos-aires') {
+    if (ciudad && esCiudadValida(ciudad)) {
         salidas = salidas.filter((item) => item.ciudad === ciudad);
     }
     return salidas
@@ -201,8 +203,47 @@ function sumarse(id, datos) {
     return { salida, yaEstaba: false };
 }
 
+/**
+ * Geocodifica salidas sin coordenadas y persiste el resultado para no
+ * repetir consultas a Nominatim en cada visita al mapa de Salen.
+ */
+async function enriquecerCoordenadasSalidas(salidas, { maxConsultas = 4 } = {}) {
+    const pendientes = salidas.filter((item) => item.lat == null || item.lng == null);
+    if (!pendientes.length) return salidas;
+
+    const porCiudad = new Map();
+    for (const salida of pendientes) {
+        const ciudad = salida.ciudad || 'rosario';
+        if (!porCiudad.has(ciudad)) porCiudad.set(ciudad, []);
+        porCiudad.get(ciudad).push(salida);
+    }
+
+    for (const [ciudad, grupo] of porCiudad) {
+        await geocodificarItems(grupo, ciudad, { maxConsultas });
+    }
+
+    const registros = leerTodas();
+    let huboCambios = false;
+
+    for (const salida of pendientes) {
+        if (salida.lat == null || salida.lng == null) continue;
+        const indice = registros.findIndex((item) => item.id === salida.id);
+        if (indice === -1) continue;
+        registros[indice].lat = salida.lat;
+        registros[indice].lng = salida.lng;
+        huboCambios = true;
+    }
+
+    if (huboCambios) {
+        guardarTodas(registros);
+    }
+
+    return salidas;
+}
+
 module.exports = {
     crearSalida,
     listarSalidas,
-    sumarse
+    sumarse,
+    enriquecerCoordenadasSalidas
 };
