@@ -1,7 +1,7 @@
 /* --- Mapa de Salidas: overrides oscuros para Leaflet + layout propio --- */
 
 .pagina-mapa {
-    width: min(100%, 980px);
+    width: var(--ancho-amplio);
 }
 
 .controles-mapa {

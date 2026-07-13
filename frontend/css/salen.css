@@ -4,6 +4,12 @@
     width: min(100%, 820px);
 }
 
+@media (min-width: 1100px) {
+    .pagina-salen {
+        width: min(100%, 900px);
+    }
+}
+
 .salen-herramientas {
     align-items: flex-end;
     display: flex;

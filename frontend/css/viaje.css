@@ -2,7 +2,7 @@
 
 .titulo-viaje,
 .viaje {
-    width: min(100%, 980px);
+    width: var(--ancho-amplio);
 }
 
 .titulo-viaje {
@@ -1410,31 +1410,9 @@
 }
 
 @media (min-width: 640px) {
-    .grid-viaje { grid-template-columns: repeat(2, 1fr); }
-    .card-viaje {
-        align-items: flex-start;
-        flex-direction: column;
-        justify-content: space-between;
-        min-height: 220px;
-    }
-    .card-viaje > span:last-child {
-        min-height: 52px;
-    }
     .opcion-plan {
         min-height: 96px;
     }
-    .opciones-plan { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (min-width: 980px) {
-    .grid-viaje { grid-template-columns: repeat(4, 1fr); }
-    .opciones-plan { grid-template-columns: repeat(3, 1fr); }
-}
-
-@media (min-width: 768px) and (max-width: 1024px) {
-    .grid-viaje { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .opciones-plan { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .viaje { padding-inline: clamp(16px, 4vw, 32px); }
 }
 
 @media (max-width: 420px) {

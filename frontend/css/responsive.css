@@ -1,0 +1,171 @@
+/* --- Proporciones y layout transversal (móvil → pantallas grandes) --- */
+
+/* --- Móvil pequeño --- */
+
+@media (max-width: 480px) {
+    :root {
+        --sitio-bloque: 16px;
+        --sitio-gutter: 14px;
+    }
+
+    .inicio-hero {
+        padding-top: 24px;
+    }
+
+    .inicio-hero__resplandor {
+        height: min(72vw, 300px);
+        top: -40px;
+        width: min(92vw, 300px);
+    }
+
+    .inicio-hero h1 {
+        font-size: clamp(2rem, 11vw, 2.6rem);
+        letter-spacing: -.05em;
+    }
+
+    .inicio-hero__lead {
+        font-size: .98rem;
+        margin-bottom: 22px;
+    }
+
+    .inicio-pasos__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cta-principal--grande {
+        justify-content: center;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .titulo-viaje h1 {
+        font-size: clamp(1.95rem, 10vw, 2.5rem);
+    }
+
+    .paso__encabezado h2,
+    .resultado h2 {
+        font-size: clamp(1.45rem, 7vw, 1.85rem);
+    }
+
+    .mapa-contenedor,
+    .mapa-contenedor--salen {
+        height: min(48vh, 340px);
+    }
+}
+
+/* --- Móvil estándar --- */
+
+@media (max-width: 640px) {
+    .card-viaje {
+        align-items: center;
+        flex-direction: row;
+        min-height: 108px;
+    }
+
+    .grid-viaje {
+        gap: 10px;
+    }
+
+    .progreso {
+        max-width: 100%;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        scrollbar-width: none;
+    }
+
+    .progreso::-webkit-scrollbar {
+        display: none;
+    }
+
+    .salen-herramientas,
+    .salen-perfil {
+        flex-basis: 100%;
+    }
+
+    .pagina-salen {
+        width: 100%;
+    }
+}
+
+/* --- Tablet --- */
+
+@media (min-width: 641px) and (max-width: 1099px) {
+    .grid-viaje {
+        gap: 14px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .opciones-plan {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card-viaje {
+        align-items: flex-start;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 200px;
+    }
+}
+
+/* --- Pantallas grandes: evitar columnas apretadas y contenido diminuto --- */
+
+@media (min-width: 1100px) {
+    :root {
+        --ancho-contenido: min(100%, 820px);
+        --ancho-amplio: min(100%, 1040px);
+    }
+
+    .pagina {
+        width: var(--ancho-contenido);
+    }
+
+    .titulo-viaje,
+    .viaje,
+    .pagina-mapa {
+        width: var(--ancho-amplio);
+    }
+
+    .pagina-salen {
+        width: min(100%, 900px);
+    }
+
+    .grid-viaje {
+        gap: 16px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .opciones-plan {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card-viaje {
+        min-height: 210px;
+    }
+
+    .inicio-hero h1 {
+        font-size: clamp(3.2rem, 4vw, 4.5rem);
+    }
+
+    .titulo-viaje h1 {
+        font-size: clamp(2.8rem, 3.5vw, 4rem);
+    }
+}
+
+/* --- Pantallas muy anchas: más aire sin estirar de más --- */
+
+@media (min-width: 1440px) {
+    :root {
+        --ancho-max-sitio: 1180px;
+        --ancho-contenido: min(100%, 860px);
+        --ancho-amplio: min(100%, 1080px);
+    }
+
+    .inicio-hero__lead {
+        max-width: 560px;
+    }
+
+    .nav-sitio__contenido,
+    .pie-sitio__contenido {
+        max-width: 1040px;
+    }
+}

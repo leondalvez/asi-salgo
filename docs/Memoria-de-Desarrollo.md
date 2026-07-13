@@ -183,8 +183,10 @@ No integramos APIs de venta de entradas porque no ofrecen tier gratuito estable 
 - Accesibilidad: skip link, `role="main"`, landmarks, foco visible.
 - Ajustes CSS tablet 768–1024 px.
 - Seguridad: CORS restrictivo en POST, cabeceras HTTP, límite body 32 KB, URLs `http`/`https` only.
+- Proporciones responsive: `frontend/css/responsive.css` (móvil, tablet, pantallas grandes).
 
 ### Pendiente para cerrar el TP (manual / evidencia)
+- **Revisar proporciones** en 360 / 768 / 1024 / 1440 px (checklist §3 en `docs/entrega-evidencias.md`).
 - Medición formal con [PageSpeed Insights](https://pagespeed.web.dev/) + capturas (ver `docs/entrega-evidencias.md`).
 - Testing cross-browser y tablet 768–1024 px con checklist del mismo doc.
 - Auditoría Lighthouse accesibilidad con captura (objetivo ≥ 90 en Home).

@@ -1,4 +1,5 @@
 @import url('puerta.css');
+@import url('responsive.css');
 
 
 :root {
@@ -32,6 +33,12 @@
     --anim-lenta: 640ms;
     --anim-easing: cubic-bezier(0.2, 0.8, 0.2, 1);
     --anim-suave: cubic-bezier(0.32, 0.72, 0, 1);
+
+    --sitio-gutter: clamp(16px, 4vw, 24px);
+    --sitio-bloque: clamp(20px, 4vw, 48px);
+    --ancho-contenido: min(100%, 760px);
+    --ancho-amplio: min(100%, 980px);
+    --ancho-max-sitio: 1100px;
 }
 
 *,
@@ -60,9 +67,26 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 48px 20px;
+    align-items: stretch;
+    padding: var(--sitio-bloque) var(--sitio-gutter);
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
     transition: background-image var(--anim-lenta) var(--anim-suave);
+}
+
+#nav-raiz,
+#pie-raiz {
+    margin-inline: calc(50% - 50vw);
+    max-width: 100vw;
+    width: 100vw;
+}
+
+body > main {
+    flex: 1 0 auto;
+    margin-inline: auto;
+    width: 100%;
+    max-width: var(--ancho-max-sitio);
 }
 
 .eyebrow {
