@@ -6,7 +6,7 @@
 
 const PAGINAS_NAV = [
     { id: 'inicio', href: 'index.html', label: 'Inicio', detalle: 'Bienvenida' },
-    { id: 'viaje', href: 'viaje.html', label: 'El Viaje', detalle: 'Tu salida', cta: true },
+    { id: 'viaje', href: 'viaje.html', label: 'El viaje', detalle: 'Tu salida', cta: true },
     { id: 'mapa', href: 'mapa.html', label: 'Mapa', detalle: 'Lugares cerca' },
     { id: 'salen', href: 'salen.html', label: 'Salen', detalle: 'Comunidad' },
     { id: 'sobre', href: 'sobre.html', label: 'Sobre', detalle: 'El proyecto' },

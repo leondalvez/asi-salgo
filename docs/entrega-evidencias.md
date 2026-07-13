@@ -4,7 +4,7 @@ Checklist para cerrar los ítems que la cátedra suele pedir con captura o infor
 
 **URL de producción:** https://asi-salgo.onrender.com  
 **URL local:** http://localhost:3000  
-**Última verificación automática:** julio 2026 — producción responde; El Viaje muestra tarjetas como botones y skip link visible.
+**Última verificación automática:** julio 2026 — producción responde; El viaje muestra tarjetas como botones y skip link visible; títulos y microcopy unificados en sentence case.
 
 ---
 
@@ -26,14 +26,14 @@ Checklist para cerrar los ítems que la cátedra suele pedir con captura o infor
 |-----|-------------|-------------|---------------|----------------|-----|
 | Home | Móvil | | | | |
 | Home | Escritorio | | | | |
-| El Viaje | Móvil | | | | |
+| El viaje | Móvil | | | | |
 | Salen | Móvil | | | | |
 
 ---
 
 ## 2. Testing cross-browser
 
-| Navegador | Home | El Viaje (tarjetas) | Salen (Me sumo + mapa) | Notas |
+| Navegador | Home | El viaje (tarjetas) | Salen (Me sumo + mapa) | Notas |
 |-----------|------|---------------------|------------------------|-------|
 | Chrome    | ☐    | ☐                   | ☐                      |       |
 | Firefox   | ☐    | ☐                   | ☐                      |       |
@@ -56,8 +56,8 @@ Revisar en DevTools con estos anchos (y en celular real si podés):
 | **1440 px+** | Títulos escalan sin quedar chicos; márgenes laterales equilibrados |
 
 - [ ] Home: resplandor y título proporcionados en móvil.
-- [ ] El Viaje: 4 columnas solo desde ~1100 px (antes 2 columnas).
-- [ ] El Viaje móvil: sin hero “Menos scroll”; tarjetas de energía justo debajo de la pregunta.
+- [ ] El viaje: 4 columnas solo desde ~1100 px (antes 2 columnas).
+- [x] El viaje móvil: sin hero “Menos scroll”; tarjetas de energía justo debajo de la pregunta.
 - [ ] Salen: formulario y mapa sin desborde.
 - [ ] Header/footer ocupan todo el ancho sin barra de scroll horizontal.
 
@@ -68,7 +68,7 @@ Revisar en DevTools con estos anchos (y en celular real si podés):
 En DevTools (o iPad real), probá ancho **768**, **834** y **1024** px:
 
 - [ ] Home: grilla de pasos en 2 columnas, título legible.
-- [ ] El Viaje: tarjetas de energía en 2 columnas (no 4 apretadas).
+- [ ] El viaje: tarjetas de energía en 2 columnas (no 4 apretadas).
 - [ ] Salen: formulario + mapa sin overflow horizontal.
 - [ ] Nav: menú hamburguesa solo &lt; 720 px; barra completa en tablet landscape.
 
@@ -97,7 +97,7 @@ En DevTools (o iPad real), probá ancho **768**, **834** y **1024** px:
 
 Verificado en código y desplegado en Render (julio 2026):
 
-- [x] Clicks en tarjetas de El Viaje funcionan (botones de energía visibles en accesibilidad).
+- [x] Clicks en tarjetas de El viaje funcionan (botones de energía visibles en accesibilidad).
 - [x] Skip link “Saltar al contenido” presente.
 - [x] Solo Rosario y Buenos Aires en selector de ciudad.
 - [ ] Logo puerta abre al hover (verificar visualmente tras cold start).
@@ -114,6 +114,19 @@ Implementado en `server/lib/seguridad.js`:
 - [x] Cabeceras: CSP, `X-Frame-Options`, `nosniff`, `Referrer-Policy`.
 - [x] Límite body JSON 32 KB.
 - [x] URLs externas solo `http`/`https` en compartir y tarjetas “Ver más”.
+
+---
+
+## 9. Consistencia de comunicación y microcopy
+
+Revisión de comunicación (julio 2026): unificación de títulos y nomenclatura.
+
+- [x] **Sentence case** en todos los títulos (sin “Title Case” tipo inglés).
+- [x] Convención de nombre: **El viaje** en texto de mayúsculas/minúsculas; `EL VIAJE` solo en eyebrows (mayúsculas por CSS).
+- [x] `Mapa de Salidas` → `Mapa de salidas`; `Con Peques` → `con peques`.
+- [x] `<title>` unificados al patrón **`Página — Así Salgo!`** con raya (—); Home como excepción de marca.
+- [x] Punto final coherente en H1 afirmativos (`Mapa de salidas.`, `A dónde salen.`).
+- [ ] Verificación visual en producción de pestañas y previsualización OG tras deploy.
 
 ---
 

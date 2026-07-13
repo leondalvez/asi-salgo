@@ -4,7 +4,7 @@
 **Autor:** Leonardo Dalvez  
 **Repositorio:** https://github.com/leondalvez/asi-salgo  
 **Producción:** https://asi-salgo.onrender.com  
-**Última actualización:** julio 2026
+**Última actualización:** julio 2026 (revisión de comunicación: microcopy y nomenclatura)
 
 ---
 
@@ -12,7 +12,7 @@
 
 **Así Salgo!** es una aplicación web para armar y compartir salidas presenciales en **Rosario** y **Buenos Aires**. No es una red social: no hay likes, no hay scroll infinito ni feed algorítmico. La idea es ayudar a decidir *a dónde salir hoy*, *con qué energía* y *con quién*, usando datos reales de la ciudad y una capa comunitaria donde cada persona puede publicar un plan y otras pueden sumarse con un **Me sumo**.
 
-El sitio tiene nueve pantallas principales: Home, Entrar (identidad), El Viaje (cuestionario), Mapa de lugares, Salen (comunidad), Sobre, Contacto, Este mes y Con Peques.
+El sitio tiene nueve pantallas principales: Home, Entrar (identidad), El viaje (cuestionario), Mapa de lugares, Salen (comunidad), Sobre, Contacto, Este mes y Con peques.
 
 **Ciudades activas (julio 2026):** Rosario y Buenos Aires. Santa Fe, Córdoba y Mendoza quedaron fuera del selector por falta de APIs estables en tier gratuito; los adapters siguen en el repo para reactivarlos cuando haya fuente confiable o presupuesto para API paga.
 
@@ -86,19 +86,19 @@ No linkeamos cuentas institucionales de Instagram o similares (decisión de marc
 ## 5. Evolución del trabajo (qué fuimos sumando)
 
 ### Fase 1 — MVP local
-- Home, El Viaje con cuestionario (energía → plan → momento).
+- Home, El viaje con cuestionario (energía → plan → momento).
 - Adapters Rosario y Buenos Aires.
 - Tarjetas de eventos con clima y complementos (lugares públicos).
 
 ### Fase 2 — Mapa y accesos directos
-- **Mapa de Salidas** (`mapa.html`) con Leaflet.
-- Páginas **Este mes** y **Con Peques** sin repetir el cuestionario.
+- **Mapa de salidas** (`mapa.html`) con Leaflet.
+- Páginas **Este mes** y **Con peques** sin repetir el cuestionario.
 - Filtro por cercanía con geocodificación Nominatim (los eventos de Rosario no traen lat/lng nativos).
 
 ### Fase 3 — Comunidad y compartir
 - Pantalla **Entrar** (nombre + código).
 - **Salen**: feed, publicar plan, Me sumo.
-- Botón **Voy a salir** desde El Viaje hacia Salen.
+- Botón **Voy a salir** desde El viaje hacia Salen.
 - Compartir por WhatsApp / Instagram + vista `/compartir/:id`.
 
 ### Fase 4 — Producción con persistencia
@@ -111,17 +111,23 @@ No linkeamos cuentas institucionales de Instagram o similares (decisión de marc
 - Etiqueta **`cultural`** en datos útiles de Rosario (teatros, cines, centros).
 - Extracción de **links de entrada** desde la agenda municipal cuando vienen en el campo `ticket`.
 - **Mapa en Salen**: planes geocodificados + capa opcional de espacios culturales.
-- Planes de El Viaje enriquecidos con sedes culturales para Rosario.
+- Planes de El viaje enriquecidos con sedes culturales para Rosario.
 
 ### Fase 6 — Símbolo puerta, comunidad en mapa y cierre de TP
 - **Puerta** como identidad visual: logo del nav, CTA de inicio y botón **Me sumo** (antes “Voy a salir”) con animación de apertura.
 - Mapa en Salen con marcadores de compañeros, popup y enfoque tras sumarse.
 - Recorte a **Rosario y Buenos Aires** en UI (adapters de otras ciudades conservados en repo).
-- Fix: `frontend/js/ciudades.js` en IIFE — redeclaraciones globales rompían `viaje.js` y las tarjetas no respondían.
+- Fix: `frontend/js/ciudades.js` en IIFE — redeclaraciones globales rompían `viaje.js` y las tarjetas de El viaje no respondían.
 - OG image PNG 1200×630, meta sociales en 9 páginas, skip link y ajustes tablet.
 
 ### Fase 6 (histórico) — Expansión nacional
 - Santa Fe, Córdoba y Mendoza se probaron en desarrollo; hoy **desactivadas** en producción por APIs inestables o sin tier gratuito.
+
+### Fase 7 — Seguridad, responsive y revisión de comunicación
+- **Seguridad**: `server/lib/seguridad.js` con CORS restrictivo en POST, cabeceras HTTP (CSP, `X-Frame-Options`, `nosniff`, `Referrer-Policy`), límite de body JSON (32 KB) y validación de URLs externas (`http`/`https`).
+- **Proporciones responsive**: `frontend/css/responsive.css` para móvil, tablet y pantallas grandes.
+- **Economía de espacio en El viaje (móvil)**: se quitó el hero “Menos scroll. Más ciudad.” del formulario; la toolbar (contexto + progreso) queda sticky y las tarjetas de energía aparecen en grilla 2×2 apenas debajo de la pregunta, sin scroll previo.
+- **Revisión de comunicación (microcopy)**: unificación a **sentence case** en títulos, convención **El viaje** (mayúscula/minúscula) reservando `EL VIAJE` para eyebrows, `Mapa de salidas` y `con peques` en minúscula, y `<title>` normalizados al patrón `Página — Así Salgo!`.
 
 ---
 
@@ -137,7 +143,9 @@ No linkeamos cuentas institucionales de Instagram o similares (decisión de marc
 | Salidas sin ubicación en mapa | La comunidad publica texto libre (“Costanera”) | Geocodificación al listar + persistencia de lat/lng en JSON |
 | Linda sin rango mensual | API solo ofrece hasta “esta semana” | Aviso explícito en Buenos Aires cuando se pide “este mes” |
 | Profesores preguntan por Santa Fe / Córdoba / Mendoza | APIs inestables o sin tier gratuito | Adapters en repo; selector limitado a Rosario y BA hasta tener fuente estable |
-| Tarjetas de El Viaje sin click | `ciudades.js` redeclaraba constantes globales → SyntaxError en scripts siguientes | IIFE en `ciudades.js`; solo `window.CiudadesApi` expuesto |
+| Tarjetas de El viaje sin click | `ciudades.js` redeclaraba constantes globales → SyntaxError en scripts siguientes | IIFE en `ciudades.js`; solo `window.CiudadesApi` expuesto |
+| Producción servía `viaje.html` viejo | Render cacheaba/servía el HTML previo con el hero “Menos scroll” | Ocultado por CSS + nav condicional, validación del frontend en el build (`render.yaml`) y `Cache-Control: no-cache` para HTML |
+| Títulos en “Title Case” | Mayúscula en cada palabra (calco del inglés) se veía poco profesional | Convención sentence case + nomenclatura única (**El viaje**) en todo el sitio |
 | JSON efímero en Render | Newsletter y salidas se pierden al redeploy | Perfiles ya en Supabase; migración del resto marcada como opcional |
 
 ---
@@ -174,11 +182,12 @@ No integramos APIs de venta de entradas porque no ofrecen tier gratuito estable 
 ### Listo en producción
 - URL pública con HTTPS (Render) con deploy automático desde `main`.
 - Perfiles persistentes en PostgreSQL (Supabase).
-- El Viaje, mapa de lugares, comunidad Salen, compartir, Este mes, Con Peques.
+- El viaje, mapa de lugares, comunidad Salen, compartir, Este mes, Con peques.
 - Mapa comunitario en Salen con capa cultural y contador de compañeros.
 - Símbolo **puerta** (logo, CTA inicio, Me sumo) con animación de apertura.
 - Solo **Rosario y Buenos Aires** en el selector de ciudades.
-- Fix crítico: `ciudades.js` en IIFE (tarjetas de El Viaje responden).
+- Fix crítico: `ciudades.js` en IIFE (tarjetas de El viaje responden).
+- Revisión de comunicación: títulos en sentence case y nomenclatura unificada (**El viaje**, `Mapa de salidas`, `con peques`).
 - `og:image` PNG 1200×630 y meta OG/Twitter en las 9 páginas.
 - Accesibilidad: skip link, `role="main"`, landmarks, foco visible.
 - Ajustes CSS tablet 768–1024 px.
