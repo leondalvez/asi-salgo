@@ -148,6 +148,7 @@
     border-radius: 999px;
     color: var(--texto-secundario);
     display: inline-flex;
+    flex-shrink: 0;
     gap: 8px;
     padding: 7px 12px 7px 9px;
     position: relative;
@@ -196,13 +197,15 @@
 .nav-sitio__texto {
     display: flex;
     flex-direction: column;
-    gap: 0;
-    line-height: 1.1;
+    gap: 1px;
+    line-height: 1.15;
+    min-width: 0;
 }
 
 .nav-sitio__etiqueta {
     font-size: .82rem;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .nav-sitio__detalle {
@@ -210,6 +213,7 @@
     font-size: .62rem;
     font-weight: 500;
     letter-spacing: .02em;
+    white-space: nowrap;
 }
 
 .nav-sitio__link:hover,
@@ -383,25 +387,44 @@
     white-space: nowrap;
 }
 
-/* --- Mobile --- */
+/* --- Escritorio ancho (≥1200): barra con más aire para el subtítulo --- */
 
-@media (max-width: 860px) {
+@media (min-width: 1200px) {
+    .nav-sitio__contenido,
+    .pie-sitio__contenido {
+        max-width: 1080px;
+    }
+}
+
+@media (min-width: 1600px) {
+    .nav-sitio__contenido,
+    .pie-sitio__contenido {
+        max-width: 1220px;
+    }
+}
+
+/* El tagline de marca solo en escritorio, para no recargar la barra chica */
+@media (max-width: 1199px) {
     .nav-sitio__marca-tag {
         display: none;
     }
 }
 
-@media (max-width: 900px) and (min-width: 721px) {
+/* --- Tablet (768–1199): barra completa pero sin subtítulos (no entran cómodos) --- */
+
+@media (min-width: 768px) and (max-width: 1199px) {
     .nav-sitio__detalle {
         display: none;
     }
 
     .nav-sitio__link {
-        padding: 7px 10px;
+        padding: 7px 11px;
     }
 }
 
-@media (max-width: 720px) {
+/* --- Móvil (<768): menú hamburguesa con título + subtítulo --- */
+
+@media (max-width: 767px) {
     .nav-sitio__disparador {
         display: inline-flex;
     }

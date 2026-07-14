@@ -1466,102 +1466,12 @@ body[data-pagina='viaje'] header.titulo-viaje {
     margin: 0;
 }
 
-/* --- Móvil: sin hero, tarjetas 2×2 arriba del todo --- */
+/* Los ajustes responsive de El viaje viven en css/responsive.css
+   (tiers móvil / tablet / escritorio / TV). Acá queda solo lo puntual. */
 
-@media (max-width: 1023px) {
-    body[data-pagina='viaje'] {
-        --sitio-bloque: 8px;
-    }
-
-    body[data-pagina='viaje'] .nav-sitio {
-        margin-bottom: 4px;
-    }
-
-    body[data-pagina='viaje'] .nav-sitio__marca-tag {
-        display: none;
-    }
-
-    body[data-pagina='viaje'] .viaje-toolbar {
-        background: color-mix(in srgb, var(--fondo-principal) 96%, transparent);
-        border-bottom: 1px solid color-mix(in srgb, var(--linea) 70%, transparent);
-        margin: 0 calc(-1 * var(--sitio-gutter)) 8px;
-        padding: 6px var(--sitio-gutter);
-        position: sticky;
-        top: 52px;
-        z-index: 55;
-    }
-
-    body[data-pagina='viaje'] .viaje-toolbar__contexto {
-        font-size: .64rem;
-        margin-bottom: 4px;
-    }
-
-    body[data-pagina='viaje'] .progreso {
-        gap: 6px;
-        margin: 0 auto;
-        max-width: 100%;
-    }
-
-    body[data-pagina='viaje'] .progreso__paso {
-        font-size: .7rem;
-    }
-
-    body[data-pagina='viaje'] .progreso__paso b {
-        display: none;
-    }
-
-    body[data-pagina='viaje'] .paso__encabezado--compacto h2 {
-        font-size: 1.18rem;
-        line-height: 1.2;
-    }
-
-    body[data-pagina='viaje'] .paso[data-paso='1'] .grid-viaje {
-        gap: 8px;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    body[data-pagina='viaje'] .paso[data-paso='1'] .card-viaje {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 6px;
-        min-height: 104px;
-        padding: 10px;
-    }
-
-    body[data-pagina='viaje'] .paso[data-paso='1'] .arte-experiencia {
-        flex: 0 0 36px;
-        height: 36px;
-        width: 36px;
-    }
-
-    body[data-pagina='viaje'] .paso[data-paso='1'] .card-viaje strong {
-        font-size: .8rem;
-        line-height: 1.15;
-    }
-
-    body[data-pagina='viaje'] .paso[data-paso='1'] .card-viaje small {
-        font-size: .66rem;
-        line-height: 1.2;
-    }
-}
-
-@media (min-width: 640px) {
+@media (min-width: 768px) {
     .opcion-plan {
         min-height: 96px;
-    }
-}
-
-@media (max-width: 420px) {
-    .titulo-viaje { margin-bottom: 28px; }
-    .titulo-viaje h1 { font-size: clamp(2.15rem, 14vw, 3rem); }
-    .progreso { gap: 6px; }
-    .progreso__paso { font-size: .72rem; gap: 4px; }
-    .progreso__paso b { display: none; }
-    .card-viaje { gap: 14px; padding: 14px; }
-    .arte-experiencia {
-        flex-basis: 62px;
-        height: 62px;
-        width: 62px;
     }
 }
 

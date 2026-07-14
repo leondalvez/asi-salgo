@@ -1,143 +1,76 @@
-/* --- Proporciones y layout transversal (móvil → pantallas grandes) --- */
+/* ============================================================
+   Sistema responsive — 3 tiers + TV
+   ------------------------------------------------------------
+   Pequeña  (móvil)      : < 768px      → probar 360 / 390
+   Intermedia (tablet)   : 768–1199px   → probar 768 / 834 / 1024
+   Grande   (escritorio) : ≥ 1200px     → probar 1280 / 1440
+   TV / ultra-wide       : ≥ 1600px     → probar 1920 / 4K
+   ------------------------------------------------------------
+   Mobile-first: los estilos base viven en cada CSS de página;
+   acá solo van los ajustes por tamaño. Un breakpoint por tier,
+   sin superposiciones, para no mantener lo mismo en dos lados.
+   ============================================================ */
 
-@media (min-width: 769px) {
-    .viaje-toolbar {
-        background: none;
-        border: 0;
-        margin-bottom: 24px;
-        padding: 0;
-        position: static;
+
+/* ===========================================================
+   TIER 1 — MÓVIL (< 768px)
+   =========================================================== */
+
+@media (max-width: 767px) {
+
+    /* --- El viaje: sin hero, toolbar sticky, energías en 2×2 --- */
+    body[data-pagina='viaje'] {
+        --sitio-bloque: 8px;
+        --nav-altura-viaje: 56px;
     }
-}
 
-@media (max-width: 1023px) {
+    body[data-pagina='viaje'] .nav-sitio {
+        margin-bottom: 4px;
+    }
+
     body[data-pagina='viaje'] .nav-sitio__marca-tag {
         display: none;
     }
 
-    body[data-pagina='viaje'] #titulo-viaje-presentacion {
-        display: none !important;
-    }
-
-    body[data-pagina='viaje'] {
-        --sitio-bloque: 10px;
-    }
-
-    body[data-pagina='viaje'] .nav-sitio {
-        margin-bottom: 6px;
-    }
-
-    body[data-pagina='viaje'] .viaje-toolbar {
-        background: color-mix(in srgb, var(--fondo-principal) 94%, transparent);
-        border-bottom: 1px solid color-mix(in srgb, var(--linea) 80%, transparent);
+    .viaje-toolbar {
+        background: color-mix(in srgb, var(--fondo-principal) 96%, transparent);
+        border-bottom: 1px solid color-mix(in srgb, var(--linea) 75%, transparent);
         margin: 0 calc(-1 * var(--sitio-gutter)) 10px;
-        padding: 6px var(--sitio-gutter) 8px;
+        padding: 8px var(--sitio-gutter);
         position: sticky;
         top: var(--nav-altura-viaje, 56px);
         z-index: 55;
     }
 
-    body[data-pagina='viaje'] .viaje-toolbar__contexto {
+    .viaje-toolbar__contexto {
         font-size: .66rem;
         margin-bottom: 6px;
     }
 
-    body[data-pagina='viaje'] .progreso {
+    .progreso {
         gap: 6px;
-        margin-bottom: 0;
+        margin: 0 auto;
         max-width: 100%;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        scrollbar-width: none;
     }
 
-    body[data-pagina='viaje'] .progreso__paso {
+    .progreso::-webkit-scrollbar {
+        display: none;
+    }
+
+    .progreso__paso {
         font-size: .72rem;
     }
 
-    body[data-pagina='viaje'] .progreso__paso b {
+    .progreso__paso b {
         display: none;
     }
 
-    body[data-pagina='viaje'] .paso__encabezado {
-        margin-bottom: 10px;
-        max-width: none;
-        text-align: left;
-    }
-
-    body[data-pagina='viaje'] .paso__encabezado > span,
-    body[data-pagina='viaje'] .paso[data-paso='1'] .paso__encabezado > p,
-    body[data-pagina='viaje'] .paso[data-paso='2'] .paso__encabezado > p,
-    body[data-pagina='viaje'] .paso[data-paso='3'] .paso__encabezado > p {
-        display: none;
-    }
-
-    body[data-pagina='viaje'] .paso__encabezado h2 {
-        font-size: 1.22rem;
-        line-height: 1.15;
-        margin: 0;
-    }
-
-    /* Paso 1: 4 energías en 2×2 para ver todas sin tanto scroll */
-    body[data-pagina='viaje'] .paso[data-paso='1'] .grid-viaje {
-        gap: 8px;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    body[data-pagina='viaje'] .paso[data-paso='1'] .card-viaje {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 8px;
-        justify-content: flex-start;
-        min-height: 112px;
-        padding: 10px;
-    }
-
-    body[data-pagina='viaje'] .paso[data-paso='1'] .arte-experiencia {
-        flex: 0 0 40px;
-        height: 40px;
-        width: 40px;
-    }
-
-    body[data-pagina='viaje'] .paso[data-paso='1'] .card-viaje strong {
-        font-size: .82rem;
-        line-height: 1.2;
-    }
-
-    body[data-pagina='viaje'] .paso[data-paso='1'] .card-viaje small {
-        font-size: .68rem;
-        line-height: 1.25;
-        margin-top: 2px;
-    }
-}
-
-@media (max-width: 768px) {
-    :root {
-        --nav-altura-viaje: 58px;
-    }
-
-    .titulo-viaje {
-        display: none;
-    }
-
-    .viaje-toolbar {
-        background: color-mix(in srgb, var(--fondo-principal) 94%, transparent);
-        border-bottom: 1px solid color-mix(in srgb, var(--linea) 80%, transparent);
-        margin: 0 calc(-1 * var(--sitio-gutter)) 14px;
-        padding: 8px var(--sitio-gutter) 10px;
-        position: sticky;
-        top: var(--nav-altura-viaje);
-        z-index: 55;
-    }
-
-    .viaje-toolbar__contexto {
-        margin-bottom: 8px;
-    }
-
-    .progreso {
-        margin-bottom: 0;
-        max-width: 100%;
-    }
-
+    /* Encabezado de paso: compacto y alineado a la izquierda */
     .paso__encabezado {
-        margin-bottom: 14px;
+        margin-bottom: 12px;
         max-width: none;
         text-align: left;
     }
@@ -151,11 +84,44 @@
 
     .paso__encabezado h2,
     .resultado h2 {
-        font-size: 1.35rem;
+        font-size: 1.3rem;
         line-height: 1.15;
         margin: 0;
     }
 
+    /* Paso 1: 4 energías en 2×2 para verlas todas sin scroll previo */
+    .paso[data-paso='1'] .grid-viaje {
+        gap: 8px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .paso[data-paso='1'] .card-viaje {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+        justify-content: flex-start;
+        min-height: 108px;
+        padding: 10px;
+    }
+
+    .paso[data-paso='1'] .arte-experiencia {
+        flex: 0 0 38px;
+        height: 38px;
+        width: 38px;
+    }
+
+    .paso[data-paso='1'] .card-viaje strong {
+        font-size: .82rem;
+        line-height: 1.18;
+    }
+
+    .paso[data-paso='1'] .card-viaje small {
+        font-size: .68rem;
+        line-height: 1.25;
+        margin-top: 2px;
+    }
+
+    /* --- Controles de paso (planes, filtros, chips) --- */
     .volver {
         font-size: .86rem;
         margin-bottom: 12px;
@@ -192,6 +158,7 @@
         width: 48px;
     }
 
+    /* --- Heros compactos en páginas internas --- */
     body[data-pagina='viaje'] .pagina-hero--chica,
     body[data-pagina='salen'] .pagina-hero--chica,
     body[data-pagina='contacto'] .pagina-hero--chica,
@@ -218,11 +185,22 @@
         line-height: 1.45;
         margin-bottom: 8px;
     }
+
+    /* --- Comunidad (Salen) a una columna --- */
+    .salen-herramientas,
+    .salen-perfil {
+        flex-basis: 100%;
+    }
+
+    .pagina-salen {
+        width: 100%;
+    }
 }
 
-/* --- Móvil pequeño --- */
 
-@media (max-width: 480px) {
+/* --- Móvil chico (< 480px): ajustes finos --- */
+
+@media (max-width: 479px) {
     :root {
         --sitio-bloque: 16px;
         --sitio-gutter: 14px;
@@ -258,29 +236,8 @@
         width: 100%;
     }
 
-    .titulo-viaje h1 {
-        font-size: clamp(1.95rem, 10vw, 2.5rem);
-    }
-
     .paso[data-paso='1'] .paso__encabezado h2 {
         font-size: 1.28rem;
-    }
-
-    .grid-viaje {
-        gap: 8px;
-    }
-
-    .card-viaje {
-        min-height: 96px;
-        padding: 12px;
-    }
-
-    .card-viaje strong {
-        font-size: .95rem;
-    }
-
-    .card-viaje small {
-        font-size: .78rem;
     }
 
     .paso__encabezado h2,
@@ -294,44 +251,22 @@
     }
 }
 
-/* --- Móvil estándar --- */
 
-@media (max-width: 640px) {
-    .paso[data-paso='2'] .card-viaje,
-    .paso[data-paso='3'] .card-viaje {
-        align-items: center;
-        flex-direction: row;
-        min-height: 108px;
+/* ===========================================================
+   TIER 2 — TABLET (768–1199px)
+   =========================================================== */
+
+@media (min-width: 768px) and (max-width: 1199px) {
+    /* La toolbar del viaje deja de ser sticky: hay aire suficiente */
+    .viaje-toolbar {
+        background: none;
+        border: 0;
+        margin-bottom: 24px;
+        padding: 0;
+        position: static;
     }
 
-    .grid-viaje {
-        gap: 10px;
-    }
-
-    .progreso {
-        max-width: 100%;
-        overflow-x: auto;
-        padding-bottom: 4px;
-        scrollbar-width: none;
-    }
-
-    .progreso::-webkit-scrollbar {
-        display: none;
-    }
-
-    .salen-herramientas,
-    .salen-perfil {
-        flex-basis: 100%;
-    }
-
-    .pagina-salen {
-        width: 100%;
-    }
-}
-
-/* --- Tablet --- */
-
-@media (min-width: 641px) and (max-width: 1099px) {
+    /* Energías y planes en 2 columnas (no 4 apretadas) */
     .grid-viaje {
         gap: 14px;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -349,19 +284,29 @@
     }
 }
 
-/* --- Pantallas grandes: evitar columnas apretadas y contenido diminuto --- */
 
-@media (min-width: 1100px) {
+/* ===========================================================
+   TIER 3 — ESCRITORIO (≥ 1200px)
+   =========================================================== */
+
+@media (min-width: 1200px) {
     :root {
         --ancho-contenido: min(100%, 820px);
         --ancho-amplio: min(100%, 1040px);
+    }
+
+    .viaje-toolbar {
+        background: none;
+        border: 0;
+        margin-bottom: 24px;
+        padding: 0;
+        position: static;
     }
 
     .pagina {
         width: var(--ancho-contenido);
     }
 
-    .titulo-viaje,
     .viaje,
     .pagina-mapa {
         width: var(--ancho-amplio);
@@ -371,6 +316,7 @@
         width: min(100%, 900px);
     }
 
+    /* Energías en 4 columnas, planes en 3 */
     .grid-viaje {
         gap: 16px;
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -387,13 +333,10 @@
     .inicio-hero h1 {
         font-size: clamp(3.2rem, 4vw, 4.5rem);
     }
-
-    .titulo-viaje h1 {
-        font-size: clamp(2.8rem, 3.5vw, 4rem);
-    }
 }
 
-/* --- Pantallas muy anchas: más aire sin estirar de más --- */
+
+/* --- Escritorio amplio (≥ 1440px): más aire sin estirar de más --- */
 
 @media (min-width: 1440px) {
     :root {
@@ -405,9 +348,41 @@
     .inicio-hero__lead {
         max-width: 560px;
     }
+}
 
-    .nav-sitio__contenido,
-    .pie-sitio__contenido {
-        max-width: 1040px;
+
+/* ===========================================================
+   TIER 4 — TV / ULTRA-WIDE (≥ 1600px)
+   Más ancho útil y tipografía mayor para distancia de lectura.
+   =========================================================== */
+
+@media (min-width: 1600px) {
+    :root {
+        --ancho-max-sitio: 1320px;
+        --ancho-contenido: min(100%, 940px);
+        --ancho-amplio: min(100%, 1220px);
+        --sitio-bloque: clamp(48px, 4vw, 72px);
+        --gap-grilla: 32px;
+    }
+
+    body {
+        font-size: 17px;
+    }
+
+    .inicio-hero h1 {
+        font-size: clamp(4.2rem, 4vw, 5.6rem);
+    }
+
+    .inicio-hero__lead {
+        font-size: 1.15rem;
+        max-width: 620px;
+    }
+
+    .grid-viaje {
+        gap: 20px;
+    }
+
+    .card-viaje {
+        min-height: 240px;
     }
 }

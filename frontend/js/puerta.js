@@ -14,12 +14,8 @@
 
     const MARCADO_LOGO = `
         <rect class="puerta-luz" x="6.5" y="5.5" width="19" height="23" rx="1" />
-        <g class="puerta-grupo puerta-grupo--izq">
-            <rect class="puerta-hoja" x="0" y="-11" width="9" height="22" rx="0.5" />
-        </g>
-        <g class="puerta-grupo puerta-grupo--der">
-            <rect class="puerta-hoja" x="-9" y="-11" width="9" height="22" rx="0.5" />
-        </g>
+        <rect class="puerta-hoja puerta-hoja--izq" x="6.5" y="5.5" width="9.75" height="23" rx="0.5" />
+        <rect class="puerta-hoja puerta-hoja--der" x="15.75" y="5.5" width="9.75" height="23" rx="0.5" />
         <line class="puerta-union" x1="16" y1="7" x2="16" y2="27" />
         <rect class="puerta-marco" x="4" y="3" width="24" height="28" rx="3" />
     `;

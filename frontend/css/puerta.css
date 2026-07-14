@@ -34,35 +34,23 @@
     transform-origin: right center;
 }
 
-/* Logo: doble hoja negra, línea central blanca; al hover se abre hacia los costados */
+/* Logo: doble hoja negra, línea central blanca. Al hover las hojas se abren
+   en 3D (rotateY, igual que el CTA) y sale luz con el color de la sección. */
 .puerta-svg--logo {
     height: 34px;
     overflow: visible;
     width: 32px;
+    transition: filter 400ms var(--anim-suave);
 }
 
 .puerta-svg--logo .puerta-luz {
-    fill: #fffef5;
+    fill: color-mix(in srgb, var(--color-card, var(--color-desenchufarme)) 55%, #fff7e0);
     opacity: 0;
     transition: opacity 400ms var(--anim-suave) 140ms;
 }
 
 .puerta-svg--logo .puerta-hoja {
     fill: #000;
-}
-
-.puerta-svg--logo .puerta-grupo {
-    transition: transform 560ms var(--anim-suave);
-}
-
-.puerta-svg--logo .puerta-grupo--izq {
-    transform: translate(7px, 17px) rotate(0deg);
-    transform-origin: 0 0;
-}
-
-.puerta-svg--logo .puerta-grupo--der {
-    transform: translate(25px, 17px) rotate(0deg);
-    transform-origin: 0 0;
 }
 
 .puerta-svg--logo .puerta-union {
@@ -79,14 +67,14 @@
     stroke: var(--texto-secundario);
 }
 
-.nav-sitio__marca:hover .puerta-svg--logo .puerta-grupo--izq,
-.nav-sitio__marca:focus-visible .puerta-svg--logo .puerta-grupo--izq {
-    transform: translate(7px, 17px) rotate(-68deg);
+.nav-sitio__marca:hover .puerta-svg--logo .puerta-hoja--izq,
+.nav-sitio__marca:focus-visible .puerta-svg--logo .puerta-hoja--izq {
+    transform: rotateY(78deg);
 }
 
-.nav-sitio__marca:hover .puerta-svg--logo .puerta-grupo--der,
-.nav-sitio__marca:focus-visible .puerta-svg--logo .puerta-grupo--der {
-    transform: translate(25px, 17px) rotate(68deg);
+.nav-sitio__marca:hover .puerta-svg--logo .puerta-hoja--der,
+.nav-sitio__marca:focus-visible .puerta-svg--logo .puerta-hoja--der {
+    transform: rotateY(-78deg);
 }
 
 .nav-sitio__marca:hover .puerta-svg--logo .puerta-union,
@@ -97,7 +85,13 @@
 .nav-sitio__marca:hover .puerta-svg--logo .puerta-luz,
 .nav-sitio__marca:focus-visible .puerta-svg--logo .puerta-luz {
     opacity: 1;
-    transition-delay: 80ms;
+    transition-delay: 120ms;
+}
+
+/* Halo del color actual: la luz "sale" de la puerta al abrirse */
+.nav-sitio__marca:hover .puerta-svg--logo,
+.nav-sitio__marca:focus-visible .puerta-svg--logo {
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--color-card, var(--color-desenchufarme)) 55%, transparent));
 }
 
 .nav-sitio__marca:not(:hover):not(:focus-visible) .puerta-svg--logo .puerta-luz {
@@ -158,7 +152,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .puerta-grupo,
+    .puerta-svg--logo,
     .puerta-hoja,
     .puerta-luz,
     .puerta-union {
