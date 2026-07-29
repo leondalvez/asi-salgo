@@ -4,8 +4,28 @@ Registro cronológico de avances. Cada entrada resume qué se hizo, qué se deci
 y qué queda pendiente. Complementa la `Memoria-de-Desarrollo.md` (que ordena por
 temas); acá el orden es por día.
 
-> **Estrategia de entrega:** escalonar los commits (1–2 por día) para mostrar
-> avance sostenido hacia el 50% del mes. No todo lo trabajado se sube el mismo día.
+---
+
+## 2026-07-29 — Post entrega 50% / retome
+
+### Hecho
+- Entrega de código a la cátedra (ZIP con README + fuente ejecutable).
+- Carpeta de empaquetado académico: `scripts/preparar-entrega.mjs` + plantillas
+  en `scripts/plantillas-entrega/` (README, Memoria y evidencias en voz individual).
+- README raíz en el repo; `render.yaml` simplificado (`npm install`); `_defensa/`
+  ignorada en git (apuntes personales para la defensa).
+
+### Pendiente hacia el 100%
+1. **Evidencias** (checklist en `docs/entrega-evidencias.md`): PageSpeed, Lighthouse,
+   cross-browser, capturas en 360/768/1024/1440.
+2. **Persistencia completa en Supabase:** salidas de comunidad + suscripciones
+   (hoy perfiles sí; el resto puede perderse en redeploy de Render).
+3. **Red social de salidas:** conexiones entre usuarios + georreferencia más rica
+   (mapa de compañeros, “quién sale cerca”).
+4. **Pulido UX:** limpiar CSS muerto (`.titulo-viaje`), alinear `salen`/`mapa`/`entrar`
+   a los tiers responsive, auditoría visual.
+5. **Calidad:** tests básicos de API (`/api/health`, `/api/eventos`), mejorar cold start
+   (cron o ping) si la defensa depende de producción.
 
 ---
 
