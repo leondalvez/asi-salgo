@@ -4,7 +4,7 @@
 **Autor:** Leonardo Dalvez  
 **Repositorio:** https://github.com/leondalvez/asi-salgo  
 **Producción:** https://asi-salgo.onrender.com  
-**Última actualización:** julio 2026 (revisión de comunicación: microcopy y nomenclatura)
+**Última actualización:** noviembre 2026 (cierre técnico: persistencia completa, robustez Rosario y ajustes de acceso)
 
 ---
 
@@ -24,8 +24,8 @@ El sitio tiene nueve pantallas principales: Home, Entrar (identidad), El viaje (
 |------|------------|--------|
 | Frontend | HTML, CSS y JavaScript vanilla | Cumple el TP sin frameworks; carga liviana en hosting gratis |
 | Backend | Node.js (`server/index.js`) | Sirve el frontend, expone API REST y concentra las integraciones externas |
-| Mapas | Leaflet + tiles oscuros CARTO | Gratis, coherente con el diseño dark del sitio |
-| Base de datos | Supabase PostgreSQL (solo perfiles) | Persistencia real en producción sin costo; el resto sigue en JSON local por ahora |
+| Mapas | Leaflet + tiles OpenStreetMap | Fuente gratuita sin API key; más estable para producción |
+| Base de datos | Supabase PostgreSQL (perfiles, salidas, conexiones y suscripciones) | Persistencia real en producción con fallback JSON local para desarrollo |
 | Hosting | Render.com Free | HTTPS incluido, deploy desde GitHub, $0 |
 
 **Restricción explícita del proyecto:** no gastar en infraestructura. Todo el stack corre en tiers gratuitos.
@@ -44,7 +44,7 @@ Para la comunidad usamos **nombre autopercibido + código único** (ej. `Camila#
 
 ### 3.3 Eventos gratuitos y con entrada paga
 
-Mostramos ambos tipos. La app **no vende entradas**: solo informa y permite compartir la salida. Cuando la fuente trae precio o link de venta (agenda municipal, Linda BA), mostramos el badge **Entrada paga** o **Gratis** y, si existe, un enlace **Ver más** hacia la fuente original.
+Mostramos ambos tipos. La app **no vende entradas**: solo informa y permite compartir la salida. Cuando la fuente trae precio o link de venta (agenda municipal, Linda BA), mostramos el badge **Entrada paga** o **Gratis**; la descripción se expande dentro de la misma tarjeta para evitar saltos fuera del flujo.
 
 ### 3.4 APIs solo gratuitas
 
@@ -52,7 +52,7 @@ Descartamos scrapear sitios comerciales (Passline, Ticketek, etc.) por tres moti
 
 ### 3.5 Compartir sin perfiles oficiales de marca
 
-No linkeamos cuentas institucionales de Instagram o similares (decisión de marca). Sí ofrecemos **Compartir** por WhatsApp e Instagram *desde el plan del usuario*, con página OG dinámica en `/compartir/:id`.
+No linkeamos cuentas institucionales de marca (decisión de producto). El compartir usa estrategia progresiva: **Web Share API** cuando está disponible y asistente fallback cuando no; además se mantiene página OG dinámica en `/compartir/:id` para previsualizaciones.
 
 ---
 
@@ -103,8 +103,8 @@ No linkeamos cuentas institucionales de Instagram o similares (decisión de marc
 
 ### Fase 4 — Producción con persistencia
 - Deploy en **Render.com** (`render.yaml`: `npm install` + `node index.js`).
-- **Supabase PostgreSQL** para perfiles (`DATABASE_URL` en Render).
-- Scripts SQL en `server/sql/` para crear y verificar la tabla.
+- **Supabase PostgreSQL** con `DATABASE_URL` en Render para perfiles, salidas, conexiones y suscripciones.
+- Scripts SQL en `server/sql/` (`001` a `009`) para creación y verificación de tablas.
 - Health check: `GET /api/health` → `almacenamiento: postgresql`.
 
 ### Fase 5 — Cultura, mapa comunitario y eventos comerciales
@@ -129,6 +129,13 @@ No linkeamos cuentas institucionales de Instagram o similares (decisión de marc
 - **Economía de espacio en El viaje (móvil)**: se quitó el hero “Menos scroll. Más ciudad.” del formulario; la toolbar (contexto + progreso) queda sticky y las tarjetas de energía aparecen en grilla 2×2 apenas debajo de la pregunta, sin scroll previo.
 - **Revisión de comunicación (microcopy)**: unificación a **sentence case** en títulos, convención **El viaje** (mayúscula/minúscula) reservando `EL VIAJE` para eyebrows, `Mapa de salidas` y `con peques` en minúscula, y `<title>` normalizados al patrón `Página — Así Salgo!`.
 
+### Fase 8 — Robustez de fuentes y cierre operativo
+- Adapter de Rosario reforzado con reintentos, timeout, hosts alternativos (`.gob.ar`/`.gov.ar`) y estrategia de consulta dual (filtrada + amplia con filtrado local).
+- Cache temporal en memoria por `momento` para servir última agenda válida cuando la fuente externa está inestable.
+- Avisos diferenciados al usuario según fuente efectiva (en vivo, cache o fallback público).
+- Endpoint de diagnóstico de desarrollo `/api/debug/rosario` (bloqueado en producción) para monitorear estado de consumo.
+- Ajuste de acceso: registro obligatorio en el flujo general y excepción explícita para `sobre.html` (accesible sin login).
+
 ---
 
 ## 6. Problemas que encontramos y cómo los resolvimos
@@ -146,7 +153,7 @@ No linkeamos cuentas institucionales de Instagram o similares (decisión de marc
 | Tarjetas de El viaje sin click | `ciudades.js` redeclaraba constantes globales → SyntaxError en scripts siguientes | IIFE en `ciudades.js`; solo `window.CiudadesApi` expuesto |
 | Producción servía `viaje.html` viejo | Render cacheaba/servía el HTML previo con el hero “Menos scroll” | Ocultado por CSS + nav condicional, validación del frontend en el build (`render.yaml`) y `Cache-Control: no-cache` para HTML |
 | Títulos en “Title Case” | Mayúscula en cada palabra (calco del inglés) se veía poco profesional | Convención sentence case + nomenclatura única (**El viaje**) en todo el sitio |
-| JSON efímero en Render | Newsletter y salidas se pierden al redeploy | Perfiles ya en Supabase; migración del resto marcada como opcional |
+| Persistencia parcial en producción | Parte de comunidad/contacto podía caer en JSON local | Migración completada a Supabase para perfiles, salidas, conexiones y suscripciones; JSON queda como fallback local |
 
 ---
 
@@ -181,7 +188,7 @@ No integramos APIs de venta de entradas porque no ofrecen tier gratuito estable 
 
 ### Listo en producción
 - URL pública con HTTPS (Render) con deploy automático desde `main`.
-- Perfiles persistentes en PostgreSQL (Supabase).
+- Perfiles, salidas, conexiones y suscripciones persistentes en PostgreSQL (Supabase).
 - El viaje, mapa de lugares, comunidad Salen, compartir, Este mes, Con peques.
 - Mapa comunitario en Salen con capa cultural y contador de compañeros.
 - Símbolo **puerta** (logo, CTA inicio, Me sumo) con animación de apertura.
@@ -193,6 +200,9 @@ No integramos APIs de venta de entradas porque no ofrecen tier gratuito estable 
 - Ajustes CSS tablet 768–1024 px.
 - Seguridad: CORS restrictivo en POST, cabeceras HTTP, límite body 32 KB, URLs `http`/`https` only.
 - Proporciones responsive: `frontend/css/responsive.css` (móvil, tablet, pantallas grandes).
+- Robustez Rosario en producción: reintentos + timeout + host alternativo + cache temporal + avisos de degradación.
+- Endpoint dev de diagnóstico: `/api/debug/rosario` (404 en producción).
+- Flujo de acceso actualizado: sin "explorar sin identificarme" y `sobre.html` accesible sin login.
 
 ### Pendiente para cerrar el TP (manual / evidencia)
 - **Revisar proporciones** en 360 / 768 / 1024 / 1440 px (checklist §3 en `docs/entrega-evidencias.md`).
@@ -200,7 +210,7 @@ No integramos APIs de venta de entradas porque no ofrecen tier gratuito estable 
 - Testing cross-browser y tablet 768–1024 px con checklist del mismo doc.
 - Auditoría Lighthouse accesibilidad con captura (objetivo ≥ 90 en Home).
 - Completar casillas de verificación en producción (OG en WhatsApp, hover puerta, formularios).
-- Opcional: migrar newsletter y salidas comunidad a Supabase.
+- Registrar capturas del monitoreo y validación de persistencia en Supabase para anexar a la defensa.
 
 ---
 
@@ -208,7 +218,7 @@ No integramos APIs de venta de entradas porque no ofrecen tier gratuito estable 
 
 ```bash
 cd server
-cp .env.example .env    # opcional: DATABASE_URL para Supabase local
+# crear archivo .env con DATABASE_URL=postgresql://... (opcional para Supabase local)
 npm install
 node index.js
 ```

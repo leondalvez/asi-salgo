@@ -4,7 +4,7 @@ Checklist para cerrar los ítems que la cátedra suele pedir con captura o infor
 
 **URL de producción:** https://asi-salgo.onrender.com  
 **URL local:** http://localhost:3000  
-**Última verificación automática:** julio 2026 — producción responde; El viaje muestra tarjetas como botones y skip link visible; títulos y microcopy unificados en sentence case.
+**Última verificación automática:** noviembre 2026 — producción responde con PostgreSQL activo, flujo de acceso actualizado (Sobre público), y robustez Rosario con fallback/cache validada.
 
 ---
 
@@ -101,8 +101,8 @@ Verificado en código y desplegado en Render (julio 2026):
 - [x] Skip link “Saltar al contenido” presente.
 - [x] Solo Rosario y Buenos Aires en selector de ciudad.
 - [ ] Logo puerta abre al hover (verificar visualmente tras cold start).
-- [ ] Formulario contacto envía sin error.
-- [ ] Me sumo en Salen actualiza lista.
+- [x] Formulario contacto persiste en PostgreSQL (tabla `suscripciones`).
+- [x] Me sumo en Salen actualiza lista y persiste en PostgreSQL.
 
 ---
 

@@ -212,7 +212,7 @@ function construirPie() {
 
 function requiereRegistroPrevio() {
     const paginaActual = document.body?.dataset?.pagina || '';
-    return paginaActual !== 'entrar';
+    return paginaActual !== 'entrar' && paginaActual !== 'sobre';
 }
 
 function redirigirAEntradaSiFaltaPerfil() {

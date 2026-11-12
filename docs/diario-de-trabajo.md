@@ -6,6 +6,21 @@ temas); acá el orden es por día.
 
 ---
 
+## 2026-11-12 — Cierre técnico de producción (Render + Supabase + robustez Rosario)
+
+### Hecho
+- Deploy actualizado en Render con conexión operativa a Supabase vía Session Pooler.
+- Persistencia validada en PostgreSQL para perfiles, salidas, conexiones y suscripciones.
+- Corrección de incidencias de entorno: autenticación GitHub, `.vs/` fuera de staging, y ajuste de `DATABASE_URL`.
+- Robustez de agenda Rosario: reintentos, timeout, host alternativo, cache temporal por momento y avisos de degradación.
+- Endpoint de diagnóstico en desarrollo: `GET /api/debug/rosario` (bloqueado en producción).
+- Ajuste de acceso: se eliminó “Explorar sin identificarme” en `entrar.html`; `sobre.html` quedó accesible sin login.
+
+### Pendiente
+- Adjuntar evidencias visuales finales (DB, errores corregidos y checks de producción) en la carpeta de defensa.
+
+---
+
 ## 2026-07-29 — Supabase: salidas y conexiones
 
 ### Hecho

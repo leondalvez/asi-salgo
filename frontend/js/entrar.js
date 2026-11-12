@@ -145,12 +145,6 @@ function inicializarEntrar() {
         boton.addEventListener('click', () => cambiarVista(boton.dataset.vista));
     });
 
-    document.querySelector('#link-saltar')?.addEventListener('click', (evento) => {
-        evento.preventDefault();
-        window.PerfilApi.marcarSaltarEntrada();
-        irADestino();
-    });
-
     actualizarPreview();
 }
 
