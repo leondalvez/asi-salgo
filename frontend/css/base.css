@@ -39,6 +39,23 @@
     --ancho-contenido: min(100%, 760px);
     --ancho-amplio: min(100%, 980px);
     --ancho-max-sitio: 1100px;
+    --texto-sobre-acento: #0d0f0d;
+}
+
+html[data-tema='claro'] {
+    --fondo-principal: #f3f0e7;
+    --fondo-card: #ffffff;
+    --fondo-card-hover: #f7f3ea;
+    --fondo-card-seleccionada: #efe9dc;
+    --linea: #d8d0bf;
+    --linea-fuerte: #bfb39e;
+    --texto-principal: #262117;
+    --texto-titulo: #16120c;
+    --texto-secundario: #5f5545;
+    --texto-tenue: #7a6d5a;
+    --sombra-card: 0 1px 2px rgba(24, 19, 11, .08), 0 14px 34px -20px rgba(24, 19, 11, .18);
+    --sombra-card-hover: 0 3px 8px rgba(24, 19, 11, .1), 0 24px 54px -26px rgba(24, 19, 11, .26);
+    --texto-sobre-acento: #1a150d;
 }
 
 *,
@@ -72,7 +89,10 @@ body {
     width: 100%;
     max-width: 100%;
     overflow-x: clip;
-    transition: background-image var(--anim-lenta) var(--anim-suave);
+    transition:
+        background-color var(--anim-media) var(--anim-suave),
+        background-image var(--anim-lenta) var(--anim-suave),
+        color var(--anim-media) var(--anim-suave);
 }
 
 #nav-raiz,
@@ -115,7 +135,7 @@ textarea {
     border: 1px solid var(--color-card, var(--color-desenchufarme));
     border-radius: 999px;
     box-shadow: 0 10px 26px -12px color-mix(in srgb, var(--color-card, #000) 70%, transparent);
-    color: var(--fondo-principal);
+    color: var(--texto-sobre-acento);
     cursor: pointer;
     display: inline-flex;
     font-weight: 600;

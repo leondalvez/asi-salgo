@@ -12,6 +12,14 @@ const iconosEtiqueta = {
     lugar: '○'
 };
 
+const iconosMeta = {
+    entradaGratis: '🟢',
+    entradaPaga: '🎟️',
+    peques: '👨‍👩‍👧',
+    distancia: '📍',
+    etiqueta: '🏷️'
+};
+
 const CIUDAD_ETIQUETA = window.CiudadesApi?.CIUDAD_ETIQUETA || {
     rosario: 'Rosario',
     'buenos-aires': 'Buenos Aires'
@@ -33,51 +41,40 @@ function textoLimpio(texto = '') {
     return texto.replace(/\s+/g, ' ').trim();
 }
 
-function necesitaVerMas(evento) {
-    if (!evento?.link) return false;
-    return textoLimpio(evento.descripcion).length > MAX_DESCRIPCION;
-}
-
 function iconoPuertaSumo() {
     return window.PuertaApi?.renderIcono() || '';
 }
 
-function accionesTarjeta(evento, enlaceLlegar, enlaceVerMas = null) {
+function accionesTarjeta(evento, enlaceLlegar) {
     if (!evento?.id) {
         return enlaceLlegar
             ? `<div class="evento-card__acciones">
-                <a class="evento-card__opcion" href="${enlaceLlegar}" target="_blank" rel="noopener noreferrer">Cómo llegar</a>
+                <a class="evento-card__opcion" href="${enlaceLlegar}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">🧭</span><span>Llegar</span></a>
                </div>`
             : '';
     }
 
     const id = escaparHtml(evento.id);
-    const linkSeguro = esUrlSegura(enlaceVerMas);
-    const verMas =
-        linkSeguro && necesitaVerMas(evento)
-            ? `<a class="evento-card__opcion evento-card__opcion--info" href="${escaparHtml(linkSeguro)}" target="_blank" rel="noopener noreferrer">Ver más</a>`
-            : '';
 
     return `
         <div class="evento-card__acciones">
-            <a class="evento-card__opcion" href="${enlaceLlegar}" target="_blank" rel="noopener noreferrer">Cómo llegar</a>
+            <a class="evento-card__opcion" href="${enlaceLlegar}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">🧭</span><span>Llegar</span></a>
             <button class="evento-card__opcion evento-card__opcion--compartir" type="button"
                 data-compartir-toggle data-evento-id="${id}"
                 aria-expanded="false" aria-controls="redes-${id}">
-                Compartir
+                <span aria-hidden="true">↗</span><span>Compartir</span>
             </button>
             <button class="evento-card__opcion evento-card__opcion--salen" type="button"
                 data-publicar-salida data-evento-id="${id}">
                 ${iconoPuertaSumo()}<span>Me sumo</span>
             </button>
-            ${verMas}
         </div>
         <div class="evento-card__redes" id="redes-${id}" data-evento-id="${id}" hidden>
-            <span class="evento-card__redes-etiqueta">Invitar por</span>
+            <span class="evento-card__redes-etiqueta">Invitar</span>
+            <button class="evento-card__red-social evento-card__red-social--sistema" type="button"
+                data-compartir="sistema" data-evento-id="${id}"><span aria-hidden="true">📲</span><span>Compartir…</span></button>
             <button class="evento-card__red-social evento-card__red-social--whatsapp" type="button"
-                data-compartir="whatsapp" data-evento-id="${id}">WhatsApp</button>
-            <button class="evento-card__red-social evento-card__red-social--instagram" type="button"
-                data-compartir="instagram" data-evento-id="${id}">Instagram</button>
+                data-compartir="whatsapp" data-evento-id="${id}"><span aria-hidden="true">💬</span><span>WhatsApp</span></button>
         </div>
     `;
 }
@@ -113,6 +110,25 @@ function recortarTexto(texto = '', maximo) {
     if (!limpio) return '';
     if (limpio.length <= maximo) return limpio;
     return `${limpio.slice(0, maximo - 1).trim()}…`;
+}
+
+function descripcionExpandible(texto, fallback = '', maximo = MAX_DESCRIPCION) {
+    const base = textoLimpio(texto || fallback);
+    if (!base) return '';
+
+    const corta = recortarTexto(base, maximo);
+    const esLarga = corta.length < base.length;
+
+    if (!esLarga) {
+        return `<p class="evento-card__descripcion">${escaparHtml(base)}</p>`;
+    }
+
+    return `
+        <details class="evento-card__descripcion-detalle">
+            <summary>${escaparHtml(corta)} <span class="evento-card__descripcion-toggle">Ver más</span></summary>
+            <p class="evento-card__descripcion evento-card__descripcion--completa">${escaparHtml(base)}</p>
+        </details>
+    `;
 }
 
 function formatearFecha(fechaIso) {
@@ -156,33 +172,53 @@ function enlaceComoLlegar(item, ciudad, ubicacion) {
 
 function etiquetaEntrada(evento) {
     if (evento.gratis === true) return 'Gratis';
-    if (evento.gratis === false) return 'Entrada paga';
+    if (evento.gratis === false) return 'Paga';
     return null;
+}
+
+function badgeMeta(icono, texto, clase = '') {
+    return `<span class="evento-card__badge ${clase}"><span aria-hidden="true">${icono}</span><span>${escaparHtml(texto)}</span></span>`;
+}
+
+function etiquetaTipo(tipo = '') {
+    const limpio = String(tipo || 'evento').replace(/-/g, ' ').trim();
+    if (!limpio) return 'Evento';
+    return limpio.charAt(0).toUpperCase() + limpio.slice(1);
 }
 
 function crearTarjetaEvento(evento, contexto = {}) {
     registrarSalida(evento, contexto);
     const { ciudad, ubicacion } = contexto;
-    const etiquetas = (evento.etiquetas || []).slice(0, 2).join(' · ');
+    const etiquetas = (evento.etiquetas || []).slice(0, 2);
     const entrada = etiquetaEntrada(evento);
     const icono = iconosEtiqueta[evento.tipo] || '◉';
     const titulo = escaparHtml(recortarTexto(evento.titulo, MAX_TITULO));
-    const descripcionCorta = escaparHtml(recortarTexto(evento.descripcion, MAX_DESCRIPCION));
+    const descripcion = descripcionExpandible(evento.descripcion);
     const distancia = formatearDistancia(evento.distanciaKm);
     const direccion = escaparHtml(evento.direccion || evento.lugar || CIUDAD_ETIQUETA[ciudad] || '');
     const ruta = enlaceComoLlegar(evento, ciudad, ubicacion);
 
+    const badges = [
+        badgeMeta(icono, etiquetaTipo(evento.tipo), 'evento-card__badge--tipo'),
+        entrada
+            ? badgeMeta(
+                entrada === 'Gratis' ? iconosMeta.entradaGratis : iconosMeta.entradaPaga,
+                entrada,
+                entrada === 'Gratis' ? 'evento-card__badge--gratis' : 'evento-card__badge--paga'
+            )
+            : '',
+        evento.aptoNinos === true ? badgeMeta(iconosMeta.peques, 'Con peques', 'evento-card__badge--peques') : '',
+        distancia ? badgeMeta(iconosMeta.distancia, distancia, 'evento-card__badge--distancia') : '',
+        ...etiquetas.map((item) => badgeMeta(iconosMeta.etiqueta, item, 'evento-card__badge--etiqueta'))
+    ].filter(Boolean).join('');
+
     return `
         <article class="evento-card">
             <div class="evento-card__meta">
-                <span class="evento-card__icono" aria-hidden="true">${icono}</span>
-                ${entrada ? `<span>${entrada}</span>` : ''}
-                ${evento.aptoNinos === true ? '<span class="evento-card__chip-peques">Para ir con peques</span>' : ''}
-                ${distancia ? `<span>${distancia}</span>` : ''}
-                ${etiquetas ? `<span>${escaparHtml(etiquetas)}</span>` : ''}
+                ${badges}
             </div>
             <h3 class="evento-card__titulo">${titulo}</h3>
-            ${descripcionCorta ? `<p class="evento-card__descripcion">${descripcionCorta}</p>` : ''}
+            ${descripcion}
             <dl class="evento-card__datos">
                 <div>
                     <dt>Cuándo</dt>
@@ -193,7 +229,7 @@ function crearTarjetaEvento(evento, contexto = {}) {
                     <dd>${direccion}</dd>
                 </div>
             </dl>
-            ${accionesTarjeta(evento, ruta, evento.link)}
+            ${accionesTarjeta(evento, ruta)}
         </article>
     `;
 }
@@ -218,9 +254,9 @@ function crearTarjetaComplemento(lugar, contexto = {}) {
     registrarSalida(eventoCompartible, contexto);
     const icono = iconosEtiqueta[lugar.tipo] || iconosEtiqueta.lugar;
     const titulo = escaparHtml(recortarTexto(lugar.titulo, MAX_TITULO));
-    const descripcion = escaparHtml(
-        recortarTexto(lugar.descripcion, MAX_DESCRIPCION) ||
-            'Espacio público para salir sin complicarte.'
+    const descripcion = descripcionExpandible(
+        lugar.descripcion,
+        'Espacio público para salir sin complicarte.'
     );
     const distancia = formatearDistancia(lugar.distanciaKm);
     const direccion = escaparHtml(lugar.direccion || lugar.barrio || CIUDAD_ETIQUETA[ciudad] || '');
@@ -235,7 +271,7 @@ function crearTarjetaComplemento(lugar, contexto = {}) {
                 ${distancia ? `<span>${distancia}</span>` : ''}
             </div>
             <h3 class="evento-card__titulo">${titulo}</h3>
-            <p class="evento-card__descripcion">${descripcion}</p>
+            ${descripcion}
             <dl class="evento-card__datos">
                 <div>
                     <dt>Ubicación</dt>

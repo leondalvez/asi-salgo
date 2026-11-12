@@ -1,7 +1,7 @@
 /**
- * Compartir una salida por WhatsApp, Instagram (vía Web Share API en mobile)
- * o copiando el link. Crea un snapshot en el servidor para que WhatsApp
- * pueda previsualizar la tarjeta con og:title / og:description.
+ * Compartir una salida por WhatsApp o por Web Share API (cuando existe).
+ * Si el navegador no soporta share nativo, copiamos la invitación y
+ * mostramos un asistente con accesos a Instagram, Facebook y X.
  *
  * Encapsulado en IIFE para no chocar con const globales de eventos.js
  * (p. ej. CIUDAD_ETIQUETA) cuando ambos scripts cargan en la misma página.
@@ -95,7 +95,7 @@
         return url;
     }
 
-    async function invitarPorInstagram(evento) {
+    async function compartirConSistema(evento) {
         const url = await crearEnlaceCompartido(evento);
         const mensaje = armarMensaje(evento, url);
 
@@ -106,32 +106,124 @@
                     text: mensaje,
                     url
                 });
-                return { url, modo: 'nativo' };
+                return { modo: 'nativo', url, mensaje };
             } catch (error) {
                 if (error?.name === 'AbortError') {
-                    return { url, modo: 'cancelado' };
+                    return { modo: 'cancelado', url, mensaje };
                 }
             }
         }
 
         await copiarTexto(mensaje);
-        return { url, modo: 'copiado' };
+        return { modo: 'fallback', url, mensaje };
+    }
+
+    let estadoAsistenteFallback = null;
+
+    function cerrarAsistenteFallback() {
+        if (!estadoAsistenteFallback?.raiz) return;
+        estadoAsistenteFallback.raiz.hidden = true;
+        document.body.classList.remove('modal-abierto');
+    }
+
+    function asegurarAsistenteFallback() {
+        if (estadoAsistenteFallback?.raiz) return estadoAsistenteFallback;
+
+        const raiz = document.createElement('div');
+        raiz.className = 'compartir-modal';
+        raiz.hidden = true;
+        raiz.innerHTML = `
+            <div class="compartir-modal__fondo" data-fallback-cerrar></div>
+            <section class="compartir-modal__panel" role="dialog" aria-modal="true" aria-labelledby="compartir-fallback-titulo">
+                <button class="compartir-modal__cerrar" type="button" data-fallback-cerrar aria-label="Cerrar asistente">×</button>
+                <p class="compartir-modal__eyebrow">Compartir</p>
+                <h3 id="compartir-fallback-titulo">Tu navegador no tiene share nativo</h3>
+                <p class="compartir-modal__descripcion">Copiamos la invitación. Podés abrir una red y pegar el texto.</p>
+                <div class="compartir-modal__preview" data-fallback-preview></div>
+                <div class="compartir-modal__acciones-principales">
+                    <button class="compartir-modal__accion" type="button" data-fallback-copiar>Copiar invitación</button>
+                    <button class="compartir-modal__accion compartir-modal__accion--ok" type="button" data-fallback-listo>Listo</button>
+                </div>
+                <div class="compartir-modal__enlaces">
+                    <a class="compartir-modal__red" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">Instagram</a>
+                    <a class="compartir-modal__red" href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook</a>
+                    <a class="compartir-modal__red" href="https://x.com/" target="_blank" rel="noopener noreferrer">X</a>
+                </div>
+            </section>
+        `;
+
+        document.body.appendChild(raiz);
+
+        const botonCopiar = raiz.querySelector('[data-fallback-copiar]');
+        const botonListo = raiz.querySelector('[data-fallback-listo]');
+
+        raiz.addEventListener('click', (evento) => {
+            if (evento.target.closest('[data-fallback-cerrar]')) {
+                cerrarAsistenteFallback();
+            }
+        });
+
+        botonCopiar?.addEventListener('click', async () => {
+            if (!estadoAsistenteFallback?.mensaje) return;
+            try {
+                await copiarTexto(estadoAsistenteFallback.mensaje);
+                window.Toast?.mostrar('Invitación copiada. Elegí una red y pegala.', { tipo: 'exito' });
+            } catch (error) {
+                window.Toast?.mostrar('No pudimos copiar. Probá de nuevo.', { tipo: 'error' });
+            }
+        });
+
+        botonListo?.addEventListener('click', () => {
+            cerrarAsistenteFallback();
+        });
+
+        document.addEventListener('keydown', (evento) => {
+            if (evento.key === 'Escape' && !raiz.hidden) {
+                cerrarAsistenteFallback();
+            }
+        });
+
+        estadoAsistenteFallback = {
+            raiz,
+            mensaje: '',
+            preview: raiz.querySelector('[data-fallback-preview]')
+        };
+
+        return estadoAsistenteFallback;
+    }
+
+    function mostrarAsistenteFallback(mensaje) {
+        const asistente = asegurarAsistenteFallback();
+        asistente.mensaje = mensaje;
+        if (asistente.preview) {
+            asistente.preview.textContent = mensaje;
+        }
+        asistente.raiz.hidden = false;
+        document.body.classList.add('modal-abierto');
+    }
+
+    function selectorSeguroParaId(id = '') {
+        if (window.CSS?.escape) return `#redes-${window.CSS.escape(id)}`;
+        return `#redes-${String(id).replace(/[^a-zA-Z0-9_-]/g, '\\$&')}`;
     }
 
     function cerrarMenusCompartir(exceptoId = null) {
         document.querySelectorAll('[data-compartir-toggle]').forEach((boton) => {
             const id = boton.dataset.eventoId;
-            const panel = document.querySelector(`#redes-${CSS.escape(id)}`);
+            const panel = document.querySelector(selectorSeguroParaId(id));
             const abierto = id === exceptoId;
             boton.setAttribute('aria-expanded', String(abierto));
             boton.classList.toggle('activo', abierto);
-            if (panel) panel.hidden = !abierto;
+            if (panel) {
+                panel.hidden = !abierto;
+                panel.style.display = abierto ? 'flex' : 'none';
+            }
         });
     }
 
     function alternarMenuCompartir(boton) {
         const id = boton.dataset.eventoId;
-        const panel = document.querySelector(`#redes-${CSS.escape(id)}`);
+        const panel = document.querySelector(selectorSeguroParaId(id));
         if (!panel) return;
 
         const vaAbrir = panel.hidden;
@@ -141,6 +233,17 @@
     function enlazarBotonesCompartir(contenedor, obtenerEvento) {
         if (!contenedor || contenedor.dataset.compartirListo === 'true') return;
         contenedor.dataset.compartirListo = 'true';
+
+        contenedor.querySelectorAll('[data-compartir-toggle]').forEach((boton) => {
+            const id = boton.dataset.eventoId;
+            const panel = contenedor.querySelector(selectorSeguroParaId(id));
+            boton.setAttribute('aria-expanded', 'false');
+            boton.classList.remove('activo');
+            if (panel) {
+                panel.hidden = true;
+                panel.style.display = 'none';
+            }
+        });
 
         contenedor.addEventListener('click', async (eventoClick) => {
             const toggle = eventoClick.target.closest('[data-compartir-toggle]');
@@ -169,16 +272,14 @@
                     await invitarPorWhatsApp(payload.evento);
                     window.Toast?.mostrar('Abrimos WhatsApp con tu invitación.', { tipo: 'exito' });
                     cerrarMenusCompartir();
-                } else if (modo === 'instagram') {
-                    const resultado = await invitarPorInstagram(payload.evento);
+                } else if (modo === 'sistema') {
+                    const resultado = await compartirConSistema(payload.evento);
                     if (resultado.modo === 'cancelado') return;
                     if (resultado.modo === 'nativo') {
-                        window.Toast?.mostrar('Elegí Instagram u otra app para invitar.', { tipo: 'info' });
+                        window.Toast?.mostrar('Se abrió el menú nativo para compartir.', { tipo: 'exito' });
                     } else {
-                        window.Toast?.mostrar(
-                            'Copiamos el mensaje. Pegalo en Instagram para invitar a salir.',
-                            { tipo: 'exito' }
-                        );
+                        window.Toast?.mostrar('Invitación copiada. Elegí red para pegarla.', { tipo: 'info' });
+                        mostrarAsistenteFallback(resultado.mensaje);
                     }
                     cerrarMenusCompartir();
                 }
@@ -205,7 +306,7 @@
         armarMensaje,
         crearEnlaceCompartido,
         invitarPorWhatsApp,
-        invitarPorInstagram,
+        compartirConSistema,
         enlazarBotonesCompartir
     };
 })();

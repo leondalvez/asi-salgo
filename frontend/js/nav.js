@@ -56,6 +56,35 @@ const ICONOS_NAV = {
         </svg>`
 };
 
+const CLAVE_TEMA = 'asi-salgo-tema';
+
+function temaPreferido() {
+    try {
+        const guardado = localStorage.getItem(CLAVE_TEMA);
+        if (guardado === 'claro' || guardado === 'oscuro') return guardado;
+    } catch {
+        /* sin storage disponible */
+    }
+    return 'oscuro';
+}
+
+function aplicarTema(tema) {
+    const raiz = document.documentElement;
+    if (tema === 'claro') {
+        raiz.setAttribute('data-tema', 'claro');
+    } else {
+        raiz.removeAttribute('data-tema');
+    }
+}
+
+function guardarTema(tema) {
+    try {
+        localStorage.setItem(CLAVE_TEMA, tema);
+    } catch {
+        /* sin storage disponible */
+    }
+}
+
 function leerPerfilNav() {
     try {
         const datos = JSON.parse(localStorage.getItem('asi-salgo-perfil') || 'null');
@@ -144,6 +173,10 @@ function construirNav(paginaActual) {
                 <span class="lector">Abrir menú</span>
                 <span class="nav-sitio__icono-menu" aria-hidden="true"><span></span><span></span><span></span></span>
             </button>
+            <button class="nav-sitio__tema" type="button" aria-pressed="false" title="Cambiar paleta">
+                <span class="nav-sitio__tema-icono" aria-hidden="true">☀️</span>
+                <span class="nav-sitio__tema-texto">Modo claro</span>
+            </button>
             ${construirChipPerfil(paginaActual)}
             <nav class="nav-sitio__menu" id="nav-sitio-menu" aria-label="Navegación principal">
                 <div class="nav-sitio__grupo">${enlaces}</div>
@@ -177,6 +210,23 @@ function construirPie() {
     `;
 }
 
+function requiereRegistroPrevio() {
+    const paginaActual = document.body?.dataset?.pagina || '';
+    return paginaActual !== 'entrar';
+}
+
+function redirigirAEntradaSiFaltaPerfil() {
+    if (!requiereRegistroPrevio()) return false;
+
+    const perfil = leerPerfilNav();
+    if (perfil) return false;
+
+    const ruta = window.location.pathname.split('/').pop() || 'index.html';
+    const destino = `${ruta}${window.location.search || ''}${window.location.hash || ''}`;
+    window.location.replace(`entrar.html?dest=${encodeURIComponent(destino)}`);
+    return true;
+}
+
 function prepararAccesibilidad() {
     const main = document.querySelector('main');
     if (!main) return;
@@ -207,6 +257,8 @@ function prepararAccesibilidad() {
 }
 
 function inicializarNav() {
+    if (redirigirAEntradaSiFaltaPerfil()) return;
+
     prepararAccesibilidad();
 
     const raiz = document.querySelector('#nav-raiz');
@@ -214,12 +266,33 @@ function inicializarNav() {
     const paginaActual = document.body.dataset.pagina || '';
 
     if (raiz) {
+        aplicarTema(temaPreferido());
         raiz.innerHTML = construirNav(paginaActual);
         raiz.setAttribute('role', 'banner');
 
         const nav = raiz.querySelector('.nav-sitio') || raiz;
         const disparador = raiz.querySelector('.nav-sitio__disparador');
         const menu = raiz.querySelector('.nav-sitio__menu');
+        const botonTema = raiz.querySelector('.nav-sitio__tema');
+
+        const sincronizarBotonTema = () => {
+            const claroActivo = document.documentElement.getAttribute('data-tema') === 'claro';
+            if (!botonTema) return;
+            botonTema.setAttribute('aria-pressed', String(claroActivo));
+            botonTema.querySelector('.nav-sitio__tema-icono').textContent = claroActivo ? '🌙' : '☀️';
+            botonTema.querySelector('.nav-sitio__tema-texto').textContent = claroActivo ? 'Modo oscuro' : 'Modo claro';
+            botonTema.title = claroActivo ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro';
+        };
+
+        botonTema?.addEventListener('click', () => {
+            const claroActivo = document.documentElement.getAttribute('data-tema') === 'claro';
+            const siguiente = claroActivo ? 'oscuro' : 'claro';
+            aplicarTema(siguiente);
+            guardarTema(siguiente);
+            sincronizarBotonTema();
+        });
+
+        sincronizarBotonTema();
 
         const cerrarMenu = () => {
             menu?.classList.remove('abierto');

@@ -1,7 +1,7 @@
 /* --- Pantalla de entrada / identidad --- */
 
 .pagina-entrar {
-    width: min(100%, 480px);
+    width: var(--ancho-amplio);
 }
 
 .entrar-panel {
@@ -9,7 +9,8 @@
     border: 1px solid var(--linea);
     border-radius: var(--radio-card);
     box-shadow: var(--sombra-card);
-    margin-top: 24px;
+    margin: 24px auto 0;
+    max-width: 560px;
     padding: 28px 24px 32px;
 }
 

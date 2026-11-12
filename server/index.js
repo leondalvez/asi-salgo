@@ -4,6 +4,7 @@ const fs = require('fs');
 const { fetchEventosCiudad } = require('./lib/fetchEventosCiudad');
 const { fetchClima } = require('./adapters/clima');
 const { fetchComplementos, fetchLugaresParaMapa } = require('./adapters/lugares');
+const { obtenerDiagnosticoRosario } = require('./adapters/rosario');
 const { esCiudadValida, listarCiudades, IDS_CIUDADES } = require('./lib/ciudades');
 const { ordenarPorRelevancia } = require('./lib/relevancia');
 const { geocodificarEventos } = require('./lib/geocoder');
@@ -11,6 +12,7 @@ const { agregarSuscripcion } = require('./lib/suscripciones');
 const { crearCompartido, obtenerCompartido } = require('./lib/compartir');
 const { crearSalida, listarSalidas, sumarse, enriquecerCoordenadasSalidas } = require('./lib/salidasComunidad');
 const { registrarPerfil, ingresarPerfil } = require('./lib/perfiles');
+const { agregarConexion, listarConexiones } = require('./lib/conexiones');
 const { probarConexion, estaConfigurada } = require('./lib/db');
 const {
     enriquecerConDistancia,
@@ -23,6 +25,9 @@ const {
     esUrlSegura,
     leerCuerpo
 } = require('./lib/seguridad');
+const { cargarEnvLocal } = require('./lib/env');
+
+cargarEnvLocal();
 
 const PUERTO = process.env.PORT || 3000;
 const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
@@ -465,7 +470,7 @@ function manejarPaginaCompartir(id, req, respuesta) {
 
 async function manejarSalenListado(url, respuesta, req) {
     const ciudad = url.searchParams.get('ciudad') || '';
-    let salidas = listarSalidas({ ciudad: ciudad || undefined });
+    let salidas = await listarSalidas({ ciudad: ciudad || undefined });
     await conLimiteDeTiempo(
         enriquecerCoordenadasSalidas(salidas, { maxConsultas: 4 }).catch((error) => {
             console.warn('[salen/geocoder]', error.message);
@@ -482,7 +487,7 @@ async function manejarSalenPublicar(req, respuesta) {
         const datos = await leerJson(req, respuesta);
         if (!datos) return;
 
-        const salida = crearSalida(datos);
+        const salida = await crearSalida(datos);
         enviarJson(respuesta, 201, { ok: true, salida }, req, { escritura: true });
     } catch (error) {
         const codigo = error.codigo || 400;
@@ -533,7 +538,7 @@ async function manejarSalenSumo(id, req, respuesta) {
         const datos = await leerJson(req, respuesta);
         if (!datos) return;
 
-        const resultado = sumarse(id, datos);
+        const resultado = await sumarse(id, datos);
         enviarJson(respuesta, 200, {
             ok: true,
             yaEstaba: resultado.yaEstaba,
@@ -547,6 +552,39 @@ async function manejarSalenSumo(id, req, respuesta) {
     }
 }
 
+async function manejarConexionesListado(url, respuesta, req) {
+    const perfilId = url.searchParams.get('perfilId') || '';
+
+    try {
+        const conexiones = await listarConexiones(perfilId);
+        enviarJson(respuesta, 200, { total: conexiones.length, conexiones }, req);
+    } catch (error) {
+        const codigo = error.codigo || 400;
+        enviarJson(respuesta, codigo, { error: error.message || 'No pudimos listar tus conexiones.' }, req);
+    }
+}
+
+async function manejarConexionesAgregar(req, respuesta) {
+    if (rechazarEscritura(req, respuesta)) return;
+
+    try {
+        const datos = await leerJson(req, respuesta);
+        if (!datos) return;
+
+        const conexion = await agregarConexion(datos.perfilId, {
+            conectadoId: datos.conectadoId,
+            nombre: datos.nombre,
+            codigo: datos.codigo
+        });
+        enviarJson(respuesta, 201, { ok: true, conexion }, req, { escritura: true });
+    } catch (error) {
+        const codigo = error.codigo || 400;
+        enviarJson(respuesta, codigo, { error: error.message || 'No pudimos agregar la conexión.' }, req, {
+            escritura: true
+        });
+    }
+}
+
 async function manejarSuscripcion(req, respuesta) {
     if (rechazarEscritura(req, respuesta)) return;
 
@@ -554,7 +592,7 @@ async function manejarSuscripcion(req, respuesta) {
         const datos = await leerJson(req, respuesta);
         if (!datos) return;
 
-        const registro = agregarSuscripcion(datos);
+        const registro = await agregarSuscripcion(datos);
         enviarJson(respuesta, 201, { ok: true, suscripcion: { email: registro.email } }, req, { escritura: true });
     } catch (error) {
         const codigo = error.codigo || 400;
@@ -599,6 +637,19 @@ const servidor = http.createServer(async (req, respuesta) => {
         return;
     }
 
+    if (req.method === 'GET' && url.pathname === '/api/debug/rosario') {
+        if (process.env.NODE_ENV === 'production') {
+            enviarJson(respuesta, 404, { error: 'No encontrado.' }, req);
+            return;
+        }
+
+        enviarJson(respuesta, 200, {
+            ok: true,
+            diagnostico: obtenerDiagnosticoRosario()
+        }, req);
+        return;
+    }
+
     if (req.method === 'GET' && url.pathname === '/api/lugares') {
         await manejarLugares(url, respuesta, req);
         return;
@@ -621,6 +672,16 @@ const servidor = http.createServer(async (req, respuesta) => {
 
     if (req.method === 'POST' && url.pathname === '/api/perfiles/ingresar') {
         await manejarPerfilIngresar(req, respuesta);
+        return;
+    }
+
+    if (req.method === 'GET' && url.pathname === '/api/conexiones') {
+        await manejarConexionesListado(url, respuesta, req);
+        return;
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/conexiones') {
+        await manejarConexionesAgregar(req, respuesta);
         return;
     }
 
@@ -665,7 +726,11 @@ const servidor = http.createServer(async (req, respuesta) => {
     respuesta.end('Method not allowed');
 });
 
-servidor.listen(PUERTO, () => {
-    console.log(`Así Salgo! listo en http://localhost:${PUERTO}`);
-    console.log('API eventos: http://localhost:' + PUERTO + '/api/eventos?ciudad=rosario&momento=hoy');
-});
+if (require.main === module) {
+    servidor.listen(PUERTO, () => {
+        console.log(`Así Salgo! listo en http://localhost:${PUERTO}`);
+        console.log('API eventos: http://localhost:' + PUERTO + '/api/eventos?ciudad=rosario&momento=hoy');
+    });
+}
+
+module.exports = { servidor };

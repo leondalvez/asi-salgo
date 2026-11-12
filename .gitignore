@@ -6,3 +6,4 @@ server/.env
 
 # Material personal para preparar la defensa (no forma parte de la entrega)
 _defensa/
+.vs/

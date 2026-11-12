@@ -316,10 +316,10 @@
         width: min(100%, 900px);
     }
 
-    /* Energías en 4 columnas, planes en 3 */
+    /* Energías en 3 columnas para ganar legibilidad, planes en 3 */
     .grid-viaje {
         gap: 16px;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .opciones-plan {
@@ -380,6 +380,7 @@
 
     .grid-viaje {
         gap: 20px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
     .card-viaje {

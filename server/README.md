@@ -75,18 +75,27 @@ Contacto documentado del WS municipal: `equipoweb@rosario.gob.ar`
 
 Este proxy Node reemplaza temporalmente el backend Java planificado. La interfaz unificada ya está pensada para migrar a JAX-RS + PostGIS más adelante.
 
-## Supabase / PostgreSQL (perfiles de comunidad)
+## Supabase / PostgreSQL
 
-Los perfiles (`Camila#4821`) se guardan en **PostgreSQL** cuando existe la variable `DATABASE_URL`. Si no está configurada, el server usa JSON local (`server/data/`) para desarrollo.
+Los perfiles (`Camila#4821`), las **salidas de comunidad** (Salen), las
+**conexiones** y las **suscripciones** (Contacto) se guardan en PostgreSQL cuando
+existe `DATABASE_URL`. Si no está configurada, el server usa JSON local
+(`server/data/`) para desarrollo.
 
-### 1. Crear la tabla en Supabase
+### 1. Crear tablas en Supabase
 
-1. Entrá a [supabase.com](https://supabase.com) → tu proyecto.
-2. Menú izquierdo → **SQL Editor** → **New query**.
-3. Abrí en tu proyecto el archivo `server/sql/001-crear-tabla-perfiles.sql`.
-4. Copiá **todo** el SQL (desde `CREATE TABLE` hasta el `CREATE INDEX`) y pegá en Supabase.
-5. Clic **Run** → debe decir **Success**.
-6. Opcional: ejecutá `002-verificar-perfiles.sql` para confirmar que la tabla existe.
+Ejecutá en orden en **SQL Editor** → **New query** → **Run**:
+
+| Paso | Archivo | Qué crea |
+|------|---------|----------|
+| 1 | `sql/001-crear-tabla-perfiles.sql` | Tabla `perfiles` |
+| 2 | `sql/002-verificar-perfiles.sql` | Verificación (opcional) |
+| 3 | `sql/004-crear-tablas-salidas.sql` | Tablas `salidas` y `salida_sumados` |
+| 4 | `sql/005-crear-tabla-conexiones.sql` | Tabla `conexiones` |
+| 5 | `sql/006-verificar-salidas.sql` | Verificación (opcional) |
+| 6 | `sql/007-datos-demo-salidas-opcional.sql` | Datos de prueba (opcional) |
+| 7 | `sql/008-crear-tabla-suscripciones.sql` | Tabla `suscripciones` |
+| 8 | `sql/009-verificar-suscripciones.sql` | Verificación (opcional) |
 
 ### 2. Obtener la connection string
 
@@ -146,7 +155,25 @@ Deberías ver:
 
 Si dice `"almacenamiento": "json_local"` o `"sin DATABASE_URL"`, la variable no llegó al server.
 
-### Flujo de registro (sin cambiar el frontend)
+### Comunidad
+
+```http
+GET  /api/salen?ciudad=rosario
+POST /api/salen
+POST /api/salen/:id/sumo
+POST /api/perfiles/registrar
+POST /api/perfiles/ingresar
+GET  /api/conexiones?perfilId=abc123
+POST /api/conexiones
+```
+
+Body de `POST /api/conexiones`:
+
+```json
+{ "perfilId": "tu-id", "nombre": "Camila", "codigo": "2847" }
+```
+
+### Flujo de registro
 
 1. Usuario elige nombre en `entrar.html`.
 2. `POST /api/perfiles/registrar` → `INSERT` en tabla `perfiles`.

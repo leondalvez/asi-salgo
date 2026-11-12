@@ -1,8 +1,14 @@
+/**
+ * Salidas de la comunidad (Salen): publicar planes y sumarse con Me sumo.
+ * Persistencia: PostgreSQL si hay DATABASE_URL; si no, JSON local.
+ */
+
 const fs = require('fs');
-const { esCiudadValida } = require('./ciudades');
 const path = require('path');
 const crypto = require('crypto');
+const { esCiudadValida } = require('./ciudades');
 const { geocodificarItems } = require('./geocoder');
+const db = require('./db');
 
 const ARCHIVO = path.join(__dirname, '..', 'data', 'salidas-comunidad.json');
 const MAX_SALIDAS = 120;
@@ -24,8 +30,9 @@ const SEMILLAS = [
         eventoId: null,
         creado: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
         sumados: [
-            { nombre: 'Nico#9103', perfilId: 'demo-nico', fecha: new Date(Date.now() - 90 * 60 * 1000).toISOString() },
-            { nombre: 'Lu#5521', perfilId: 'demo-lu', fecha: new Date(Date.now() - 40 * 60 * 1000).toISOString() }
+            { nombre: 'Camila#2847', perfilId: 'demo-camila', fecha: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), esOrganizador: true },
+            { nombre: 'Nico#9103', perfilId: 'demo-nico', fecha: new Date(Date.now() - 90 * 60 * 1000).toISOString(), esOrganizador: false },
+            { nombre: 'Lu#5521', perfilId: 'demo-lu', fecha: new Date(Date.now() - 40 * 60 * 1000).toISOString(), esOrganizador: false }
         ]
     },
     {
@@ -42,9 +49,46 @@ const SEMILLAS = [
         lng: -60.6393,
         eventoId: null,
         creado: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-        sumados: [{ nombre: 'Juli#7782', perfilId: 'demo-juli', fecha: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString() }]
+        sumados: [
+            { nombre: 'Martín#3310', perfilId: 'demo-martin', fecha: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), esOrganizador: true },
+            { nombre: 'Juli#7782', perfilId: 'demo-juli', fecha: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), esOrganizador: false }
+        ]
     }
 ];
+
+const SQL_SALIDA_BASE = `
+  SELECT
+    s.id,
+    s.perfil_id,
+    s.organizador,
+    s.titulo,
+    s.descripcion,
+    s.ciudad,
+    s.fecha_inicio,
+    s.lugar,
+    s.direccion,
+    s.lat,
+    s.lng,
+    s.evento_id,
+    s.creado,
+    COALESCE(
+      (
+        SELECT json_agg(
+          json_build_object(
+            'nombre', ss.nombre,
+            'perfilId', ss.perfil_id,
+            'fecha', ss.fecha,
+            'esOrganizador', ss.es_organizador
+          )
+          ORDER BY ss.fecha
+        )
+        FROM salida_sumados ss
+        WHERE ss.salida_id = s.id
+      ),
+      '[]'::json
+    ) AS sumados
+  FROM salidas s
+`;
 
 function limpiarTexto(texto = '', maximo = 280) {
     return texto
@@ -53,23 +97,6 @@ function limpiarTexto(texto = '', maximo = 280) {
         .replace(/\s+/g, ' ')
         .trim()
         .slice(0, maximo);
-}
-
-function leerTodas() {
-    try {
-        const contenido = fs.readFileSync(ARCHIVO, 'utf-8');
-        const datos = JSON.parse(contenido);
-        if (Array.isArray(datos) && datos.length) return datos;
-    } catch (error) {
-        /* archivo nuevo */
-    }
-    guardarTodas(SEMILLAS.map((item) => ({ ...item })));
-    return SEMILLAS.map((item) => ({ ...item }));
-}
-
-function guardarTodas(salidas) {
-    fs.mkdirSync(path.dirname(ARCHIVO), { recursive: true });
-    fs.writeFileSync(ARCHIVO, JSON.stringify(salidas, null, 2), 'utf-8');
 }
 
 function nuevoId() {
@@ -87,6 +114,59 @@ function mismaPersona(persona, perfilId, nombreVisible) {
     const nombreA = (persona.nombre || '').toLowerCase();
     const nombreB = (nombreVisible || '').toLowerCase();
     return nombreA && nombreB && nombreA === nombreB;
+}
+
+function filaASalida(fila) {
+    const sumados = Array.isArray(fila.sumados) ? fila.sumados : [];
+    return {
+        id: fila.id,
+        perfilId: fila.perfil_id || null,
+        organizador: fila.organizador,
+        titulo: fila.titulo,
+        descripcion: fila.descripcion || '',
+        ciudad: fila.ciudad,
+        fechaInicio: fila.fecha_inicio instanceof Date
+            ? fila.fecha_inicio.toISOString()
+            : fila.fecha_inicio || null,
+        lugar: fila.lugar || '',
+        direccion: fila.direccion || '',
+        lat: fila.lat ?? null,
+        lng: fila.lng ?? null,
+        eventoId: fila.evento_id || null,
+        creado: fila.creado instanceof Date ? fila.creado.toISOString() : fila.creado,
+        sumados: sumados.map((persona) => ({
+            nombre: persona.nombre,
+            perfilId: persona.perfilId || persona.perfil_id || null,
+            fecha: persona.fecha instanceof Date ? persona.fecha.toISOString() : persona.fecha,
+            esOrganizador: Boolean(persona.esOrganizador ?? persona.es_organizador)
+        })),
+        totalSumados: sumados.length
+    };
+}
+
+function conTotalSumados(salida) {
+    return {
+        ...salida,
+        totalSumados: (salida.sumados || []).length
+    };
+}
+
+function leerTodasJson() {
+    try {
+        const contenido = fs.readFileSync(ARCHIVO, 'utf-8');
+        const datos = JSON.parse(contenido);
+        if (Array.isArray(datos) && datos.length) return datos;
+    } catch (error) {
+        /* archivo nuevo */
+    }
+    const semillas = SEMILLAS.map((item) => ({ ...item }));
+    guardarTodasJson(semillas);
+    return semillas;
+}
+
+function guardarTodasJson(salidas) {
+    fs.mkdirSync(path.dirname(ARCHIVO), { recursive: true });
+    fs.writeFileSync(ARCHIVO, JSON.stringify(salidas, null, 2), 'utf-8');
 }
 
 function validarPublicar(datos) {
@@ -119,7 +199,20 @@ function validarPublicar(datos) {
     };
 }
 
-function crearSalida(datos) {
+async function obtenerSalidaPorId(id, cliente = null) {
+    const consulta = `${SQL_SALIDA_BASE} WHERE s.id = $1 LIMIT 1`;
+    const parametros = [id];
+
+    if (cliente) {
+        const { rows } = await cliente.query(consulta, parametros);
+        return rows.length ? filaASalida(rows[0]) : null;
+    }
+
+    const { rows } = await db.consultar(consulta, parametros);
+    return rows.length ? filaASalida(rows[0]) : null;
+}
+
+async function crearSalida(datos) {
     const { valido, error, salida } = validarPublicar(datos);
     if (!valido) {
         const err = new Error(error);
@@ -127,38 +220,85 @@ function crearSalida(datos) {
         throw err;
     }
 
-    const registros = leerTodas();
+    const id = nuevoId();
+    const ahora = new Date().toISOString();
+
+    if (db.estaConfigurada()) {
+        await db.transaccion(async (cliente) => {
+            await cliente.query(
+                `insert into public.salidas (
+                    id, perfil_id, organizador, titulo, descripcion, ciudad,
+                    fecha_inicio, lugar, direccion, lat, lng, evento_id, creado
+                ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+                [
+                    id,
+                    salida.perfilId,
+                    salida.organizador,
+                    salida.titulo,
+                    salida.descripcion,
+                    salida.ciudad,
+                    salida.fechaInicio,
+                    salida.lugar,
+                    salida.direccion,
+                    salida.lat,
+                    salida.lng,
+                    salida.eventoId,
+                    ahora
+                ]
+            );
+
+            await cliente.query(
+                `insert into public.salida_sumados (salida_id, perfil_id, nombre, es_organizador, fecha)
+                 values ($1, $2, $3, true, $4)`,
+                [id, salida.perfilId, salida.organizador, ahora]
+            );
+        });
+
+        return obtenerSalidaPorId(id);
+    }
+
+    const registros = leerTodasJson();
     const registro = {
-        id: nuevoId(),
+        id,
         ...salida,
-        creado: new Date().toISOString(),
+        creado: ahora,
         sumados: [{
             nombre: salida.organizador,
             perfilId: salida.perfilId,
-            fecha: new Date().toISOString(),
+            fecha: ahora,
             esOrganizador: true
         }]
     };
 
     registros.unshift(registro);
-    guardarTodas(registros.slice(0, MAX_SALIDAS));
-    return registro;
+    guardarTodasJson(registros.slice(0, MAX_SALIDAS));
+    return conTotalSumados(registro);
 }
 
-function listarSalidas({ ciudad } = {}) {
-    let salidas = leerTodas();
+async function listarSalidas({ ciudad } = {}) {
+    if (db.estaConfigurada()) {
+        const filtroCiudad = ciudad && esCiudadValida(ciudad) ? ciudad : null;
+        const { rows } = await db.consultar(
+            `${SQL_SALIDA_BASE}
+             WHERE ($1::text IS NULL OR s.ciudad = $1)
+             ORDER BY s.creado DESC
+             LIMIT $2`,
+            [filtroCiudad, MAX_SALIDAS]
+        );
+        return rows.map(filaASalida);
+    }
+
+    let salidas = leerTodasJson();
     if (ciudad && esCiudadValida(ciudad)) {
         salidas = salidas.filter((item) => item.ciudad === ciudad);
     }
+
     return salidas
-        .map((item) => ({
-            ...item,
-            totalSumados: (item.sumados || []).length
-        }))
+        .map(conTotalSumados)
         .sort((a, b) => new Date(b.creado).getTime() - new Date(a.creado).getTime());
 }
 
-function sumarse(id, datos) {
+async function sumarse(id, datos) {
     const nombreVisible = normalizarNombreVisible(datos.nombre || datos.nombreVisible);
     const perfilId = limpiarTexto(datos.perfilId, 32) || null;
 
@@ -168,7 +308,52 @@ function sumarse(id, datos) {
         throw err;
     }
 
-    const registros = leerTodas();
+    if (db.estaConfigurada()) {
+        const existente = await db.consultar(
+            `select id from public.salidas where id = $1 limit 1`,
+            [id]
+        );
+        if (!existente.rows.length) {
+            const err = new Error('Esta salida ya no está disponible.');
+            err.codigo = 404;
+            throw err;
+        }
+
+        const duplicado = await db.consultar(
+            `select 1 from public.salida_sumados
+             where salida_id = $1
+               and (
+                 ($2::text is not null and perfil_id = $2)
+                 or lower(nombre) = lower($3)
+               )
+             limit 1`,
+            [id, perfilId, nombreVisible]
+        );
+        if (duplicado.rows.length) {
+            return { salida: await obtenerSalidaPorId(id), yaEstaba: true };
+        }
+
+        const conteo = await db.consultar(
+            `select count(*)::int as total from public.salida_sumados where salida_id = $1`,
+            [id]
+        );
+        if (conteo.rows[0].total >= MAX_SUMADOS_POR_SALIDA) {
+            const err = new Error('Esta salida ya llegó al cupo de gente sumada.');
+            err.codigo = 409;
+            throw err;
+        }
+
+        const ahora = new Date().toISOString();
+        await db.consultar(
+            `insert into public.salida_sumados (salida_id, perfil_id, nombre, es_organizador, fecha)
+             values ($1, $2, $3, false, $4)`,
+            [id, perfilId, nombreVisible, ahora]
+        );
+
+        return { salida: await obtenerSalidaPorId(id), yaEstaba: false };
+    }
+
+    const registros = leerTodasJson();
     const indice = registros.findIndex((item) => item.id === id);
     if (indice === -1) {
         const err = new Error('Esta salida ya no está disponible.');
@@ -181,7 +366,7 @@ function sumarse(id, datos) {
     const yaSumado = sumados.some((persona) => mismaPersona(persona, perfilId, nombreVisible));
 
     if (yaSumado) {
-        return { salida, yaEstaba: true };
+        return { salida: conTotalSumados(salida), yaEstaba: true };
     }
 
     if (sumados.length >= MAX_SUMADOS_POR_SALIDA) {
@@ -198,9 +383,9 @@ function sumarse(id, datos) {
     });
     salida.sumados = sumados;
     registros[indice] = salida;
-    guardarTodas(registros);
+    guardarTodasJson(registros);
 
-    return { salida, yaEstaba: false };
+    return { salida: conTotalSumados(salida), yaEstaba: false };
 }
 
 /**
@@ -222,11 +407,23 @@ async function enriquecerCoordenadasSalidas(salidas, { maxConsultas = 4 } = {}) 
         await geocodificarItems(grupo, ciudad, { maxConsultas });
     }
 
-    const registros = leerTodas();
+    const actualizadas = pendientes.filter((item) => item.lat != null && item.lng != null);
+    if (!actualizadas.length) return salidas;
+
+    if (db.estaConfigurada()) {
+        for (const salida of actualizadas) {
+            await db.consultar(
+                `update public.salidas set lat = $2, lng = $3 where id = $1`,
+                [salida.id, salida.lat, salida.lng]
+            );
+        }
+        return salidas;
+    }
+
+    const registros = leerTodasJson();
     let huboCambios = false;
 
-    for (const salida of pendientes) {
-        if (salida.lat == null || salida.lng == null) continue;
+    for (const salida of actualizadas) {
         const indice = registros.findIndex((item) => item.id === salida.id);
         if (indice === -1) continue;
         registros[indice].lat = salida.lat;
@@ -235,7 +432,7 @@ async function enriquecerCoordenadasSalidas(salidas, { maxConsultas = 4 } = {}) 
     }
 
     if (huboCambios) {
-        guardarTodas(registros);
+        guardarTodasJson(registros);
     }
 
     return salidas;

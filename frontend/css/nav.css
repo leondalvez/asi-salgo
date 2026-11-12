@@ -336,6 +336,49 @@
     transform: translateY(-7px) rotate(-45deg);
 }
 
+/* --- Toggle de paleta --- */
+
+.nav-sitio__tema {
+    align-items: center;
+    background: color-mix(in srgb, var(--fondo-card) 78%, transparent);
+    border: 1px solid var(--linea);
+    border-radius: 999px;
+    color: var(--texto-secundario);
+    cursor: pointer;
+    display: inline-flex;
+    flex-shrink: 0;
+    font-size: .76rem;
+    font-weight: 600;
+    gap: 7px;
+    padding: 7px 12px;
+    transition:
+        border-color var(--anim-rapida) var(--anim-suave),
+        color var(--anim-rapida) var(--anim-suave),
+        background var(--anim-rapida) var(--anim-suave);
+}
+
+.nav-sitio__tema:hover,
+.nav-sitio__tema:focus-visible {
+    border-color: var(--linea-fuerte);
+    color: var(--texto-principal);
+    outline: none;
+}
+
+.nav-sitio__tema[aria-pressed='true'] {
+    background: color-mix(in srgb, var(--color-card, var(--color-desenchufarme)) 16%, transparent);
+    border-color: color-mix(in srgb, var(--color-card, var(--color-desenchufarme)) 40%, var(--linea));
+    color: var(--texto-titulo);
+}
+
+.nav-sitio__tema-icono {
+    font-size: .9rem;
+    line-height: 1;
+}
+
+.nav-sitio__tema-texto {
+    white-space: nowrap;
+}
+
 /* --- Perfil en la barra --- */
 
 .nav-sitio__perfil {
@@ -432,6 +475,14 @@
     .nav-sitio__contenido {
         gap: 10px;
         padding: 12px 14px;
+    }
+
+    .nav-sitio__tema {
+        padding: 6px 9px;
+    }
+
+    .nav-sitio__tema-texto {
+        display: none;
     }
 
     .nav-sitio__perfil {

@@ -6,6 +6,21 @@ temas); acá el orden es por día.
 
 ---
 
+## 2026-07-29 — Supabase: salidas y conexiones
+
+### Hecho
+- SQL: `004` salidas + sumados, `005` conexiones, `006` verificación, `007` demo.
+- `salidasComunidad.js` migrado a PostgreSQL con fallback JSON (mismo patrón que perfiles).
+- `conexiones.js` + API `GET/POST /api/conexiones` (agregar por nombre + código).
+- `db.js`: helper `transaccion()` para publicar salidas atómicamente.
+
+### Pendiente
+- UI en Salen para agregar conexiones y ver red.
+- Migrar suscripciones (contacto) a Supabase.
+- Ejecutar SQL 004–005 en el proyecto Supabase de producción.
+
+---
+
 ## 2026-07-29 — Post entrega 50% / retome
 
 ### Hecho

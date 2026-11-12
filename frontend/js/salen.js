@@ -39,10 +39,10 @@ function inicializarMapaSalen() {
 
     mapaSalen = L.map('mapa-salen', { scrollWheelZoom: false }).setView(CENTRO_POR_CIUDAD.rosario, 13);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(mapaSalen);
 
     capaComunidad = L.layerGroup().addTo(mapaSalen);
@@ -550,6 +550,11 @@ function aplicarBorradorEvento(evento) {
 }
 
 function inicializarSalen() {
+    const destino = window.location.hash === '#publicar' ? 'salen.html#publicar' : 'salen.html';
+    if (window.PerfilApi?.redirigirSiFalta?.(destino)) {
+        return;
+    }
+
     window.CiudadesApi?.poblarSelect(document.querySelector('#filtro-ciudad'), {
         valorInicial: 'rosario',
         incluirTodas: true
