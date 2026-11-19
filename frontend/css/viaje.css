@@ -1142,6 +1142,10 @@ body[data-pagina='viaje'] header.titulo-viaje {
     display: none;
 }
 
+.evento-card__descripcion-resumen {
+    color: var(--texto-secundario);
+}
+
 .evento-card__descripcion-toggle {
     color: var(--color-card, var(--texto-principal));
     font-size: .8rem;
@@ -1151,12 +1155,22 @@ body[data-pagina='viaje'] header.titulo-viaje {
     text-underline-offset: 2px;
 }
 
+.evento-card__descripcion-toggle--cerrar {
+    display: none;
+}
+
 .evento-card__descripcion--completa {
     margin-top: 8px;
 }
 
-.evento-card__descripcion-detalle[open] .evento-card__descripcion-toggle {
+.evento-card__descripcion-detalle[open] .evento-card__descripcion-resumen,
+.evento-card__descripcion-detalle[open] .evento-card__descripcion-toggle--abrir {
     display: none;
+}
+
+.evento-card__descripcion-detalle[open] .evento-card__descripcion-toggle--cerrar {
+    display: inline;
+    margin-left: 0;
 }
 
 .evento-card__detalle {

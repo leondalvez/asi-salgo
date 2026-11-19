@@ -125,7 +125,11 @@ function descripcionExpandible(texto, fallback = '', maximo = MAX_DESCRIPCION) {
 
     return `
         <details class="evento-card__descripcion-detalle">
-            <summary>${escaparHtml(corta)} <span class="evento-card__descripcion-toggle">Ver más</span></summary>
+            <summary>
+                <span class="evento-card__descripcion-resumen">${escaparHtml(corta)}</span>
+                <span class="evento-card__descripcion-toggle evento-card__descripcion-toggle--abrir">Ver más</span>
+                <span class="evento-card__descripcion-toggle evento-card__descripcion-toggle--cerrar">Ver menos</span>
+            </summary>
             <p class="evento-card__descripcion evento-card__descripcion--completa">${escaparHtml(base)}</p>
         </details>
     `;
