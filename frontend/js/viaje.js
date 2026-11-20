@@ -51,6 +51,8 @@ const respuestas = {
     ciudad: 'rosario'
 };
 
+let viajeCargando = false;
+
 const CIUDADES = window.CiudadesApi?.CIUDAD_ETIQUETA || {
     rosario: 'Rosario',
     'buenos-aires': 'Buenos Aires'
@@ -226,6 +228,15 @@ function mostrarCargaEventos() {
 }
 
 async function mostrarResultado() {
+    if (viajeCargando) return;
+    viajeCargando = true;
+
+    const botonDescubrir = document.querySelector('#descubrir');
+    if (botonDescubrir) {
+        botonDescubrir.disabled = true;
+        botonDescubrir.setAttribute('aria-busy', 'true');
+    }
+
     const momento = {
         hoy: 'hoy',
         manana: 'mañana',
@@ -268,6 +279,12 @@ async function mostrarResultado() {
         document.querySelector('#seccion-complementos').hidden = true;
         document.querySelector('#contexto-clima').hidden = true;
         estado.textContent = 'No pudimos cargar tu salida.';
+    } finally {
+        viajeCargando = false;
+        if (botonDescubrir) {
+            botonDescubrir.disabled = false;
+            botonDescubrir.removeAttribute('aria-busy');
+        }
     }
 }
 

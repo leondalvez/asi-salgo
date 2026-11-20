@@ -527,14 +527,31 @@ async function buscarEventos({ ciudad, momento, plan, distancia, energia, perfil
         params.set('lng', String(ubicacion.lng));
     }
 
-    const respuesta = await fetch(`${API_BASE}/api/eventos?${params}`);
+    const controlador = new AbortController();
+    const timeout = window.setTimeout(() => controlador.abort(), 20000);
 
-    if (!respuesta.ok) {
-        const error = await respuesta.json().catch(() => ({}));
-        throw new Error(error.error || 'No pudimos cargar tu salida.');
+    try {
+        const respuesta = await fetch(`${API_BASE}/api/eventos?${params}`, {
+            signal: controlador.signal
+        });
+
+        if (!respuesta.ok) {
+            const error = await respuesta.json().catch(() => ({}));
+            throw new Error(error.error || 'No pudimos cargar tu salida.');
+        }
+
+        return respuesta.json();
+    } catch (error) {
+        if (error?.name === 'AbortError') {
+            throw new Error('La búsqueda está tardando demasiado. Probá de nuevo en unos segundos.');
+        }
+        if (error instanceof TypeError) {
+            throw new Error('No hay conexión con el servidor en este momento.');
+        }
+        throw error;
+    } finally {
+        window.clearTimeout(timeout);
     }
-
-    return respuesta.json();
 }
 
 window.EventosApi = {
