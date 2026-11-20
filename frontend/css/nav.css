@@ -22,7 +22,7 @@
         border-color var(--anim-media) var(--anim-suave),
         box-shadow var(--anim-media) var(--anim-suave);
     width: 100%;
-    z-index: 60;
+    z-index: 2000;
 }
 
 .nav-sitio--desplazado {
