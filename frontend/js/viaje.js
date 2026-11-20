@@ -273,12 +273,21 @@ async function mostrarResultado() {
         window.EventosApi.renderizarEventos(document.querySelector('#lista-eventos'), payload);
         estado.textContent = 'Tu recorrido está listo.';
     } catch (error) {
-        document.querySelector('#lista-eventos').innerHTML =
-            `<p class="eventos-error">${error.message}</p>`;
-        document.querySelector('#lista-complementos').innerHTML = '';
-        document.querySelector('#seccion-complementos').hidden = true;
-        document.querySelector('#contexto-clima').hidden = true;
-        estado.textContent = 'No pudimos cargar tu salida.';
+        const puedeUsarOfflineRosario = respuestas.ciudad === 'rosario' &&
+            typeof window.EventosApi?.construirPayloadOfflineRosario === 'function';
+
+        if (puedeUsarOfflineRosario) {
+            const payloadOffline = window.EventosApi.construirPayloadOfflineRosario();
+            window.EventosApi.renderizarEventos(document.querySelector('#lista-eventos'), payloadOffline);
+            estado.textContent = 'Mostrando opciones guardadas sin conexión.';
+        } else {
+            document.querySelector('#lista-eventos').innerHTML =
+                `<p class="eventos-error">${error.message}</p>`;
+            document.querySelector('#lista-complementos').innerHTML = '';
+            document.querySelector('#seccion-complementos').hidden = true;
+            document.querySelector('#contexto-clima').hidden = true;
+            estado.textContent = 'No pudimos cargar tu salida.';
+        }
     } finally {
         viajeCargando = false;
         if (botonDescubrir) {

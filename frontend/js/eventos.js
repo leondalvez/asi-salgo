@@ -28,6 +28,85 @@ const CIUDAD_ETIQUETA = window.CiudadesApi?.CIUDAD_ETIQUETA || {
 /** Cache en memoria para enlazar botones de compartir con el evento completo. */
 const cacheSalidas = new Map();
 
+const EVENTOS_RESPALDO_ROSARIO = [
+    {
+        id: 'fallback-evento-rosario-macro',
+        titulo: 'Recorrido en el Macro',
+        descripcion: 'Muestra de arte contemporáneo para cortar la rutina y salir con un plan cultural.',
+        lugar: 'Macro',
+        direccion: 'Bv. Oroño y el río, Rosario',
+        tipo: 'evento',
+        etiquetas: ['Arte y cultura'],
+        gratis: null,
+        aptoNinos: null
+    },
+    {
+        id: 'fallback-evento-rosario-espana',
+        titulo: 'Tarde cultural en Parque de España',
+        descripcion: 'Espacio para muestras, actividades y paseo frente al río.',
+        lugar: 'Centro Cultural Parque de España',
+        direccion: 'Sarmiento y el río, Rosario',
+        tipo: 'evento',
+        etiquetas: ['Cultural'],
+        gratis: null,
+        aptoNinos: null
+    },
+    {
+        id: 'fallback-evento-rosario-independencia',
+        titulo: 'Salida activa en Parque Independencia',
+        descripcion: 'Plan al aire libre para caminar, tomar mate y activar una salida simple.',
+        lugar: 'Parque Independencia',
+        direccion: 'Av. Pellegrini y Bv. Oroño, Rosario',
+        tipo: 'evento',
+        etiquetas: ['Al aire libre'],
+        gratis: true,
+        aptoNinos: true
+    }
+];
+
+const LUGARES_OFFLINE_ROSARIO = [
+    {
+        id: 'offline-rosario-macro',
+        titulo: 'Macro — Museo de Arte Contemporáneo',
+        descripcion: 'Plan cultural frente al río para recorrer muestras y cortar la rutina.',
+        direccion: 'Bv. Oroño y el río, Rosario',
+        barrio: 'Pichincha',
+        etiqueta: 'cultural',
+        tipo: 'cultural',
+        transporte: []
+    },
+    {
+        id: 'offline-rosario-independencia',
+        titulo: 'Parque Independencia',
+        descripcion: 'Clásico para caminar, tomar aire y organizar una salida tranquila.',
+        direccion: 'Av. Pellegrini y Bv. Oroño, Rosario',
+        barrio: 'Parque Independencia',
+        etiqueta: 'parques',
+        tipo: 'parque',
+        transporte: []
+    },
+    {
+        id: 'offline-rosario-espana',
+        titulo: 'Centro Cultural Parque de España',
+        descripcion: 'Espacio cultural con programación variada y buen entorno para encontrarse.',
+        direccion: 'Sarmiento y el río, Rosario',
+        barrio: 'Centro',
+        etiqueta: 'cultural',
+        tipo: 'cultural',
+        transporte: []
+    },
+    {
+        id: 'offline-rosario-bandera',
+        titulo: 'Parque Nacional a la Bandera',
+        descripcion: 'Punto abierto para pasear y activar plan al aire libre sin depender de agenda.',
+        direccion: 'Av. Belgrano 600, Rosario',
+        barrio: 'Centro',
+        etiqueta: 'parques',
+        tipo: 'parque',
+        transporte: []
+    }
+];
+
 function registrarSalida(evento, contexto = {}) {
     if (!evento?.id) return;
     cacheSalidas.set(evento.id, { evento, contexto });
@@ -408,8 +487,31 @@ function renderizarEventos(contenedor, payload) {
         avisos.push('Planes cerca: datos públicos de espacios y clima.');
     }
 
+    const usarEventosRespaldoRosario =
+        ciudad === 'rosario' &&
+        !eventos.length &&
+        (String(aviso || '').toLowerCase().includes('agenda municipal') || fuente === 'offline-rosario-local');
+
+    const eventosRender = usarEventosRespaldoRosario
+        ? EVENTOS_RESPALDO_ROSARIO.map((evento) => ({
+            ...evento,
+            ciudad: 'rosario',
+            fechaInicio: null,
+            fechaFin: null,
+            fuente: 'respaldo-local-rosario',
+            lat: null,
+            lng: null,
+            distanciaKm: null,
+            link: null
+        }))
+        : eventos;
+
+    if (usarEventosRespaldoRosario) {
+        avisos.push('Mostramos eventos de respaldo de Rosario mientras la agenda municipal se normaliza.');
+    }
+
     const contexto = { ciudad, ubicacion };
-    const sinEventos = !eventos.length;
+    const sinEventos = !eventosRender.length;
     const conComplementos = complementos.length > 0;
 
     if (sinEventos && conComplementos) {
@@ -422,7 +524,7 @@ function renderizarEventos(contenedor, payload) {
             </p>
         `;
     } else {
-        contenedor.innerHTML = eventos
+        contenedor.innerHTML = eventosRender
             .map((evento) => crearTarjetaEvento(evento, contexto))
             .join('');
     }
@@ -510,6 +612,35 @@ function obtenerUbicacion() {
     });
 }
 
+function construirPayloadOfflineRosario() {
+    return {
+        ciudad: 'rosario',
+        eventos: EVENTOS_RESPALDO_ROSARIO.map((evento) => ({
+            ...evento,
+            ciudad: 'rosario',
+            fechaInicio: null,
+            fechaFin: null,
+            fuente: 'respaldo-local-rosario',
+            lat: null,
+            lng: null,
+            distanciaKm: null,
+            link: null
+        })),
+        complementos: LUGARES_OFFLINE_ROSARIO.map((lugar) => ({
+            ...lugar,
+            ciudad: 'rosario',
+            fuente: 'offline-rosario-local',
+            lat: null,
+            lng: null,
+            distanciaKm: null
+        })),
+        clima: null,
+        fuente: 'offline-rosario-local',
+        aviso: 'Sin conexión. Te mostramos lugares de Rosario guardados en la app para que puedas salir igual.',
+        ubicacion: null
+    };
+}
+
 async function buscarEventos({ ciudad, momento, plan, distancia, energia, perfil, ubicacion }) {
     const params = new URLSearchParams({
         ciudad,
@@ -557,5 +688,6 @@ async function buscarEventos({ ciudad, momento, plan, distancia, energia, perfil
 window.EventosApi = {
     buscarEventos,
     renderizarEventos,
-    obtenerUbicacion
+    obtenerUbicacion,
+    construirPayloadOfflineRosario
 };
